@@ -8,7 +8,8 @@ from datetime import datetime
 mat1 = []
 mat2 = []
 expecting = ["Date", ["Type" , "Category"], ["Number", "Acc", "IBAN"],
-             [ "Details", "Description", "Reference", "Narrative"], ["Credit Amount", "Withdrawal", "Out"], ["In", "Debit Amount", "Received", "Deposit"]]
+             [ "Details", "Description", "Reference", "Narrative"], ["Credit Amount", "Withdrawal", "Out"], ["In", "Debit Amount", "Received", "Deposit"], "Balance"
+             ]
 
 # https://stackoverflow.com/questions/52206973/convert-different-date-formats-to-a-given-unique-date-format-in-python
 def change_type(dateList, column, dataframe):
@@ -43,23 +44,24 @@ def choose_ratio(expect):
                 mat2.append(i[0])
         else:
             highest = 0
-            highIdx = 0
+            highIdx = None
             for idx, j in enumerate(i):
                 if (j[1] > highest and j[1] >above):
                     highest = j[1]
                     highIdx = idx
-            element = i[highIdx][0]
-            mat2.append(element)
+
+            if highIdx is not None:
+                element = i[highIdx][0]
+                mat2.append(element)
 
     if (mat2[-1] == mat2[-2]):
         mat2.pop()
 
-
 choose_ratio(expecting)
 new_df = pd.read_csv("output0.csv", usecols=mat2)
+new_df = new_df[mat2]
 date_list = new_df[new_df.columns[0]].tolist()
 date_column = new_df[new_df.columns[0]]
 change_type(date_list, date_column, new_df)
-# print(new_df.columns.values)
-
-
+print(new_df.columns.values)
+print(new_df)

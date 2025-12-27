@@ -65,6 +65,7 @@ def clean_up(table, idx):
             rows_to_drop.append(j)
 
     df = df.drop(rows_to_drop)
+    df = df.drop_duplicates()
     df = df.reset_index(drop=True)
     if not df.empty:
         df = df.replace(r'\n', ' ', regex=True) 
@@ -78,14 +79,30 @@ def flavor_decision(name, idx):
     with pdfplumber.open(name) as pdf:
         page = pdf.pages[idx]
 
-        count = len(page.rects)
-    if count > 10:
+        # count = len(page.rects)
+
+        header_rects = [
+        r for r in page.rects 
+        if r['height'] > 5  # Headers have specific height
+        and r['height'] < 100  # Not too tall
+        and r['width'] < 200   # Reasonable width for a header cell
+        ]
+        print(len(header_rects))
+        im = page.to_image(resolution=150)
+        im.draw_rects(header_rects, stroke="red", stroke_width=2)
+        im.save('debug_rectangles.png')
+
+        
+        
+    if len(header_rects) > 10:
         return "lattice"
 
     return "stream"
-
-flavor_choice = flavor_decision('Statement_12_2025.pdf', 0)
-tables = run_camelot('Statement_12_2025.pdf', flavor_choice)
+# Statement_12_2025
+# fake_pdf
+# sample-tables
+flavor_choice = flavor_decision('sample-tables.pdf', 0)
+tables = run_camelot('sample-tables.pdf', flavor_choice)
 
 for idx, table in enumerate(tables):
     clean_up(table, idx)
