@@ -10,7 +10,7 @@ def find_header(df):
 
         header_Values = row.tolist()
 
-        print(header_Values)
+        # print(header_Values)
         string = True
         unique = True
         length = True
@@ -80,7 +80,7 @@ def clean_up(table, idx):
     if not df.empty:
         df = df.replace(r'\n', ' ', regex=True) 
         dataframe_list.append(df)
-        # df.to_csv(f'output{idx}.csv', index=False)
+        df.to_csv(f'output{idx}.csv', index=False)
     
     return dataframe_list
 
@@ -117,8 +117,8 @@ def flavor_decision(name, idx):
 # fake_pdf
 # sample-tables
 # KH_P_statement
-flavor_choice = flavor_decision('Statement_12_2025.pdf', 0)
-tables = run_camelot('Statement_12_2025.pdf', flavor_choice)
+flavor_choice = flavor_decision('KH_P_statement.pdf', 0)
+tables = run_camelot('KH_P_statement.pdf', flavor_choice)
 
 for idx, table in enumerate(tables):
     dataframes = clean_up(table, idx)
