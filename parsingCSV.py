@@ -23,24 +23,28 @@ class csv_parsing():
             date_column = df[df.columns[0]]
             self.change_type(date_list, date_column, df)
             new_df = self.order_dataframe(df, selected_columns)
-            new_df = new_df.loc[:,~df.columns.duplicated()].copy()
+            # new_df = new_df.loc[:,~df.columns.duplicated()].copy()
             self.df = new_df
-            print(self.df)
 
     def order_dataframe(self, df, columns):
-        extra = list(set(range(6)) - set(columns))
+        missing = sorted(list(set(range(6)) - set(columns)))
 
-        if (extra == 0):
+        if (not missing):
             return df
-        print(extra)
+        print("missing values:\n")
+        print(missing)
 
-        for i in extra:
+        extra = 0
+        for i in missing:
+            pos = i + extra
             if (i == 1):
-                df.insert(i, "Type", "")
+                df.insert(pos, "Type", "")
             elif (i == 2):
-                df.insert(i, "Description", "")
+                df.insert(pos, "Description", "")
             else:
                 raise Exception("Important column is not selected")
+            
+            extra+=1
         return df
 
     def check_date_type(self, dateList):
