@@ -19,12 +19,27 @@ class csv_parsing():
         if mat2:
             df = pd.read_csv(pdf_name, usecols=mat2)
             df = df[mat2]
+
             date_list = df[df.columns[0]].tolist()
             date_column = df[df.columns[0]]
             self.change_type(date_list, date_column, df)
+
+
             new_df = self.order_dataframe(df, selected_columns)
+
+            same = new_df[new_df.columns[-3]].equals(new_df[new_df.columns[-2]])
+            
+            if (same):
+                df.drop(df.columns[[-3]], axis=1, inplace=True)
+            else:
+                corrected = (new_df[new_df.columns[-2]].fillna(0) - new_df[new_df.columns[-3]].fillna(0))
+                pos = len(df.columns) - 3
+                df.insert(pos, "Amount", corrected)
+                df.drop(columns=[new_df.columns[-3], new_df.columns[-2]], inplace=True)
+
             # new_df = new_df.loc[:,~df.columns.duplicated()].copy()
             self.df = new_df
+            print(self.df )
 
     def order_dataframe(self, df, columns):
         missing = sorted(list(set(range(6)) - set(columns)))
