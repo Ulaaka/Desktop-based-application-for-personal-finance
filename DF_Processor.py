@@ -6,7 +6,7 @@ from decimal import Decimal
 import pandas as pd
 
 
-class csvProcessor:
+class ProcessingDF:
 
     def __init__(self, df, username, password, account_name, account_type, account_currency):
 

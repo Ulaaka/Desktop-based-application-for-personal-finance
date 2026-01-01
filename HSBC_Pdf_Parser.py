@@ -3,40 +3,25 @@ import pdfplumber
 import re 
 from datetime import datetime
 import dateutil.parser
-
+from BASE_parser import ParsingBase
 # https://github.com/Anlanther/bank-statement-converter/blob/main/src/classes/BOCStatement.py#L28
 class HSBC_PDF_CONVERSION:
     def __init__(self, pdf_name):
-        self.text = self.return_text(pdf_name)
-        self.detected_transactions = self.detect_transactions(self.text)
-        self.corrected_transaction = self.correct_transactions(self.detected_transactions)
+        text = self.return_text(pdf_name)
+        detected_transactions = self.detect_transactions(text)
+        self.corrected_transaction = self.correct_transactions(detected_transactions)
         self.classified_transactions = self.classify_transactions(self.corrected_transaction)
+        parser = ParsingBase()
 
         df = pd.DataFrame(self.classified_transactions)
+        date_list = df[df.columns[0]].tolist()
         date_column = df[df.columns[0]]
-        self.change_type(date_column, df)
-        self.unify_amount_columns(df)
+        parser.change_type(date_list, date_column, df)
+        parser.unify_amount_columns(df)
         self.df = df
 
         print(self.df.to_string(index=False))
         print("\n" + "="*100)
-
-    def unify_amount_columns(self, df):
-        same = df[df.columns[-3]].equals(df[df.columns[-2]])
-        
-        if (same):
-            df.drop(df.columns[[-3]], axis=1, inplace=True)
-        else:
-            corrected = (df[df.columns[-2]].fillna(0) - df[df.columns[-3]].fillna(0))
-            pos = len(df.columns) - 3
-            df.insert(pos, "Amount", corrected)
-            df.drop(columns=[df.columns[-3], df.columns[-2]], inplace=True)
-
-
-    def change_type(self, column, dataframe):
-        for i in column:
-            column = column.replace([i], dateutil.parser.parse(i).strftime("%d/%m/%Y"))
-        dataframe[dataframe.columns[0]] = column
 
     def return_text(self, pdf_file):
         with pdfplumber.open(pdf_file) as pdf:
