@@ -225,7 +225,7 @@ class sign_up_page(QWidget):
 
         # email input ( will add more functionalities)
         self.email = QLineEdit()
-        self.email.setPlaceholderText('email')
+        self.email.setPlaceholderText('Email')
         self.email.setStyleSheet(input_style)
         self.email.setFont(QFont('Arial', 15))
 
@@ -261,7 +261,6 @@ class sign_up_page(QWidget):
     def handle_submit(self):
         username_local = self.username.text()
         password_local = self.password.text()
-        # later to be added
         email_local = self.email.text()
         password_manager = password_class()
         sql = f"SELECT userID FROM users WHERE username = %s"
@@ -275,8 +274,8 @@ class sign_up_page(QWidget):
         if not result:
             try:
                 hashed_password = password_manager.hash_password(password_local)
-                new_sql = f"INSERT INTO users (username, hashed_password) VALUES (%s, %s)"
-                self.cursor.execute(new_sql, (username_local, hashed_password))
+                new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
+                self.cursor.execute(new_sql, (username_local, hashed_password, email_local))
                 self.db.commit()
                 self.controller.show_login()
                 print("Credentials added successfully")

@@ -9,7 +9,7 @@ import pandas as pd
 
 class ProcessingDF:
 
-    def __init__(self, df, username, password, account_name, account_type, account_currency):
+    def __init__(self, df, username, password, email,  account_name, account_type, account_currency):
 
         connection = database()
         self.db = connection.db
@@ -17,6 +17,7 @@ class ProcessingDF:
 
         self.username = username
         self.password = password
+        self.email = email
         self.acc_name = account_name
         self.acc_type = account_type
         self.acc_currency = account_currency
@@ -49,8 +50,8 @@ class ProcessingDF:
         if not result: 
             hashed_password = password_manager.hash_password(self.password)
 
-            new_sql = f"INSERT INTO users ( username, hashed_password) VALUES (%s, %s)"
-            self.cursor.execute(new_sql, (self.username, hashed_password))
+            new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
+            self.cursor.execute(new_sql, (self.username, hashed_password, self.email))
             userID = self.cursor.lastrowid
         else:
             userID = result[0]

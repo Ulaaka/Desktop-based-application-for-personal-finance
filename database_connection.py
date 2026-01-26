@@ -6,9 +6,9 @@ class database:
 
         self.db = mysql.connector.connect(
             host = "localhost",
-            user = "finance_user",
+            user = "root",
             password = "Ulaaka_1223",
-            database ="transaction_db"
+            database ="finance_db"
         )
 
         self.cursor = self.db.cursor(buffered=True)

@@ -49,6 +49,7 @@ class ParsingBase:
         return df
 
 class password_class:
+    
     def hash_password(self, password):
         return bcrypt.hashpw(password, bcrypt.gensalt())
 
