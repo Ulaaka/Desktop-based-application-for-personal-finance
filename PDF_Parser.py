@@ -8,15 +8,14 @@ from BASE_Classes import ParsingBase
 class ParsingPDF:
     def __init__(self, pdf_name):
 
-        self.flavor_choice = self.flavor_decision(pdf_name, 0)
-        self.tables = self.run_camelot(pdf_name, self.flavor_choice)
+        flavor_choice = self.flavor_decision(pdf_name, 0)
+        tables = self.run_camelot(pdf_name, flavor_choice)
         self.parser = ParsingBase()
-
-        self.dataframes_list = []
-        for idx, table in enumerate(self.tables):
-            dataframe = self.clean_up(table, idx)
-            self.dataframes_list.append(dataframe)
-            print(dataframe)
+        self.df = []
+        for idx, table in enumerate(tables):
+            dataframes = self.clean_up(table, idx)
+            for i in dataframes:
+                self.df.append(i)
 
     def find_header(self, df):
         print("----------------------------------------")
@@ -75,40 +74,40 @@ class ParsingPDF:
         header = self.find_header(df)
         df.columns = df.iloc[header]
         df = df.reset_index(drop=True) 
+
         rows_to_drop = []
 
         for j in range(len(df)):
             has_numbers = False
             row = df.iloc[j].tolist()
             for item in row:
-                if isinstance(item, (int, float)):
+                try:
+                    float(item)
                     has_numbers = True
                     break
+                except:
+                    continue
 
             if (has_numbers == False):
                 rows_to_drop.append(j)
 
         df = df.drop(rows_to_drop)
-        # df = df.drop_duplicates()
         df = df.reset_index(drop=True)
 
         if not df.empty:
             date_list = df[df.columns[0]].tolist()
             date_column = df[df.columns[0]]
-            # print(date_list)
             self.parser.change_type(date_list, date_column, df)
             df = df.replace(r'\n', ' ', regex=True) 
             dataframe_list.append(df)
+
             df.to_csv(f'output{idx}.csv', index=False)
         
         return dataframe_list
 
     def run_camelot(self, name, flavor_camelot):
         if (flavor_camelot == "stream"):
-
-            # tables = camelot.read_pdf(name, flavor=flavor_camelot, row_tol=18, column_tol=7, edge_tol=25, strip_text='\n \t', split_text=False ,pages='all')
             tables = camelot.read_pdf(name, flavor=flavor_camelot ,pages='all')
-
         else: 
             tables = camelot.read_pdf(name, flavor=flavor_camelot, pages='all')
         return tables
