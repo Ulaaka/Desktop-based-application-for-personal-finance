@@ -4,6 +4,7 @@ import csv
 import pdfplumber
 from datetime import datetime
 from BASE_Classes import ParsingBase
+import pandas as pd
 
 class ParsingPDF:
     def __init__(self, pdf_name):
@@ -14,8 +15,22 @@ class ParsingPDF:
         self.df = []
         for idx, table in enumerate(tables):
             dataframes = self.clean_up(table, idx)
-            for i in dataframes:
-                self.df.append(i)
+            for dataframe in dataframes:
+                print(dataframe)
+                columns = self.parser.choose_ratio(dataframe.columns.tolist())[0]
+
+                dataframe = dataframe[columns]
+
+                self.parser.unify_amount_columns(dataframe)
+
+                money_columns = [dataframe.columns[-1], dataframe.columns[-2]]
+                for i in money_columns:
+                    # turn the values into a str, and replace comma to convert into numeric
+                    #https://stackoverflow.com/questions/56947333/how-to-remove-commas-from-all-the-column-in-pandas-at-once
+                    dataframe[i] = pd.to_numeric(dataframe[i].astype(str).str.replace(',', ''), errors='coerce')
+
+                print(dataframe)
+                self.df.append(dataframe)
 
     def find_header(self, df):
         print("----------------------------------------")
@@ -50,9 +65,10 @@ class ParsingPDF:
             
     def clean_up(self, table, idx):
 
-        dataframe_list = []
+        #dataframe_list = []
         df = table.df
         df = df.drop_duplicates()
+
 
         for j in range(len(df)):
             for i in range(len(df.columns)):
@@ -61,6 +77,7 @@ class ParsingPDF:
                 if (len(value) > 0 ):
                     if (value[-1] == "."):
                         try:
+                            # if it was a numeric string, convert into a float
                             df.iat[j, i] = float(value[:-1].replace(",", "").replace('"', ""))
                         except:
                             df.iat[j, i] = value[:-1]
@@ -75,6 +92,7 @@ class ParsingPDF:
         df.columns = df.iloc[header]
         df = df.reset_index(drop=True) 
 
+        dataframe_list = []
         rows_to_drop = []
 
         for j in range(len(df)):

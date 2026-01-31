@@ -17,6 +17,7 @@ class query_processor:
 
     # transfer toggle = if true find the total income
     # at least one of the transfer_toggle and max_toggle should be included
+    # grouping by the type of transaction is useful too
     def total_transfer_or_extreme_value(self, username, transfer_toggle=None, max_toggle=None, account_name=None, date_lower=None, date_upper=None):
         try:
             # string to datetime conversion, could get useful
@@ -104,6 +105,63 @@ class query_processor:
             return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, account_name=account_name, date_lower=date_second, date_upper=date_second))
 
         return return_values
+    
+    def common_transactions(self, username, limit, account_name=None, transfer_toggle=None, date_lower=None, date_upper=None, filter_amount=None):
+        head_query = """
+            SELECT T.description, SUM(ABS(T.amount)) total_sent
+            FROM users U
+            JOIN accounts A ON A.userID = U.userID
+            JOIN transactions T ON T.accountID = A.accountID
+        """
+
+        where_query = f" WHERE U.username = '{username}'"
+
+        if (account_name):
+            where_query+=f" and A.account_name = '{account_name}'"
+
+        if (transfer_toggle is not None):
+            toggle = ">" if transfer_toggle else "<"
+            where_query+=f" and T.amount {toggle} 0"
+
+        if (date_lower):
+            where_query += f" and T.transaction_date >= '{date_lower}'"
+
+        if (date_upper):
+            where_query += f" and T.transaction_date <= '{date_upper}'"
+
+        tail_query = f" GROUP BY T.description ORDER BY total_sent DESC LIMIT {limit}"
+
+        if (filter_amount):
+            tail_query = f" GROUP BY T.description HAVING total_sent >= {filter_amount} ORDER BY total_sent DESC LIMIT {limit}"
+
+        query = head_query + where_query + tail_query
+        self.cursor.execute(query)
+
+        output = self.cursor.fetchall()
+        print(output)
+        return output
+
+    def find_subscriptions(self, username, account_name=None):
+        head_query = """
+            SELECT T.description, SUM(ABS(T.amount)) as total_sent, COUNT(*) count_transaction
+            FROM transactions T
+            JOIN accounts A ON T.accountID = A.accountID
+            JOIN users U ON U.userID = A.userID
+        """
+
+        where_query = f" WHERE U.username = '{username}'"
+
+        if (account_name):
+            where_query+=f" and A.account_name = '{account_name}'"
+
+        tail_query = f" GROUP BY T.description HAVING count_transaction > 3 ORDER BY total_sent DESC"
+
+        query = head_query + where_query + tail_query
+        self.cursor.execute(query)
+        output = self.cursor.fetchall()
+        print(output)
+        return output
+
 
 
 
