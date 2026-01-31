@@ -19,6 +19,6 @@ query = query_processor()
 
 #last_day = query.return_last_month("2025-11-13")
 
-exp = query.compare_range("test5", False,  "2025-11-07", "2025-12-23", "date")
+exp = query.compare_range("test5", False, "savings", "2025-11-07", "2025-12-23", "date")
 
 

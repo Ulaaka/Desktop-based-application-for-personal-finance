@@ -85,24 +85,24 @@ class query_processor:
             return first_date, last_date
 
 
-    def compare_range(self, username, transfer_toggle, date_first, date_second, range):
+    def compare_range(self, username, transfer_toggle, account_name,  date_first, date_second, range):
 
         first_dates = self.produce_dates(date_first, range)
         second_dates = self.produce_dates(date_second, range)
         return_values = []
         if (range == "year"):
 
-            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, date_lower=first_dates[0], date_upper=first_dates[1]))
-            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, date_lower=second_dates[0], date_upper=second_dates[1]))
+            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, account_name=account_name, date_lower=first_dates[0], date_upper=first_dates[1]))
+            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, account_name=account_name, date_lower=second_dates[0], date_upper=second_dates[1]))
 
         elif (range == "year_month"):
-            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, date_lower=first_dates[0], date_upper=first_dates[1]))
-            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, date_lower=second_dates[0], date_upper=second_dates[1]))
+            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, account_name=account_name, date_lower=first_dates[0], date_upper=first_dates[1]))
+            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, account_name=account_name, date_lower=second_dates[0], date_upper=second_dates[1]))
         
         elif (range == "date"):
 
-            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, date_lower=date_first, date_upper=date_first))
-            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, date_lower=date_second, date_upper=date_second))
+            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, account_name=account_name, date_lower=date_first, date_upper=date_first))
+            return_values.append(self.total_transfer_or_extreme_value(username, transfer_toggle=transfer_toggle, account_name=account_name, date_lower=date_second, date_upper=date_second))
 
         return return_values
 
