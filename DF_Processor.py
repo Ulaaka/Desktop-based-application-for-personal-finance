@@ -95,7 +95,7 @@ class ProcessingDF:
                 sql = f"INSERT INTO transactions (accountID, transaction_date, transaction_type, description, amount, balance) VALUES (%s,%s,%s,%s,%s,%s)"
                 self.cursor.execute(sql, (accountID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]),  Decimal(row[4])))
             except:
-                print("the value doesnt match")
+                print("could not execute insert_transaction")
 
     def change_to_date(self, date_string):
         date = datetime.strptime(date_string, "%d/%m/%Y")

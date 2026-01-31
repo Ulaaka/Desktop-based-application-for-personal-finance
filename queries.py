@@ -14,7 +14,6 @@ class query_processor:
         self.cursor.execute(query)
         output = self.cursor.fetchone()
         return output[0]
-        
 
     # transfer toggle = if true find the total income
     # at least one of the transfer_toggle and max_toggle should be included
