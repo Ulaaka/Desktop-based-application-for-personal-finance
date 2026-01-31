@@ -51,30 +51,36 @@ class ProcessingDF:
         self.cursor.execute(sql, (self.username,))
         result = self.cursor.fetchone()
         
-        if not result: 
-            hashed_password = password_manager.hash_password(self.password)
+        try:
+            if not result: 
+                hashed_password = password_manager.hash_password(self.password)
 
-            new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
-            self.cursor.execute(new_sql, (self.username, hashed_password, self.email))
-            userID = self.cursor.lastrowid
-        else:
-            userID = result[0]
-        self.insert_account(userID, row)
+                new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
+                self.cursor.execute(new_sql, (self.username, hashed_password, self.email))
+                userID = self.cursor.lastrowid
+            else:
+                userID = result[0]
+            self.insert_account(userID, row)
+        except:
+            print("Could not execute insert_user")
 
     def insert_account(self, userID, row):
         sql = f"SELECT accountID FROM accounts WHERE account_name = %s and userID = %s"
         self.cursor.execute(sql, (self.acc_name, userID))
         result = self.cursor.fetchone()
 
-        if not result:
-            new_sql = f"INSERT INTO accounts (userID, account_name, account_type, account_currency) VALUES (%s, %s, %s, %s)"
-            self.cursor.execute(new_sql, (userID, self.acc_name, self.acc_type, self.acc_currency))
+        try:
+            if not result:
+                new_sql = f"INSERT INTO accounts (userID, account_name, account_type, account_currency) VALUES (%s, %s, %s, %s)"
+                self.cursor.execute(new_sql, (userID, self.acc_name, self.acc_type, self.acc_currency))
 
-            accountID = self.cursor.lastrowid
-        else:
-            accountID = result[0]
+                accountID = self.cursor.lastrowid
+            else:
+                accountID = result[0]
 
-        self.insert_transaction(accountID, row)
+            self.insert_transaction(accountID, row)
+        except:
+            print("Could not execute insert_account")
 
     def insert_transaction(self, accountID, row):
         # ["Date", ["Type" , "Category"], [ "Details", "Description", "Reference", "Narrative"], ["Credit Amount", "Withdrawal", "Out"], ["In", "Debit Amount", "Received", "Deposit"], "Balance"]

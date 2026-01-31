@@ -5,14 +5,20 @@ from PDF_Parser import ParsingPDF
 from queries import query_processor
 
 
-parsing = ParsingCSV("Transaction_data_original.csv")
+#parsing = ParsingCSV("Transaction_data_original.csv")
 #parsing = ParsingPDF("Statement_12_2025_2.pdf")
 
 #parsing = HSBC_PDF_CONVERSION("2025-06-20_Statement.pdf")
-processor = ProcessingDF(parsing.df, "test5", "Ulaaka_1223", "urnaa@gmail.com", "savings", "Bank", "GBP")
+#processor = ProcessingDF(parsing.df, "test5", "Ulaaka_1223", "urnaa@gmail.com", "savings", "Bank", "GBP")
 #converted = ParsingPDF("Statement_12_2025.pdf")
 
-#query = query_processor()
-# date_upper="2025-06-03 00:00:00"
-#query.total_transfer_or_extreme_value("test5")
+query = query_processor()
+#date_upper="2025-06-03"
+#query.total_transfer_or_extreme_value("test5", "2025-06-03")
+
+
+#last_day = query.return_last_month("2025-11-13")
+
+exp = query.compare_range("test5", False,  "2025-11-07", "2025-12-23", "date")
+
 
