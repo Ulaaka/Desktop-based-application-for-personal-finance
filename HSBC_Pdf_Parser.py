@@ -14,9 +14,8 @@ class HSBC_PDF_CONVERSION:
         parser = ParsingBase()
 
         df = pd.DataFrame(self.classified_transactions)
-        date_list = df[df.columns[0]].tolist()
         date_column = df[df.columns[0]]
-        parser.change_type(date_list, date_column, df)
+        parser.change_type(df.loc[0, df.columns[0]] , date_column, df)
         parser.unify_amount_columns(df)
         self.df = df
 

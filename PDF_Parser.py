@@ -5,6 +5,10 @@ import pdfplumber
 from datetime import datetime
 from BASE_Classes import ParsingBase
 import pandas as pd
+import re
+import numpy as np
+
+
 
 class ParsingPDF:
     def __init__(self, pdf_name):
@@ -14,13 +18,18 @@ class ParsingPDF:
         self.parser = ParsingBase()
         self.df = []
         for idx, table in enumerate(tables):
-            dataframes = self.clean_up(table, idx)
+            df = table.df
+            dataframes = self.clean_up(df, idx)
             for dataframe in dataframes:
-                print(dataframe)
-                columns = self.parser.choose_ratio(dataframe.columns.tolist())[0]
 
-                dataframe = dataframe[columns]
+                columns = self.parser.choose_ratio(dataframe.columns.tolist())
 
+
+                dataframe = dataframe[columns[0]]
+
+                self.parser.order_dataframe(dataframe, columns[1])
+
+                # needs to check the format
                 self.parser.unify_amount_columns(dataframe)
 
                 money_columns = [dataframe.columns[-1], dataframe.columns[-2]]
@@ -29,7 +38,6 @@ class ParsingPDF:
                     #https://stackoverflow.com/questions/56947333/how-to-remove-commas-from-all-the-column-in-pandas-at-once
                     dataframe[i] = pd.to_numeric(dataframe[i].astype(str).str.replace(',', ''), errors='coerce')
 
-                print(dataframe)
                 self.df.append(dataframe)
 
     def find_header(self, df):
@@ -39,7 +47,6 @@ class ParsingPDF:
 
             header_Values = row.tolist()
 
-            # print(header_Values)
             string = True
             unique = True
             length = True
@@ -59,34 +66,35 @@ class ParsingPDF:
                 length = False
 
             if (string == True and unique == True and length == True):
-                #print(df.iloc[i])
                 return i
         return 0
-            
-    def clean_up(self, table, idx):
+    
 
-        #dataframe_list = []
-        df = table.df
+    def pre_clean_up(self, value):
+        if value is None or not value or not isinstance(value, str):
+            return value
+
+        if (value[-1] == "."):
+            value = value[:-1]
+
+        if ("\n" in value):
+            value = value.split("\n")[-1]
+
+        value = re.sub(r'[^A-Za-z0-9 -./]+', '', value)
+
+        try:
+            value = float(value.replace(",", "").replace('"', ""))
+        except:
+            pass
+
+        return value
+
+    def clean_up(self, df, idx):
+
         df = df.drop_duplicates()
 
-
-        for j in range(len(df)):
-            for i in range(len(df.columns)):
-                value = str(df.iat[j, i]).strip()
-
-                if (len(value) > 0 ):
-                    if (value[-1] == "."):
-                        try:
-                            # if it was a numeric string, convert into a float
-                            df.iat[j, i] = float(value[:-1].replace(",", "").replace('"', ""))
-                        except:
-                            df.iat[j, i] = value[:-1]
-                    else:
-                        try:
-                            df.iat[j, i] = float(value.replace(",", "").replace('"', ""))
-                        except:
-                            pass
-
+        # https://stackoverflow.com/questions/39475978/apply-function-to-each-cell-in-dataframe
+        df = df.map(self.pre_clean_up)
 
         header = self.find_header(df)
         df.columns = df.iloc[header]
@@ -113,21 +121,19 @@ class ParsingPDF:
         df = df.reset_index(drop=True)
 
         if not df.empty:
-            date_list = df[df.columns[0]].tolist()
-            date_column = df[df.columns[0]]
-            self.parser.change_type(date_list, date_column, df)
-            df = df.replace(r'\n', ' ', regex=True) 
+            test_value = df.loc[0, df.columns[0]]      
+            self.parser.change_type(test_value, df[df.columns[0]], df)
             dataframe_list.append(df)
+            # print(df)
+            return dataframe_list
 
-            df.to_csv(f'output{idx}.csv', index=False)
-        
         return dataframe_list
 
     def run_camelot(self, name, flavor_camelot):
         if (flavor_camelot == "stream"):
-            tables = camelot.read_pdf(name, flavor=flavor_camelot ,pages='all')
+            tables = camelot.read_pdf(name, flavor=flavor_camelot ,pages='all', row_tol = 20)
         else: 
-            tables = camelot.read_pdf(name, flavor=flavor_camelot, pages='all')
+            tables = camelot.read_pdf(name, flavor=flavor_camelot, pages='all', line_scale=40)
         return tables
 
     def flavor_decision(self, name, idx):
@@ -140,12 +146,13 @@ class ParsingPDF:
             and r['height'] < 100 
             and r['width'] < 200
             ]
-            # 150
+
+        # debugging
             im = page.to_image(resolution=150)
             im.draw_rects(header_rects, stroke="red", stroke_width=2)
             im.save('debug_rectangles.png')
             
-        if len(header_rects) > 10:
+        if len(header_rects) > 15:
             return "lattice"
-
+        #stream
         return "stream"

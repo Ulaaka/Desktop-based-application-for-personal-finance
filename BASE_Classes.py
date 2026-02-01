@@ -4,44 +4,49 @@ import bcrypt
 import pandas as pd
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+from collections import defaultdict
 
 
 class ParsingBase:
     def __init__(self):
         self.expecting = ["Date", ["Type" , "Category"], [ "Details", "Description", "Reference", "Narrative"], ["Credit Amount", "Withdrawal", "Out"], ["In", "Debit Amount", "Received", "Deposit"], "Balance"]
 
-    def check_date_type(self, dateList):
+    # check the first value of the date list
+    def check_date_type(self, test_date):
         try:
-            datetime.strptime(dateList[0], "%d/%m/%Y")
+            datetime.strptime(test_date, "%d/%m/%Y")
             return True
         except ValueError:
             return False
-        
+
     # https://stackoverflow.com/questions/52206973/convert-different-date-formats-to-a-given-unique-date-format-in-python
-    def change_type(self, dateList, column, dataframe):
-        if not self.check_date_type(dateList):
+    def change_type(self, test_date, column, dataframe):
+        if not self.check_date_type(test_date):
+
             for i in column:
                 column = column.replace([i], dateutil.parser.parse(i).strftime("%d/%m/%Y"))
         dataframe[dataframe.columns[0]] = column
 
     # need to do more debugging 
     def unify_amount_columns(self, df):
-        same = df[df.columns[-3]].equals(df[df.columns[-2]])
-        
+        new_df = df
+        print(new_df)
+        same = new_df[new_df.columns[-3]].equals(new_df[new_df.columns[-2]])        
         if (same):
             # if 2 columns are equal, drop the later one
-            df.drop(df.columns[[-3]], axis=1, inplace=True)
+            new_df.drop(new_df.columns[[-2]], axis=1, inplace=True)
+            print(new_df)
         else:
+
             # change any non-numeric value to NaN
-            df[df.columns[-3]] = pd.to_numeric(df[df.columns[-3]], errors='coerce')
-            df[df.columns[-2]] = pd.to_numeric(df[df.columns[-2]], errors='coerce')
+            new_df[new_df.columns[-3]] = pd.to_numeric(new_df[new_df.columns[-3]], errors='coerce')
+            new_df[new_df.columns[-2]] = pd.to_numeric(new_df[new_df.columns[-2]], errors='coerce')
 
-            corrected = (df[df.columns[-3]].fillna(0) - df[df.columns[-2]].fillna(0))
-            pos = len(df.columns) - 3
+            corrected = (abs(new_df[new_df.columns[-2]].fillna(0)) - abs(new_df[new_df.columns[-3]].fillna(0)))
+            pos = len(new_df.columns) - 3
             df.insert(pos, "Amount", corrected)
-            df.drop(columns=[df.columns[-3], df.columns[-2]], inplace=True)
+            df.drop(columns=[new_df.columns[-3], new_df.columns[-2]], inplace=True)
 
-    # need to change the whole thing
     def order_dataframe(self, df, columns):
 
         missing = sorted(list(set(range(6)) - set(columns)))
@@ -58,6 +63,8 @@ class ParsingBase:
                 df.insert(pos, "Type", "")
             elif (i == 2):
                 df.insert(pos, "Description", "")
+            elif(i == 5):
+                df.insert(pos, "Balance", 0)
             else:
                 raise Exception("Important column is not selected")
             extra+=1
@@ -79,13 +86,15 @@ class ParsingBase:
                 #mat1.append(group_results)
                 mat1[idx] = group_results
 
-        above = 70
+        above = 60
         chosen_columns = []
+        percentage = []
         for idx, i in enumerate(mat1):
             if not isinstance(i, list):
                 if (i[1] > above):
                     mat2.append(i[0])
                     chosen_columns.append(idx)
+                    percentage.append(i[1])
             else:
                 highest = 0
                 highIdx = None
@@ -98,12 +107,36 @@ class ParsingBase:
                     element = i[highIdx][0]
                     mat2.append(element)
                     chosen_columns.append(idx)
+                    percentage.append(highest)
 
         try:
             if (mat2[-1] == mat2[-2]):
                 mat2.pop()
         except:
             print("The table is not related to transaction")
+        # https://stackoverflow.com/questions/11236006/identify-duplicate-values-in-a-list-in-python
+
+        Dict = defaultdict(list)
+        for idx,item in enumerate(mat2):
+            if (item not in [mat2[-3], mat2[-2]]):
+                Dict[item].append(idx)
+
+        indices = set()
+        for key, value in Dict.items():
+            if (len(value) > 1):
+                max_value = 0
+                max_ind = -1
+                for i in value:
+                    if (percentage[i] > max_value):
+                        max_value = percentage[i]
+                        max_ind = i
+
+                indices = set(value) - {max_ind}
+                
+        for i in indices:
+            chosen_columns.remove(i)
+            mat2.pop(i)
+
         return mat2, chosen_columns
 
 

@@ -87,17 +87,18 @@ class ProcessingDF:
     def insert_transaction(self, accountID, row):
         # ["Date", ["Type" , "Category"], [ "Details", "Description", "Reference", "Narrative"], ["Credit Amount", "Withdrawal", "Out"], ["In", "Debit Amount", "Received", "Deposit"], "Balance"]
 
-        try:
-            sql = f"SELECT 1 FROM transactions WHERE accountID = %s AND transaction_date = %s AND transaction_type = %s AND description = %s AND amount = %s AND balance = %s"
+        sql = f"SELECT 1 FROM transactions WHERE accountID = %s AND transaction_date = %s AND transaction_type = %s AND description = %s AND amount = %s AND balance = %s"
 
-            self.cursor.execute(sql, (accountID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]), Decimal(row[4])))
-            result = self.cursor.fetchone()
+        self.cursor.execute(sql, (accountID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]), Decimal(row[4])))
+        result = self.cursor.fetchone()
 
-            if not result:
+        if not result:
+                try:
                     sql = f"INSERT INTO transactions (accountID, transaction_date, transaction_type, description, amount, balance) VALUES (%s,%s,%s,%s,%s,%s)"
                     self.cursor.execute(sql, (accountID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]),  Decimal(row[4])))
-        except:
-            print("could not execute insert_transaction")
+                except:
+                    print("could not execute insert_transaction")
+
 
     def change_to_date(self, date_string):
         date = datetime.strptime(date_string, "%d/%m/%Y")
