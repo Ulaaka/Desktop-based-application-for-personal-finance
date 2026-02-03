@@ -161,6 +161,19 @@ class query_processor:
         output = self.cursor.fetchall()
         print(output)
         return output
+    
 
 
-    # def delete_file(self, )
+    # account queries
+    # ============================
+
+    def get_userID(self, username):
+        sql = f"SELECT userID FROM users WHERE username = %s"
+        self.cursor.execute(sql, (username,))
+        return self.cursor.fetchone()
+
+    def get_accountID(self, account_name, userID):
+        sql = f"SELECT accountID FROM accounts WHERE account_name = %s and userID = %s"
+        self.cursor.execute(sql, (account_name, userID))
+        return self.cursor.fetchone()
+    

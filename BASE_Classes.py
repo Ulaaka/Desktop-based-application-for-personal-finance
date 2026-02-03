@@ -1,6 +1,7 @@
 import dateutil.parser
 from database_connection import database
 from datetime import datetime
+from queries import query_processor
 import bcrypt
 import pandas as pd
 from fuzzywuzzy import process, fuzz
@@ -166,12 +167,13 @@ class cryptography:
         self.db = connection.db
         self.cursor = connection.cursor
         self.salt = b'HuhTengereesZayatai'
+        self.query = query_processor()
 
     def generate_key(self, password):
         hashed = SHA256.new(password.encode()).digest()
         return base64.urlsafe_b64encode(hashed)
 
-    def encrypt(self, save_folder, folder_path, filename, password, username):
+    def encrypt(self, save_folder, folder_path, filename, password, username, account_name):
 
         file_path = os.path.join(folder_path, filename)
         with open(file_path, 'rb') as file:
@@ -187,22 +189,20 @@ class cryptography:
         with open(destination, 'wb') as file:
             file.write(encrypted)
 
-        query = f"SELECT userID FROM users WHERE username = '{username}'"
-        self.cursor.execute(query)
-        userID = self.cursor.fetchone()[0]
+        userID = self.query.get_userID(username)[0]
+        accountID = self.query.get_accountID(account_name, userID)[0]
 
-        new_query = "INSERT INTO files (userID, file_name, hashed_name) VALUES (%s, %s, %s)"
-        self.cursor.execute(new_query, (userID, filename, new_filename))
+        new_query = "INSERT INTO files (userID, accountID, file_name, hashed_name) VALUES (%s, %s, %s, %s)"
+        self.cursor.execute(new_query, (userID, accountID,  filename, new_filename))
         self.db.commit()
         # file needs to be deleted from the original folder
 
-    def decrypt(self, enc_storage_path, filename, password, username):
+    def decrypt(self, enc_storage_path, filename, password, username, account_name):
 
-        query = f"SELECT userID FROM users WHERE username = '{username}'"
-        self.cursor.execute(query)
-        userID = self.cursor.fetchone()[0]
+        userID = self.query.get_userID(username)[0]
+        accountID = self.query.get_accountID(account_name, userID)
 
-        new_sql = f"SELECT hashed_name FROM files WHERE userID = '{userID}' and file_name = '{filename}'"
+        new_sql = f"SELECT hashed_name FROM files WHERE userID = '{userID}' and accountID = '{accountID}' and file_name = '{filename}'"
         self.cursor.execute(new_sql)
         hashed_filename = self.cursor.fetchone()
 

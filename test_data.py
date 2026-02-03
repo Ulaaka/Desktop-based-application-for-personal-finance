@@ -36,12 +36,13 @@ save_folder = '/Users/nyamdorjbat-erdene/Final_year/encrypted_storage'
 
 password = 'Ulaaka_1223'
 username = "test5"
+account_name =  "savings"
 
 for filename in os.listdir(folder_path):
     if (filename.endswith(".csv") or filename.endswith(".pdf")): 
         crypto = cryptography()
 
-        crypto.encrypt(save_folder, folder_path, filename, password, username)
+        crypto.encrypt(save_folder, folder_path, filename, password, username, account_name)
 
         file_path = os.path.join(folder_path, filename)
         if (filename.endswith(".csv")):
@@ -51,7 +52,7 @@ for filename in os.listdir(folder_path):
                 parsing = ParsingPDF(file_path)
             except:
                 parsing = HSBC_PDF_CONVERSION(file_path)
-        processor = ProcessingDF(parsing.df, username, password, "urnaa@gmail.com", "savings", "Bank", "GBP")
+        processor = ProcessingDF(parsing.df, username, password, "urnaa@gmail.com", account_name, "Bank", "GBP")
         print("===================================")
         print(f"Successfully read file {filename}")
     else:

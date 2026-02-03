@@ -3,7 +3,7 @@ from database_connection import database
 from BASE_Classes import password_class
 from datetime import datetime
 from decimal import Decimal
-
+from queries import query_processor
 import pandas as pd
 
 
@@ -14,6 +14,8 @@ class ProcessingDF:
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
+
+        self.query = query_processor()
 
         self.username = username
         self.password = password
@@ -47,10 +49,9 @@ class ProcessingDF:
 
     def insert_user(self, row):
         password_manager = password_class()
-        sql = f"SELECT userID FROM users WHERE username = %s"
-        self.cursor.execute(sql, (self.username,))
-        result = self.cursor.fetchone()
-        
+
+        result = self.query.get_userID(self.username)
+
         if not result: 
             try:
                 hashed_password = password_manager.hash_password(self.password)
@@ -66,9 +67,7 @@ class ProcessingDF:
 
 
     def insert_account(self, userID, row):
-        sql = f"SELECT accountID FROM accounts WHERE account_name = %s and userID = %s"
-        self.cursor.execute(sql, (self.acc_name, userID))
-        result = self.cursor.fetchone()
+        result = self.query.get_accountID(self.acc_name, userID)
 
         if not result:
             try:
@@ -103,8 +102,6 @@ class ProcessingDF:
     def change_to_date(self, date_string):
         date = datetime.strptime(date_string, "%d/%m/%Y")
         return date
-
-
 
 
 
