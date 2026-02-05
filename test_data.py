@@ -19,7 +19,6 @@ from BASE_Classes import cryptography
 #processor = ProcessingDF(parsing.df, "test5", "Ulaaka_1223", "urnaa@gmail.com", "savings", "Bank", "GBP")
 #converted = ParsingPDF("Statement_12_2025.pdf")
 
-#query = query_processor()
 #date_upper="2025-06-03"
 #query.total_transfer_or_extreme_value("test5", "2025-06-03")
 
@@ -29,7 +28,7 @@ from BASE_Classes import cryptography
 #query.common_transactions("test5",  5, account_name="savings",transfer_toggle=False, date_lower="2025-12-23", filter_amount=5)
 
 # https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
+"""folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
 save_folder = '/Users/nyamdorjbat-erdene/Final_year/encrypted_storage'
 
 password = 'Ulaaka_1223'
@@ -55,3 +54,14 @@ for filename in os.listdir(folder_path):
         processor = ProcessingDF(parsing.df, username, password, "urnaa@gmail.com", account_name, "Bank", file_ID,  "GBP")
     else:
         raise Exception("Incompatible file/s has been submitted.")
+"""
+
+query = query_processor()
+query.common_transactions('test5', 50, transfer_toggle=False, )
+
+"""import re
+# self, username, limit, account_name=None, transfer_toggle=None, date_lower=None, date_upper=None, filter_amount=None
+# query.common_transactions('test5', 50, transfer_toggle=False, )
+s = re.findall(r'\b[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*\b', 'TESCO STORES  6445')
+result =  ' '.join(s)
+print(result)"""

@@ -1,5 +1,5 @@
 from database_connection import database
-from BASE_Classes import password_class
+from BASE_Classes import password_class, ParsingBase
 from datetime import datetime
 from decimal import Decimal
 from queries import query_processor
@@ -66,7 +66,6 @@ class ProcessingDF:
 
         if not result:
             try:
-
                 accountID = self.query.insert_into_accounts(userID, self.acc_name, self.acc_type, self.acc_currency)
             except:
                 print("could not execute insert_into_accounts ")
@@ -75,16 +74,16 @@ class ProcessingDF:
 
         self.insert_transaction(accountID, row)
 
-
     def insert_transaction(self, accountID, row):
         # ["Date", ["Type" , "Category"], [ "Details", "Description", "Reference", "Narrative"], ["Credit Amount", "Withdrawal", "Out"], ["In", "Debit Amount", "Received", "Deposit"], "Balance"]
 
+        parser = ParsingBase()
         sql = f"SELECT 1 FROM transactions WHERE accountID = %s AND file_ID = %s AND transaction_date = %s AND transaction_type = %s AND description = %s AND amount = %s AND balance = %s"
-
         self.cursor.execute(sql, (accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]), Decimal(row[4])))
         result = self.cursor.fetchone()
 
         if not result:
+            row[1] = parser.classify_transaction_type(row[1])
             self.query.insert_into_transactions(accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]),  Decimal(row[4]))
 
     def change_to_date(self, date_string):

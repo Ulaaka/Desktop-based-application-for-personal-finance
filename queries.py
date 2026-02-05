@@ -1,6 +1,6 @@
 from database_connection import database
 from datetime import datetime
-
+import re
 class query_processor:
     def __init__(self):
         connection = database()
@@ -108,11 +108,12 @@ class query_processor:
     
     def common_transactions(self, username, limit, account_name=None, transfer_toggle=None, date_lower=None, date_upper=None, filter_amount=None):
         head_query = """
-            SELECT T.description, SUM(ABS(T.amount)) total_sent
+            SELECT T.description as statement, SUM(ABS(T.amount)) as total_sent
             FROM users U
             JOIN accounts A ON A.userID = U.userID
             JOIN transactions T ON T.accountID = A.accountID
         """
+        
 
         where_query = f" WHERE U.username = '{username}'"
 
@@ -129,17 +130,24 @@ class query_processor:
         if (date_upper):
             where_query += f" and T.transaction_date <= '{date_upper}'"
 
-        tail_query = f" GROUP BY T.description ORDER BY total_sent DESC LIMIT {limit}"
+        tail_query = f" GROUP BY statement ORDER BY total_sent DESC LIMIT {limit}"
 
         if (filter_amount):
-            tail_query = f" GROUP BY T.description HAVING total_sent >= {filter_amount} ORDER BY total_sent DESC LIMIT {limit}"
+            tail_query = f" GROUP BY statement HAVING total_sent >= {filter_amount} ORDER BY total_sent DESC LIMIT {limit}"
 
         query = head_query + where_query + tail_query
         self.cursor.execute(query)
 
         output = self.cursor.fetchall()
-        print(output)
-        return output
+
+
+        regex = re.compile(r'\b[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*\b')
+
+        clean_ouput = []
+        for key, value in output:
+            clean_ouput.append(( ' '.join(regex.findall(key)), value))
+
+        return clean_ouput
 
     def find_subscriptions(self, username, account_name=None):
         head_query = """
@@ -160,8 +168,7 @@ class query_processor:
         self.cursor.execute(query)
         output = self.cursor.fetchall()
         print(output)
-        return output
-    
+        return output    
 
     # account queries
     # ============================
@@ -184,6 +191,8 @@ class query_processor:
         sql = f"INSERT INTO transactions (accountID, file_ID, transaction_date, transaction_type, description, amount, balance) VALUES (%s,%s,%s,%s,%s,%s,%s)"
         self.cursor.execute(sql, (accountID, file_ID, date, type, description, amount, balance))
         self.db.commit()
+
+
 
     def get_userID(self, username):
         sql = f"SELECT userID FROM users WHERE username = %s"

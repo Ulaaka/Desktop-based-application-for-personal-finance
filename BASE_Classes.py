@@ -8,7 +8,7 @@ from fuzzywuzzy import process, fuzz
 from collections import defaultdict
 import numpy as np
 from cryptography.fernet import Fernet
-import os
+import os   
 from database_connection import database
 import base64
 from Crypto.Hash import SHA256
@@ -16,7 +16,30 @@ from Crypto.Hash import SHA256
 class ParsingBase:
     def __init__(self):
         self.expecting = ["Date", ["Type" , "Category"], [ "Details", "Description", "Reference", "Narrative"], ["Out", "Credit Amount", "Withdrawal"], ["In", "Debit Amount", "Received", "Deposit"], "Balance"]
+        self.card = {'DEB', ')))', 'VIS', 'Card payment', 'Debit Card Transaction', 'DD'}
+        self.atm = {'CPT', 'PIM', 'ATM', 'Cash withdrawal'}
+        self.fast_payment = {'FPO', 'BP', 'Mobile/Online Transaction',  'FPI', 'Faster payment'}
+        self.salary = {'BGC', 'GIRO'}
+        self.general_in ={'Automated Credit'}
+        self.refund = {'CR'}
 
+    def classify_transaction_type(self, transaction_type):
+        if (transaction_type in self.card):
+            return 'Deposit'
+        elif (transaction_type in self.atm):
+            return 'ATM'
+        elif (transaction_type in self.fast_payment):
+            return 'Fast Payment'
+        elif (transaction_type in self.fast_payment):
+            return 'Salary'
+        elif (transaction_type in self.general_in):
+            return 'General Credit'
+        elif (transaction_type in self.refund):
+            return 'Refund'
+        else:
+            return transaction_type
+        
+        
     # check the first value of the date list
     def check_date_type(self, test_date):
         try:
@@ -63,16 +86,14 @@ class ParsingBase:
 
         if (not missing):
             return df
-        print("missing values:\n")
-        # print(missing)
-
+        
         extra = 0
         for i in missing:
             pos = i + extra
             if (i == 1):
-                df.insert(pos, "Type", "")
+                df.insert(pos, "Type", "Unknown")
             elif (i == 2):
-                df.insert(pos, "Description", "")
+                df.insert(pos, "Description", "Unknown")
             elif(i == 5):
                 df.insert(pos, "Balance", 0)
             else:

@@ -19,9 +19,6 @@ class HSBC_PDF_CONVERSION:
         parser.unify_amount_columns(df)
         self.df = df
 
-        print(self.df.to_string(index=False))
-        print("\n" + "="*100)
-
     def return_text(self, pdf_file):
         with pdfplumber.open(pdf_file) as pdf:
             text_list = []
