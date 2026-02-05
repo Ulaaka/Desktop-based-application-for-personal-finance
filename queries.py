@@ -163,9 +163,27 @@ class query_processor:
         return output
     
 
-
     # account queries
     # ============================
+
+    def insert_into_users(self, username, hashed_password, email):
+        sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
+        self.cursor.execute(sql, (username, hashed_password, email))
+        userID = self.cursor.lastrowid
+        self.db.commit()
+        return userID
+    
+    def insert_into_accounts(self, userID, acc_name, acc_type, acc_currency):
+        sql = f"INSERT INTO accounts (userID, account_name, account_type, account_currency) VALUES (%s, %s, %s, %s)"
+        self.cursor.execute(sql, ( userID, acc_name, acc_type, acc_currency))
+        accountID = self.cursor.lastrowid
+        self.db.commit()
+        return accountID
+    
+    def insert_into_transactions(self, accountID, file_ID, date, type, description, amount, balance):
+        sql = f"INSERT INTO transactions (accountID, file_ID, transaction_date, transaction_type, description, amount, balance) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        self.cursor.execute(sql, (accountID, file_ID, date, type, description, amount, balance))
+        self.db.commit()
 
     def get_userID(self, username):
         sql = f"SELECT userID FROM users WHERE username = %s"

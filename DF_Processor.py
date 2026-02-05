@@ -1,4 +1,3 @@
-import mysql.connector
 from database_connection import database
 from BASE_Classes import password_class
 from datetime import datetime
@@ -35,7 +34,6 @@ class ProcessingDF:
         """
         All data relating to the user is deleted
         """
-
         sql = f"DELETE FROM users WHERE username = %s"
         self.cursor.execute(sql, (self.username,))
         self.db.commit()
@@ -45,7 +43,6 @@ class ProcessingDF:
             row = dtb.iloc[i].tolist()
             row_str = list(map(str, row))
             self.insert_user(row_str)
-        self.db.commit()
 
 
     def insert_user(self, row):
@@ -56,12 +53,9 @@ class ProcessingDF:
         if not result: 
             try:
                 hashed_password = password_manager.hash_password(self.password)
-
-                new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
-                self.cursor.execute(new_sql, (self.username, hashed_password, self.email))
-                userID = self.cursor.lastrowid
+                userID = self.query.insert_into_users(self.username, hashed_password, self.email)
             except:
-                print("could not execute insert_user")
+                print("could not execute insert_into_users")
         else:
             userID = result
         self.insert_account(userID, row)
@@ -72,12 +66,10 @@ class ProcessingDF:
 
         if not result:
             try:
-                new_sql = f"INSERT INTO accounts (userID, account_name, account_type, account_currency) VALUES (%s, %s, %s, %s)"
-                self.cursor.execute(new_sql, (userID, self.acc_name, self.acc_type, self.acc_currency))
 
-                accountID = self.cursor.lastrowid
+                accountID = self.query.insert_into_accounts(userID, self.acc_name, self.acc_type, self.acc_currency)
             except:
-                print("could not execute insert_account ")
+                print("could not execute insert_into_accounts ")
         else:
             accountID = result
 
@@ -93,8 +85,7 @@ class ProcessingDF:
         result = self.cursor.fetchone()
 
         if not result:
-            sql = f"INSERT INTO transactions (accountID, file_ID, transaction_date, transaction_type, description, amount, balance) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-            self.cursor.execute(sql, (accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]),  Decimal(row[4])))
+            self.query.insert_into_transactions(accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], Decimal(row[3]),  Decimal(row[4]))
 
     def change_to_date(self, date_string):
         date = datetime.strptime(date_string, "%d/%m/%Y")

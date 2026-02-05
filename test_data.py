@@ -29,12 +29,6 @@ from BASE_Classes import cryptography
 #query.common_transactions("test5",  5, account_name="savings",transfer_toggle=False, date_lower="2025-12-23", filter_amount=5)
 
 # https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-query = query_processor()
-password = 'Ulaaka_1223'
-username = "test5"
-account_name =  "savings"
-query = query_processor()
-
 folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
 save_folder = '/Users/nyamdorjbat-erdene/Final_year/encrypted_storage'
 

@@ -4,7 +4,6 @@ import pdfplumber
 from BASE_Classes import ParsingBase
 import pandas as pd
 import re
-import numpy as np
 
 class ParsingPDF:
     def __init__(self, pdf_name):

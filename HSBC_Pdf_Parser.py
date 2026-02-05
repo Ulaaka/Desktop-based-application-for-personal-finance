@@ -2,7 +2,6 @@ import pandas as pd
 import pdfplumber
 import re 
 from datetime import datetime
-import dateutil.parser
 from BASE_Classes import ParsingBase
 # https://github.com/Anlanther/bank-statement-converter/blob/main/src/classes/BOCStatement.py#L28
 class HSBC_PDF_CONVERSION:
