@@ -247,6 +247,18 @@ class query_processor:
         self.cursor.execute(sql)
         self.db.commit()
 
+
+    def noise_words(self):
+        query = """
+        SELECT description, COUNT(*) as count
+        FROM transactions
+        GROUP BY description
+        ORDER BY count DESC
+        LIMIT 10
+        """
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
     def find_close_transactions(self, description):
         # https://stackoverflow.com/questions/6259647/mysql-match-against-order-by-relevance-and-column
         regex = re.compile(r'\b[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*\b')
@@ -284,6 +296,8 @@ class query_processor:
 
     # needs to search for similar description to apply the same category in the database
     def change_category(self, category, transactionID):
+        noises = self.noise_words()
+        print(noises)
         self.update_category(category, transactionID)
 
         description_query =  f"""

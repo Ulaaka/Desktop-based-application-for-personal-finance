@@ -62,7 +62,3 @@ for filename in os.listdir(folder_path):
         processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
     else:
         raise Exception("Incompatible file/s has been submitted.")
-
-
-"""query = query_processor()
-query.change_category("tesco", 170)"""
