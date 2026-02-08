@@ -62,7 +62,7 @@ class ProcessingDF:
 
         if not result:
             row[1] = parser.classify_transaction_type(row[1])
-            self.query.insert_into_transactions(accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], "Undefined", Decimal(row[3]),  Decimal(row[4]))
+            self.query.insert_into_transactions(accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], category, Decimal(row[3]),  Decimal(row[4]))
 
     def change_to_date(self, date_string):
         date = datetime.strptime(date_string, "%d/%m/%Y")

@@ -224,9 +224,10 @@ class query_processor:
         return accountID
     
     def insert_category(self, userID, category_list, category_name):
-        categoryID = self.get_category(userID, category_list)[0]
-        if categoryID is not None:
+        result = self.get_category(userID, category_list)
+        if result is not None:
             try:
+                categoryID = result[0]
                 query = f"""
                     UPDATE categories
                     SET category_name = %s
@@ -237,7 +238,7 @@ class query_processor:
             except:
                 print(f"could not update the category:{categoryID}")
         else:
-            categoryID = self.insert_into_categories(query, category_list, category_name)
+            categoryID = self.insert_into_categories(userID, category_list, category_name)
         return categoryID
 
     def get_category(self, userID, category_list):
