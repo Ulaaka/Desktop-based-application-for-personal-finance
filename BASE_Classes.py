@@ -4,7 +4,7 @@ from datetime import datetime
 from queries import query_processor
 import bcrypt
 import pandas as pd
-from fuzzywuzzy import process, fuzz
+from fuzzywuzzy import fuzz
 from collections import defaultdict
 import numpy as np
 from cryptography.fernet import Fernet

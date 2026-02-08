@@ -1,12 +1,18 @@
 from database_connection import database
 from datetime import datetime
 import re
+from nltk.corpus import stopwords
+from geotext import GeoText
 
 class query_processor:
     def __init__(self):
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
+        self.stop_words = set(stopwords.words('english'))
+        # https://stackoverflow.com/a/51534662
+        new_stopwords = {'ltd', 'limited', 'inc', 'stores', 'gb', 'uk'}
+        self.stop_words.update(new_stopwords)
 
     def find_min_max(self, column, max_toggle=True):
         toggle = "MAX" if max_toggle else "MIN"
@@ -14,7 +20,6 @@ class query_processor:
         query = f"SELECT {toggle}({column})from transactions"
         self.cursor.execute(query)
         output = self.cursor.fetchone()
-        return output[0]
 
     # transfer toggle = if true find the total income
     # at least one of the transfer_toggle and max_toggle should be included
@@ -246,36 +251,33 @@ class query_processor:
         sql = f"DELETE FROM transactions WHERE file_ID = '{file_ID}'"
         self.cursor.execute(sql)
         self.db.commit()
-
-
-    def noise_words(self):
-        query = """
-        SELECT description, COUNT(*) as count
-        FROM transactions
-        GROUP BY description
-        ORDER BY count DESC
-        LIMIT 10
-        """
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
+        
 
     def find_close_transactions(self, description):
         # https://stackoverflow.com/questions/6259647/mysql-match-against-order-by-relevance-and-column
+
+        places = (GeoText(description.title()).cities + GeoText(description.title()).countries)
+        places_set = {place.lower() for place in places}
+
+
         regex = re.compile(r'\b[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*\b')
         str_list = regex.findall(description)
+        plus_list = []
+        for  word in str_list:
+            if (word.lower() not in (places_set | self.stop_words)):
+                # since the case does not matter
+                plus_list.append(f'+{word}')
+        
 
-        for idx,  word in enumerate(str_list):
-            str_list[idx] = f'+{word}'
+        parameters = [' '.join(plus_list)]
 
-        parameters = [' '.join(str_list)]
-
-        query = "SELECT transactionID FROM transactions WHERE MATCH(description) AGAINST(%s IN BOOLEAN MODE)"
+        query = "SELECT transactionID, description FROM transactions WHERE MATCH(description) AGAINST(%s IN NATURAL LANGUAGE MODE)"
         self.cursor.execute(query, parameters)
 
         output = self.cursor.fetchall()
-        for idx,  i in enumerate(output):
-            output[idx] = i[0]
-        return output
+        selective_ids = [value[0] for value in output]
+
+        return selective_ids
 
     def update_category(self, category, transactionID):
         parameter = [category]
@@ -299,12 +301,10 @@ class query_processor:
         self.db.commit()
 
     # needs to search for similar description to apply the same category in the database
-    def change_category(self, category, transactionID):
-        noises = self.noise_words()
-        print(noises)
+    def change_category(self, userID, category, transactionID):
         self.update_category(category, transactionID)
 
-        description_query =  f"""
+        description_query =  """
             SELECT description
             FROM transactions
             WHERE transactionID = %s

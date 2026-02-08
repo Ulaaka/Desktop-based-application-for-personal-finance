@@ -29,7 +29,7 @@ from BASE_Classes import cryptography, password_class
 #query.common_transactions("test5",  5, account_name="savings",transfer_toggle=False, date_lower="2025-12-23", filter_amount=5)
 
 # https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
+"""folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
 save_folder = '/Users/nyamdorjbat-erdene/Final_year/encrypted_storage'
 
 password = 'Ulaaka_1223'
@@ -62,3 +62,7 @@ for filename in os.listdir(folder_path):
         processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
     else:
         raise Exception("Incompatible file/s has been submitted.")
+"""
+query = query_processor()
+# "TESCO STORES 5243"
+query.change_category("subscription", 492)
