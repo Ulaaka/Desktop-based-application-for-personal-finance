@@ -197,6 +197,13 @@ class query_processor:
         sql = f"INSERT INTO transactions (accountID, file_ID, transaction_date, transaction_type, description, category, amount, balance) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
         self.cursor.execute(sql, (accountID, file_ID, date, type, description, category, amount, balance))
         self.db.commit()
+
+    def insert_into_categories(self, userID, category_list, category_name):
+        query = f"INSERT INTO categories (userID, category_list, category_name) VALUES (%s, %s, %s)"
+        self.cursor.execute(query, (userID, json.dumps(category_list), category_name))
+        categoryID = self.cursor.lastrowid
+        self.db.commit()
+        return categoryID
     
     def insert_user(self, username, hashed_password, email):
         userID = self.get_userID(username)
@@ -232,10 +239,7 @@ class query_processor:
             except:
                 print(f"could not update the category:{categoryID}")
         else:
-                query = f"INSERT INTO categories (userID, category_list, category_name) VALUES (%s, %s, %s)"
-                self.cursor.execute(query, (userID, json.dumps(category_list), category_name))
-                categoryID = self.cursor.lastrowid
-                self.db.commit()
+            categoryID = self.insert_into_categories(query, category_list, category_name)
         return categoryID
 
     def get_category(self, userID, category_list):
@@ -344,7 +348,6 @@ class query_processor:
         description = self.cursor.fetchone()[0]
 
         close_transaction_ids = self.find_close_transactions(description)
-        print(close_transaction_ids[1])
         categoryID = self.insert_category(userID, close_transaction_ids[1], category)
 
         self.update_category(category, close_transaction_ids[0])
