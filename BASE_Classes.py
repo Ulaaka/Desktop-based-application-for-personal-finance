@@ -5,7 +5,6 @@ from queries import query_processor
 import bcrypt
 import pandas as pd
 from fuzzywuzzy import fuzz
-from collections import defaultdict
 import numpy as np
 from cryptography.fernet import Fernet
 import os   
@@ -126,10 +125,6 @@ class ParsingBase:
         for i in mat1:
             if (i is not None):
                 mat2.append(i)
-        #print("========")
-        #print(result_list)
-        # print(mat2)
-        #print(chosen_columns)
         return mat2, chosen_columns
 
 class password_class:

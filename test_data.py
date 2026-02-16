@@ -40,7 +40,7 @@ email = "urnaa@gmail.com"
 account_type = "Bank"
 account_currency = "GBP"
 query = query_processor()
-for filename in os.listdir(exp_folder):
+for filename in os.listdir(folder_path):
     if (filename.endswith(".csv") or filename.endswith(".pdf")): 
 
         crypto = cryptography()
@@ -49,7 +49,7 @@ for filename in os.listdir(exp_folder):
         userID = query.insert_user(username, password, email)
         accountID = query.insert_account(userID, account_name, account_type, account_currency)
 
-        file_path = os.path.join(exp_folder, filename)
+        file_path = os.path.join(folder_path, filename)
         if (filename.endswith(".csv")):
             parsing = ParsingCSV(file_path)
         else:
@@ -59,11 +59,11 @@ for filename in os.listdir(exp_folder):
                 parsing = HSBC_PDF_CONVERSION(file_path)
 
         print("parsed: ", filename)
-        file_ID = crypto.encrypt(save_folder, exp_folder, filename, password, accountID)
+        file_ID = crypto.encrypt(save_folder, folder_path, filename, password, accountID)
         processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
     else:
         raise Exception("Incompatible file/s has been submitted.")
-
 """query = query_processor()
 # "TESCO STORES 5243"
-query.change_category(1, "Grocery", 243)"""
+query.change_category(1, "LIDL", 490)
+"""

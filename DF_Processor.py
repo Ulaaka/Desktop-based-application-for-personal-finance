@@ -38,16 +38,15 @@ class ProcessingDF:
         self.db.commit()
 
     def insert_all(self, dtb):
-        for i in range(len(dtb)):
-            row = dtb.iloc[i].tolist()
-            row_str = list(map(str, row))
-            userID = self.query.insert_user(self.username, self.password, self.email)
-            accountID = self.query.insert_account(userID, self.acc_name, self.acc_type, self.acc_currency)
-            self.insert_transaction(userID, accountID, row_str)
+        userID = self.query.insert_user(self.username, self.password, self.email)
+        accountID = self.query.insert_account(userID, self.acc_name, self.acc_type, self.acc_currency)
+        dtb.apply(lambda row: self.insert_transaction(userID=userID, accountID=accountID, row=row), axis=1)
 
-    def insert_transaction(self, userID, accountID, row):
+    def insert_transaction(self, row, userID, accountID):
         parser = ParsingBase()
         query = query_processor()
+        
+        row = list(map(str, row.tolist()))
         word_list = query.return_word_list(row[2])[1]
         
         output = query.get_category(userID, word_list)
