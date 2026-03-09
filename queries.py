@@ -241,12 +241,33 @@ class query_processor:
             categoryID = self.insert_into_categories(userID, category_sentence, category_list, category_name)
         return categoryID
 
+    # function for returning the category based on the tokens of words in the list
     def get_category(self, userID, category_list):
         # https://stackoverflow.com/a/37662298
         # https://dev.mysql.com/doc/refman/8.4/en/json-search-functions.html
+
+        sql_categories  = "SELECT categoryID, category_list, category_name FROM categories WHERE userID = %s ORDER BY categoryID"
+        self.cursor.execute(sql_categories, (userID, ))
+
+        tuple_to_dictionary = { category_list: (categoryID, category_name) for categoryID, category_list, category_name in self.cursor.fetchall()}
+
+        priority_list = [(len([item for item in category_list if item in i]), len(i)) for i in tuple_to_dictionary]
+
+        max_category = max(priority_list, key=lambda x: (x[0], -x[1]))
+
+        position = priority_list.index(max_category)
+
+        key = list(tuple_to_dictionary)[position]
+        
+        output = tuple_to_dictionary[key]
+
+
+        """        # needs add selecting the one with the highest priority
         sql = f"SELECT categoryID, category_name FROM categories WHERE userID = %s AND JSON_CONTAINS(category_list, %s)"
+
         self.cursor.execute(sql, (userID, json.dumps(category_list)))
         output = self.cursor.fetchone()
+        return output if output else None"""
         return output if output else None
 
     def get_userID(self, username):

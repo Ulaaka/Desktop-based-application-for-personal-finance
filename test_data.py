@@ -71,14 +71,7 @@ query = query_processor()
 #result = query.get_categories(1)
 # result = query.show_description_list_by_category_name(1, "grocery")
 description  = "Lidl Cosmetic Surgery Mongolia"
-word_list = query.return_word_list(description)[1]
-print(word_list)
-output = query.get_category(1, word_list)
-if (output is None):
-    category = "Undefined"
-else:
-    category = output[1]
-print(category)
+category = query.return_updated_category(description)
 transaction = [(1, 7, "2026-03-09", "Deposit", description, category, "30", "2034")]
 query.insert_into_transactions(transaction)
 
