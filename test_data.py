@@ -29,7 +29,7 @@ from BASE_Classes import cryptography, password_class
 #query.common_transactions("test5",  5, account_name="savings",transfer_toggle=False, date_lower="2025-12-23", filter_amount=5)
 
 # https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
+"""folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
 save_folder = '/Users/nyamdorjbat-erdene/Final_year/encrypted_storage'
 exp_folder = '/Users/nyamdorjbat-erdene/Final_year/exp_folder'
 # /Users/nyamdorjbat-erdene/Final_year/2025_October_Statement.pdf
@@ -62,8 +62,14 @@ for filename in os.listdir(folder_path):
         file_ID = crypto.encrypt(save_folder, folder_path, filename, password, accountID)
         processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
     else:
-        raise Exception("Incompatible file/s has been submitted.")
-"""query = query_processor()
+        raise Exception("Incompatible file/s has been submitted.")"""
+
+query = query_processor()
 # "TESCO STORES 5243"
-query.change_category(1, "LIDL", 490)
-"""
+#query.change_category(1, "shopping", 228)
+#result = query.get_categories(1)
+# result = query.show_description_list_by_category_name(1, "grocery")
+result = query.add_description_into_list_category(1, "lidl", "grocery")
+print(result)
+
+

@@ -198,9 +198,9 @@ class query_processor:
         self.cursor.executemany(sql, transaction_list)
         self.db.commit()
 
-    def insert_into_categories(self, userID, category_list, category_name):
-        query = f"INSERT INTO categories (userID, category_list, category_name) VALUES (%s, %s, %s)"
-        self.cursor.execute(query, (userID, json.dumps(category_list), category_name))
+    def insert_into_categories(self, userID, category_sentence, category_list, category_name):
+        query = f"INSERT INTO categories (userID, category_sentence, category_list, category_name) VALUES (%s, %s, %s, %s)"
+        self.cursor.execute(query, (userID, category_sentence, json.dumps(category_list), category_name))
         categoryID = self.cursor.lastrowid
         self.db.commit()
         return categoryID
@@ -223,7 +223,7 @@ class query_processor:
                 print("could not execute insert_into_accounts ")
         return accountID
     
-    def insert_category(self, userID, category_list, category_name):
+    def insert_category(self, userID, category_sentence, category_list, category_name):
         result = self.get_category(userID, category_list)
         if result is not None:
             try:
@@ -238,7 +238,7 @@ class query_processor:
             except:
                 print(f"could not update the category:{categoryID}")
         else:
-            categoryID = self.insert_into_categories(userID, category_list, category_name)
+            categoryID = self.insert_into_categories(userID, category_sentence, category_list, category_name)
         return categoryID
 
     def get_category(self, userID, category_list):
@@ -284,11 +284,13 @@ class query_processor:
         self.db.commit()
 
     def return_word_list(self, description):
-        places = (GeoText(description.title()).cities + GeoText(description.title()).countries)
+        # removing words with length of 2-3 and extra white space between words in the description
+        clean_description = re.sub(r'\b\w{2,3}\b', '', " ".join(description.lower().split()))
+        places = (GeoText(clean_description.title()).cities + GeoText(clean_description.title()).countries)
         places_set = {place.lower() for place in places}
 
         regex = re.compile(r'\b[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*\b')
-        str_list = regex.findall(description)
+        str_list = regex.findall(clean_description)
         plus_list = []
         word_list = []
         for  word in str_list:
@@ -296,6 +298,7 @@ class query_processor:
                 # since the case does not matter
                 plus_list.append(f'+{word}')
                 word_list.append(word)
+
         return plus_list, word_list
 
     def find_close_transactions(self, description):
@@ -344,15 +347,75 @@ class query_processor:
         """
 
         self.cursor.execute(description_query, (transactionID, ))
+
+        # the description of the transaction
         description = self.cursor.fetchone()[0]
 
         close_transaction_ids = self.find_close_transactions(description)
-        categoryID = self.insert_category(userID, close_transaction_ids[1], category)
+        categoryID = self.insert_category(userID, description, close_transaction_ids[1], category)
 
         self.update_category(category, close_transaction_ids[0])
-    
 
+    # after showing the lists of keywords of category
+    def get_categories(self, userID):
+        query = """
+            SELECT COUNT(categoryID) AS total_descriptions, category_name
+            FROM categories
+            WHERE userID = %s
+            GROUP BY category_name
+            ORDER BY total_descriptions DESC
+        """
     
+        self.cursor.execute(query, (userID, ))
+        result = self.cursor.fetchall()
+        return result if result else None
+
+    def show_description_list_by_category_name(self, userID, category_name):
+        query = """
+            SELECT category_sentence, categoryID, 
+            FROM categories
+            WHERE userID = %s AND category_name = %s
+            ORDER BY categoryID ASC
+        """
+        self.cursor.execute(query, (userID, category_name))
+        result = self.cursor.fetchall()
+        return result if result else None
+
+    def add_description_into_list_category(self, userID, description, category_name):
+        close_transaction_ids = self.find_close_transactions(description)
+        categoryID = self.insert_category(userID, description, close_transaction_ids[1], category_name)
+        self.update_category(category_name, close_transaction_ids[0])
+        return categoryID if categoryID else None
+
+    # after the description list is shown, the user can remove 
+    def remove_description_from_list_category(self, userID, categoryID, category_name):
+        query_delete = """
+            DELETE FROM categories 
+            WHERE userID = %s AND categoryID = %s"""
+
+        self.cursor.execute(query_delete, (userID, categoryID))
+        # removed category name
+        return category_name
+    
+    # use the category name of the removed description
+    def update_transaction_after_deletion_description(self, userID, category_name):
+        query = """
+            SELECT category_sentence, category_name
+            FROM categories
+            WHERE userID = %s AND category_name = %s
+            ORDER BY categoryID ASC
+        """
+        self.cursor.execute(query, (userID, category_name))
+        result = self.cursor.fetchall()
+         #return result if result else None
+        
+        # close_transaction_ids = self.find_close_transactions(description)
+
+        
+
+
+
+
 
 
 

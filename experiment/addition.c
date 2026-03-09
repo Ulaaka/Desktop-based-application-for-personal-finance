@@ -1,22 +1,28 @@
-
 #include <stdio.h>
 
-int main()
-{
-    int size, i;
-    double sum=0;
+int main() {
+    int N, M, K;
+    scanf("%d %d %d", &N, &M, &K);
 
-    printf("Нийт нэмэх тоо: ");
-    scanf("%d", &size);
+    int a[100][100];
+    int i, j, k,  toot = 1;
 
-    double array[size];
-    printf("%d тоог оруулна уу?:\n", size);
+    for(k = 0; k < K; k++){
+        for(i = 0; i < N; i++) {
+            for(j = 0; j < M; j++) {
+            a[i][j] = toot++;
+            }
+        }
 
-    for (i = 0; i < size; i++) {
-        scanf("%lf", &array[i]);
-        sum += array[i];
     }
 
-    printf("Нийлбэр: %lf ", sum);
+
+    for(i = 0; i < N; i++) {
+        for(j = 0; j < M; j++) {
+            printf("%4d", a[i][j]);
+        }
+        printf("\n");
+    }
+
     return 0;
 }

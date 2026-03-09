@@ -162,10 +162,10 @@ class cryptography:
 
         new_filename = filename[:-4] + str(datetime.now())
 
-        """ destination = os.path.join(save_folder, new_filename)
+        """        destination = os.path.join(save_folder, new_filename)
         with open(destination, 'wb') as file:
             file.write(encrypted)
-        """
+    """
         
         new_query = "INSERT INTO files (accountID, file_name, hashed_name) VALUES (%s, %s, %s)"
         self.cursor.execute(new_query, (accountID,  filename, new_filename))
