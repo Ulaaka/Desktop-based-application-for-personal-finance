@@ -248,19 +248,21 @@ class query_processor:
 
         sql_categories  = "SELECT categoryID, category_list, category_name FROM categories WHERE userID = %s ORDER BY categoryID"
         self.cursor.execute(sql_categories, (userID, ))
+        result = self.cursor.fetchall()
 
-        tuple_to_dictionary = { category_list: (categoryID, category_name) for categoryID, category_list, category_name in self.cursor.fetchall()}
+        tuple_to_dictionary = {tuple(json.loads(category_list)): (categoryID, category_name) for categoryID, category_list, category_name in result}
 
         priority_list = [(len([item for item in category_list if item in i]), len(i)) for i in tuple_to_dictionary]
 
+        print(priority_list)
         max_category = max(priority_list, key=lambda x: (x[0], -x[1]))
+        print(max_category)
 
         position = priority_list.index(max_category)
 
         key = list(tuple_to_dictionary)[position]
         
         output = tuple_to_dictionary[key]
-
 
         """        # needs add selecting the one with the highest priority
         sql = f"SELECT categoryID, category_name FROM categories WHERE userID = %s AND JSON_CONTAINS(category_list, %s)"

@@ -72,7 +72,7 @@ query = query_processor()
 # result = query.show_description_list_by_category_name(1, "grocery")
 description  = "Lidl Cosmetic Surgery Mongolia"
 category = query.return_updated_category(description)
-transaction = [(1, 7, "2026-03-09", "Deposit", description, category, "30", "2034")]
+transaction = [(1, 7, "2026-03-09", "Deposit", description, category, "30", "2035")]
 query.insert_into_transactions(transaction)
 
 # result = query.add_description_into_list_category(1, "lidl Cosmetic Surgery Mongolia", "cosmetic")
