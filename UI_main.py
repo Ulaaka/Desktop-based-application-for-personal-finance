@@ -6,6 +6,24 @@ import mysql.connector
 from database_connection import database
 from BASE_Classes import password_class
 from qtwidgets import PasswordEdit
+from system_functions import system_functions
+import os
+import certifi
+import sys
+from system_functions import system_functions
+from functools import partial
+
+
+system = system_functions()
+# Add the project root to Python path
+sys.path.insert(0, '/Users/nyamdorjbat-erdene/Final_year')
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings' 
+os.environ['SSL_CERT_FILE'] = certifi.where()
+os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+
+import django
+django.setup()
 
 # https://stackoverflow.com/questions/45623918/using-qstackedwidget-for-multi-windowed-pyqt-application
 # https://doc.qt.io/qt-6/stylesheet-reference.html
@@ -35,6 +53,25 @@ forgot_button_style = '''
         color: green;
     }
     '''
+random_digit_box_style = '''
+    QLineEdit {
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background: #f9f9f9;
+        color: #333;
+        font-size: 15px;
+        text-align: center;
+        min-width: 50px;
+        max-width: 50px;
+        min-height: 55px;
+        max-height: 55px;
+    }
+    QLineEdit:focus {
+        border: 2px solid #6C63FF;
+        background: white;
+    }
+
+'''
 def handle_button_style(button_color, hover_color):
         line = f'''
             QPushButton {{
@@ -58,6 +95,7 @@ class login_page(QWidget):
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
+        self.system = system_functions()
 
         self.user_interface()
         
@@ -168,11 +206,101 @@ class login_page(QWidget):
             )
             return
         
-        QMessageBox.information(
+        email_query = "SELECT email_address FROM users WHERE username = %s"
+        self.cursor.execute(email_query, (username_local, ))
+        email_user = self.cursor.fetchone()[0]
+
+        random_digits = self.system.send_reset_digits(6, email_user)
+
+        self.controller.show_reset_form()
+        """        QMessageBox.information(
             self, 
             'Password Reset', 
             f'A password reset link has been sent to the email associated with username: {username_local}'
-        )
+        )"""
+
+class reset_from_page(QWidget):
+    def __init__(self, controller):
+        super().__init__()
+        self.controller = controller
+        connection = database()
+        self.db = connection.db
+        self.cursor = connection.cursor
+        self.user_interface()
+
+    def user_interface(self):
+        # set the size and name
+        self.setWindowTitle('Reset Password')
+        self.setFixedSize(400, 500)
+        
+        # set the color of the background 
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        palette.setColor(QPalette.Window, QColor("dark"))
+        self.setPalette(palette)
+
+        # layout
+        layout = QVBoxLayout()
+        layout.setContentsMargins(50, 70, 50, 70)
+        layout.setSpacing(25)
+
+        # Title
+        title = QLabel('Reset Your Password')
+        title.setAlignment(Qt.AlignCenter)
+        title.setFont(QFont('Arial', 20, QFont.Bold))
+        title_color = title.palette()
+        title_color.setColor(QPalette.WindowText, QColor("#1877F2"))
+        title.setPalette(title_color)
+
+
+        # Login button
+        submit_btn = QPushButton('Submit')
+        submit_btn.setStyleSheet(handle_button_style("#1877F2", "#18d5F2"))
+        submit_btn.setFont(QFont('Arial', 15, QFont.Bold))
+        submit_btn.setFixedHeight(50)
+        submit_btn.setCursor(Qt.PointingHandCursor)
+        submit_btn.clicked.connect(self.handle_reset_password)
+
+        self.squares = []
+        centering = Qt.AlignCenter
+        square_layout = QHBoxLayout()
+
+        for idx in range(6):
+            square = QLineEdit()
+            square.setMaxLength(1)
+            square.setAlignment(centering)
+            square.setStyleSheet(random_digit_box_style)
+
+            square.textChanged.connect(partial(self.to_next_box, idx))
+            square.keyPressEvent = partial(self.to_prev_box, idx)
+
+            square_layout.addWidget(square)
+            self.squares.append(square)
+
+        layout.addWidget(title)
+        layout.addLayout(square_layout)
+        self.setLayout(layout)
+        layout.addWidget(submit_btn)
+        layout.addStretch()
+
+    # needs to be changed
+    def to_next_box(self, idx, _):
+        if idx < 5:
+            self.squares[idx + 1].setFocus()
+
+
+    def to_prev_box(self, idx, input):
+        if input.key() == Qt.Key_Backspace:
+            if not self.squares[idx].text() and idx > 0:
+                self.squares[idx - 1].setFocus()
+
+                self.squares[idx - 1].clear()
+        QLineEdit.keyPressEvent(self.squares[idx], input)
+
+    def handle_reset_password(self):
+        entered = "".join(i.text() for i in self.squares)
+        print(entered)
+
 
 class sign_up_page(QWidget):
 
@@ -296,12 +424,17 @@ class MainApp(QMainWindow):
 
         self.login_page = login_page(self) 
         self.sign_up_page = sign_up_page(self)
+
+        #  # adding reset form page
+        self.reset_form = reset_from_page(self)
         self.dashboard_page = QWidget()
+
         self.setup_dashboard()
 
         self.stacked_widget.addWidget(self.login_page)    
         self.stacked_widget.addWidget(self.dashboard_page)
         self.stacked_widget.addWidget(self.sign_up_page)
+        self.stacked_widget.addWidget(self.reset_form)
 
     def setup_dashboard(self):
         layout = QVBoxLayout()
@@ -324,7 +457,10 @@ class MainApp(QMainWindow):
     def show_sign_up(self):
         self.stacked_widget.setCurrentIndex(2)
         self.setMaximumSize(400, 500)
-
+    
+    def show_reset_form(self):
+        self.stacked_widget.setCurrentIndex(3)
+        self.setMaximumSize(400, 500)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

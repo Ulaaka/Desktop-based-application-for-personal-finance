@@ -150,8 +150,8 @@ class password_class:
         self.cursor.execute(query, (hashed, userID))
         self.db.commit()
         print("changed the password successfully")
-
-
+        return hashed
+    
 # https://stackoverflow.com/questions/66218337/encrypt-and-protect-file-with-python
 #https://stackoverflow.com/questions/42568262/how-to-encrypt-text-with-a-password-in-python
 class cryptography:

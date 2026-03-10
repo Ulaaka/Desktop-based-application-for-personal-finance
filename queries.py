@@ -435,6 +435,7 @@ class query_processor:
             FROM transactions
             WHERE accountID = %s AND category = %s
         """
+
         self.cursor.execute(query, (accountID, category_name))
         result = self.cursor.fetchall()
          #return result if result else None

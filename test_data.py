@@ -80,6 +80,9 @@ query.insert_into_transactions(transaction)
 #result = query.remove_description_from_list_category(1, 7, "cosmetic")
 #query.update_transaction_after_deletion_description(1, "cosmetic")
 
-system = system_functions()
+"""system = system_functions()
 random = system.generate_random_digits(6)
-print(random)
+print(random)"""
+
+password = password_class()
+new_password = password.change_password(1, "Bi20031223torson")
