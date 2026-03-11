@@ -136,9 +136,10 @@ class password_class:
         
     # https://stackoverflow.com/questions/74932694/checking-password-validation-in-python
     def check_password_safety(self, password):
-        if len(password) >= 6 and re.search(r"\d", password) and re.search(r"[A-Z]", password) and re.search(r"[!$@%]", password):
+        if len(password) >= 8 and re.search(r"\d", password) and re.search(r"[A-Za-z]", password) and re.search(r"[!$@%]", password):
             return True 
-        return False
+        else:
+            return False
     
     def hash_password(self, password):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())

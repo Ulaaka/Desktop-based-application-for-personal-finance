@@ -82,7 +82,7 @@ def handle_button_style(button_color, hover_color):
         '''
         return line
 
-DURATION_INT = 60
+DURATION_INT = 90
 
 def secs_to_minsec(secs: int):
     mins = secs // 60
@@ -91,7 +91,6 @@ def secs_to_minsec(secs: int):
     return minsec
 
 class login_page(QWidget):
-
     def __init__(self, controller, db, cursor):
         super().__init__()
         self.controller = controller
@@ -147,7 +146,7 @@ class login_page(QWidget):
         login_btn.setFixedHeight(50)
         login_btn.setCursor(Qt.PointingHandCursor)
         login_btn.clicked.connect(self.handle_login)
-        
+
         # sign up button
         signup_btn = QPushButton('Create new account')
         signup_btn.setStyleSheet(handle_button_style("#1877F2", "#18d5f2"))
@@ -161,7 +160,7 @@ class login_page(QWidget):
         forgot_password.setStyleSheet(forgot_button_style)
         forgot_password.setCursor(Qt.PointingHandCursor)
         forgot_password.clicked.connect(self.handle_forgot_password)
-        
+
         # Add widgets to layout
         layout.addWidget(title)
         layout.addWidget(self.username)
@@ -183,7 +182,7 @@ class login_page(QWidget):
         if not username_local or not password_local:
             QMessageBox.warning(self, 'Error', 'Please enter both of the credentials, thank you')
             return
-        
+
         # needs to add a timer of 1 minute
         sql = f"SELECT hashed_password FROM users WHERE username = %s"
         self.cursor.execute(sql, (username_local, ))
@@ -206,7 +205,7 @@ class login_page(QWidget):
                 'Please enter your username first, then click "Forgot your password?"'
             )
             return
-        
+
         self.random_digits = self.system.send_reset_digits(6, username_local)
         self.controller.show_reset_form()
         """        QMessageBox.information(
@@ -234,7 +233,7 @@ class reset_from_page(QWidget):
         # set the size and name
         self.setWindowTitle('Reset Password')
         self.setFixedSize(400, 500)
-        
+
         # set the color of the background 
         self.setAutoFillBackground(True)
         palette = self.palette()
@@ -350,7 +349,7 @@ class reset_password(QWidget):
         # set the size and name
         self.setWindowTitle('Enter New Password')
         self.setFixedSize(400, 500)
-        
+
         # set the color of the background 
         self.setAutoFillBackground(True)
         palette = self.palette()
@@ -390,11 +389,22 @@ class reset_password(QWidget):
         submit_btn.setCursor(Qt.PointingHandCursor)
         submit_btn.clicked.connect(self.compare_password)
 
+
+        self.description = "Your password must be at least 8 characters and should include a combination of numbers, letters and special characters (!$@%)."
+        # instruction for password requirement 
+        description_label = QLabel(self.description, self)
+        description_label.move(100, 100)
+        description_label.setAlignment(Qt.AlignCenter)
+        description_label.setWordWrap(True) 
+        description_label.setFixedWidth(300)    
+        description_label.setStyleSheet("font: 15pt Helvetica;")
+
         # Add widgets to layout
         layout.addWidget(title)
         layout.addWidget(self.password_1)
         layout.addWidget(self.password_2)
         layout.addWidget(submit_btn)
+        layout.addWidget(description_label)
         layout.addStretch()
         
         self.setLayout(layout)
@@ -403,7 +413,24 @@ class reset_password(QWidget):
         # needs to add password check, warning to the user
         password_manager = password_class()
         safety = password_manager.check_password_safety(self.password_1.text())
-        if self.password_1.text() == self.password_2.text():
+        same = self.password_1.text() == self.password_2.text()
+        if not safety:
+            QMessageBox.information(
+                self, 
+                'Password requirement not satisfied', 
+                self.description
+            )
+            return
+        
+        if not same:
+            QMessageBox.information(
+                self, 
+                'Password do not match', 
+                'Check your password again"'
+            )
+            return
+        
+        if safety and same:
            print("New Password Matches")
 
            hashed_password = password_manager.hash_password(self.password_1.text())
@@ -414,24 +441,15 @@ class reset_password(QWidget):
            self.db.commit()
 
            self.controller.show_login()
-        else:
-            QMessageBox.information(
-                self, 
-                'Password do not match', 
-                'Check your password again"'
-            )
-            return
 
 class sign_up_page(QWidget):
 
     # https://doc.qt.io/qt-6/stylesheet-reference.html
-
     def __init__(self, controller, db, cursor):
         super().__init__()
         self.controller = controller
         self.db = db
         self.cursor = cursor
-
         self.user_interface()
         
     def user_interface(self):
@@ -469,6 +487,13 @@ class sign_up_page(QWidget):
         self.password.setPlaceholderText('Password')
         self.password.setStyleSheet(input_style)
         self.password.setFont(QFont('Arial', 15))
+        self.password.setToolTip(
+            "Your password must be at least 8 characters \n"
+            "should include: \n"
+            "- a combination of numbers\n"
+            "- letters\n"
+            "- special characters (!$@%)"
+        )
 
         # email input
         self.email = QLineEdit()
@@ -509,28 +534,35 @@ class sign_up_page(QWidget):
         username_local = self.username.text()
         password_local = self.password.text()
         email_local = self.email.text()
+
         password_manager = password_class()
+
         sql = f"SELECT userID FROM users WHERE username = %s"
         self.cursor.execute(sql, (username_local,))
         result = self.cursor.fetchone()
         
         if not username_local or not password_local or not email_local:
-            QMessageBox.warning(self, 'Error', 'Please enter both of the credentials, thank you')
+            QMessageBox.warning(self, 'Error', 'Please enter all  the credentials, thank you')
             return
         
         if not result:
-            try:
-                hashed_password = password_manager.hash_password(password_local)
-                new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
-                self.cursor.execute(new_sql, (username_local, hashed_password, email_local))
-                self.db.commit()
-                self.controller.show_login()
-                print("Credentials added successfully")
-            except:
-                print("could not commit")
+            if not password_manager.check_password_safety(password_local):
+                QMessageBox.warning(self, 'Error', 'Password Requirement not satisfied')
+                return
+            else:
+                try:
+                    hashed_password = password_manager.hash_password(password_local)
+                    new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
+                    self.cursor.execute(new_sql, (username_local, hashed_password, email_local))
+                    self.db.commit()
+                    self.controller.show_login()
+                    print("Credentials added successfully")
+                except:
+                    print("could not commit")
         else:
             QMessageBox.warning(self, 'Error', 'Username already exists, please try another username')
             return
+
 
 class MainApp(QMainWindow):
     def __init__(self):
@@ -562,7 +594,6 @@ class MainApp(QMainWindow):
         self.stacked_widget.addWidget(self.reset_form)
         self.stacked_widget.addWidget(self.reset_password)
     
-
     def setup_dashboard(self):
         layout = QVBoxLayout()
 
