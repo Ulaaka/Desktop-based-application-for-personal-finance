@@ -159,6 +159,7 @@ class password_class:
         self.db.commit()
         print("changed the password successfully")
         return hashed
+    
     # https://www.geeksforgeeks.org/python/check-if-email-address-valid-or-not-in-python/
     def check_email_validity(self, email):
         regex = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}"

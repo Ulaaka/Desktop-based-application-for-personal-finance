@@ -99,23 +99,23 @@ class login_page(QWidget):
         self.system = system_functions()
 
         self.user_interface()
-        
+
     def user_interface(self):
         # set the size and name
         self.setWindowTitle('Finance Login')
         self.setFixedSize(400, 500)
-        
-        # set the color of the background 
+
+        # set the color of the background
         self.setAutoFillBackground(True)
         palette = self.palette()
         palette.setColor(QPalette.Window, QColor("dark"))
         self.setPalette(palette)
-        
+
         # layout
         layout = QVBoxLayout()
         layout.setContentsMargins(50, 70, 50, 70)
         layout.setSpacing(25)
-    
+
         # Title
         title = QLabel('Finance Reporter')
         title.setAlignment(Qt.AlignCenter)
@@ -123,13 +123,13 @@ class login_page(QWidget):
         title_color = title.palette()
         title_color.setColor(QPalette.WindowText, QColor("limegreen"))
         title.setPalette(title_color)
-        
+
         # Username input
         self.username = QLineEdit()
         self.username.setPlaceholderText('Username')
         self.username.setStyleSheet(input_style)
         self.username.setFont(QFont('Arial', 15))
-        
+
         # Password input
         self.password = QLineEdit()
         self.password.setPlaceholderText('Password')
@@ -138,7 +138,7 @@ class login_page(QWidget):
         self.password.setEchoMode(QLineEdit.Password)
         self.password.setStyleSheet(input_style)
         self.password.setFont(QFont('Arial', 15))
-        
+
         # Login button
         login_btn = QPushButton('Log In')
         login_btn.setStyleSheet(handle_button_style("limegreen", "springgreen"))
@@ -200,8 +200,8 @@ class login_page(QWidget):
 
         if not username_local:
             QMessageBox.information(
-                self, 
-                'Forgot Password', 
+                self,
+                'Forgot Password',
                 'Please enter your username first, then click "Forgot your password?"'
             )
             return
@@ -209,8 +209,8 @@ class login_page(QWidget):
         self.random_digits = self.system.send_reset_digits(6, username_local)
         self.controller.show_reset_form()
         """        QMessageBox.information(
-            self, 
-            'Password Reset', 
+            self,
+            'Password Reset',
             f'A password reset link has been sent to the email associated with username: {username_local}'
         )"""
 
@@ -342,7 +342,6 @@ class reset_password(QWidget):
         self.db = db
         self.cursor = cursor
         self.login_page = login_page
-
         self.user_interface()
 
     def user_interface(self):
@@ -355,12 +354,12 @@ class reset_password(QWidget):
         palette = self.palette()
         palette.setColor(QPalette.Window, QColor("dark"))
         self.setPalette(palette)
-        
+
         # layout
         layout = QVBoxLayout()
         layout.setContentsMargins(50, 70, 50, 70)
         layout.setSpacing(25)
-    
+
         # Title
         title = QLabel('Password Reset')
         title.setAlignment(Qt.AlignCenter)
@@ -389,14 +388,13 @@ class reset_password(QWidget):
         submit_btn.setCursor(Qt.PointingHandCursor)
         submit_btn.clicked.connect(self.compare_password)
 
-
         self.description = "Your password must be at least 8 characters and should include a combination of numbers, letters and special characters (!$@%)."
-        # instruction for password requirement 
+        # instruction for password requirement
         description_label = QLabel(self.description, self)
         description_label.move(100, 100)
         description_label.setAlignment(Qt.AlignCenter)
-        description_label.setWordWrap(True) 
-        description_label.setFixedWidth(300)    
+        description_label.setWordWrap(True)
+        description_label.setFixedWidth(300)
         description_label.setStyleSheet("font: 15pt Helvetica;")
 
         # Add widgets to layout
@@ -406,7 +404,7 @@ class reset_password(QWidget):
         layout.addWidget(submit_btn)
         layout.addWidget(description_label)
         layout.addStretch()
-        
+
         self.setLayout(layout)
 
     def compare_password(self):
@@ -415,12 +413,12 @@ class reset_password(QWidget):
         same = self.password_1.text() == self.password_2.text()
         if not safety:
             QMessageBox.information(
-                self, 
-                'Password requirement not satisfied', 
+                self,
+                'Password requirement not satisfied',
                 self.description
             )
             return
-        
+
         if not same:
             QMessageBox.information(
                 self, 
@@ -428,7 +426,7 @@ class reset_password(QWidget):
                 'Check your password again"'
             )
             return
-        
+
         if safety and same:
            print("New Password Matches")
 
@@ -450,23 +448,22 @@ class sign_up_page(QWidget):
         self.db = db
         self.cursor = cursor
         self.user_interface()
-        
+
     def user_interface(self):
         # set the size and name
         self.setWindowTitle('Sign Up')
         self.setFixedSize(400, 500)
-        
         # set the color of the background 
         self.setAutoFillBackground(True)
         palette = self.palette()
         palette.setColor(QPalette.Window, QColor("dark"))
         self.setPalette(palette)
-        
+
         # layout
         layout = QVBoxLayout()
         layout.setContentsMargins(50, 70, 50, 70)
         layout.setSpacing(25)
-    
+
         # Title
         title = QLabel('Create a new account')
         title.setAlignment(Qt.AlignCenter)
@@ -474,13 +471,13 @@ class sign_up_page(QWidget):
         title_color = title.palette()
         title_color.setColor(QPalette.WindowText, QColor("#1877F2"))
         title.setPalette(title_color)
-        
+
         # Username input
         self.username = QLineEdit()
         self.username.setPlaceholderText('Username')
         self.username.setStyleSheet(input_style)
         self.username.setFont(QFont('Arial', 15))
-        
+
         # Password input
         self.password = PasswordEdit()
         self.password.setPlaceholderText('Password')
@@ -507,7 +504,7 @@ class sign_up_page(QWidget):
         submit_btn.setFixedHeight(50)
         submit_btn.setCursor(Qt.PointingHandCursor)
         submit_btn.clicked.connect(self.handle_submit)
-        
+
         # already have an account?
         got_account = QPushButton('Already have an account?')
         got_account.setStyleSheet(forgot_button_style)
@@ -522,13 +519,12 @@ class sign_up_page(QWidget):
         layout.addWidget(submit_btn)
         layout.addWidget(got_account, alignment=Qt.AlignCenter)
         layout.addStretch()
-        
         self.setLayout(layout)
 
     def handle_got_account(self):
         self.controller.show_login()
         pass
-    
+
     def handle_submit(self):
         username_local = self.username.text()
         password_local = self.password.text()
@@ -539,23 +535,23 @@ class sign_up_page(QWidget):
         sql = f"SELECT userID FROM users WHERE username = %s"
         self.cursor.execute(sql, (username_local,))
         result = self.cursor.fetchone()
-        
+
         if not username_local or not password_local or not email_local:
             QMessageBox.warning(self, 'Error', 'Please enter all  the credentials, thank you')
             return
-        
+
         if result:
             QMessageBox.warning(self, 'Error', 'Username already exists, please try another username')
             return
-        
+
         if not password_manager.check_password_safety(password_local):
             QMessageBox.warning(self, 'Not Satisfied', 'Password Requirement not satisfied')
             return
-        
+
         if not password_manager.check_email_validity(email_local):
             QMessageBox.warning(self, 'Invalid', 'Invalid email')
             return
-        
+
         try:
             hashed_password = password_manager.hash_password(password_local)
             new_sql = f"INSERT INTO users (username, hashed_password, email_address) VALUES (%s, %s, %s)"
@@ -591,18 +587,18 @@ class MainApp(QMainWindow):
 
         self.setup_dashboard()
 
-        self.stacked_widget.addWidget(self.login_page)    
+        self.stacked_widget.addWidget(self.login_page)
         self.stacked_widget.addWidget(self.dashboard_page)
         self.stacked_widget.addWidget(self.sign_up_page)
         self.stacked_widget.addWidget(self.reset_form)
         self.stacked_widget.addWidget(self.reset_password)
-    
+
     def setup_dashboard(self):
         layout = QVBoxLayout()
 
         logout_btn = QPushButton("Log Out")
         logout_btn.clicked.connect(self.show_login)
-        
+
         layout.addWidget(logout_btn)
         self.dashboard_page.setLayout(layout)
 
@@ -618,7 +614,7 @@ class MainApp(QMainWindow):
     def show_sign_up(self):
         self.stacked_widget.setCurrentIndex(2)
         self.setMaximumSize(400, 500)
-    
+
     def show_reset_form(self):
         self.stacked_widget.setCurrentIndex(3)
         self.setMaximumSize(400, 500)
@@ -629,8 +625,8 @@ class MainApp(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    
+
     main_window = MainApp()
     main_window.show()
-    
+
     sys.exit(app.exec_())
