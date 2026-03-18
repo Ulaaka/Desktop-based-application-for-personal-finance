@@ -29,7 +29,7 @@ from system_functions import system_functions
 #query.common_transactions("test5",  5, account_name="savings",transfer_toggle=False, date_lower="2025-12-23", filter_amount=5)
 
 # https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-"""folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
+folder_path = '/Users/nyamdorjbat-erdene/Final_year/file_storage'
 save_folder = '/Users/nyamdorjbat-erdene/Final_year/encrypted_storage'
 exp_folder = '/Users/nyamdorjbat-erdene/Final_year/exp_folder'
 # /Users/nyamdorjbat-erdene/Final_year/2025_October_Statement.pdf
@@ -40,7 +40,7 @@ email = "urnaa@gmail.com"
 account_type = "Bank"
 account_currency = "GBP"
 query = query_processor()
-for filename in os.listdir(folder_path):
+for filename in os.listdir(exp_folder):
     if (filename.endswith(".csv") or filename.endswith(".pdf")): 
 
         crypto = cryptography()
@@ -49,7 +49,8 @@ for filename in os.listdir(folder_path):
         userID = query.insert_user(username, password, email)
         accountID = query.insert_account(userID, account_name, account_type, account_currency)
 
-        file_path = os.path.join(folder_path, filename)
+        file_path = os.path.join(exp_folder, filename)
+
         if (filename.endswith(".csv")):
             parsing = ParsingCSV(file_path)
         else:
@@ -59,10 +60,10 @@ for filename in os.listdir(folder_path):
                 parsing = HSBC_PDF_CONVERSION(file_path)
 
         print("parsed: ", filename)
-        file_ID = crypto.encrypt(save_folder, folder_path, filename, password, accountID)
+        file_ID = crypto.encrypt(save_folder, exp_folder, filename, password, accountID)
         processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
     else:
-        raise Exception("Incompatible file/s has been submitted.")"""
+        raise Exception("Incompatible file/s has been submitted.")
 
 
 query = query_processor()
@@ -84,5 +85,5 @@ query.insert_into_transactions(transaction)
 random = system.generate_random_digits(6)
 print(random)"""
 
-password = password_class()
-new_password = password.change_password(1, "Bi20031223torson")
+"""password = password_class()
+new_password = password.change_password(1, "Bi20031223torson")"""

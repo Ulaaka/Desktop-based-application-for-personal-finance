@@ -206,7 +206,7 @@ class cryptography:
         return file_ID
 
         # file needs to be deleted from the original folder
-    def decrypt(self, enc_storage_path, filename, password, username, account_name):
+    def decrypt_with_filename(self, enc_storage_path, filename, password, username, account_name):
         query = query_processor()
 
         userID = query.get_userID(username)
@@ -214,7 +214,6 @@ class cryptography:
         hashed_filename = query.get_hashed_name(accountID, filename)
 
         file_path = os.path.join(enc_storage_path, hashed_filename)
-
 
         with open(file_path, "rb") as file:
             data = file.read()
@@ -225,6 +224,7 @@ class cryptography:
 
         decrypted = fernet.decrypt(data)
 
-        print(decrypted)
+        return decrypted
+    
 
 
