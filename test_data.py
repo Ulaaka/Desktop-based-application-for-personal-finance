@@ -81,7 +81,6 @@ for filename in os.listdir(folder_path):
                         found = True
                         print(f"The file {filename} already exists as: {existing_name}")
                         break
-
         if found is False:
             if (filename.endswith(".csv")):
                 parsing = ParsingCSV(file_path)
@@ -96,4 +95,3 @@ for filename in os.listdir(folder_path):
             processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
     else:
         raise Exception("Incompatible file/s has been submitted.")
-
