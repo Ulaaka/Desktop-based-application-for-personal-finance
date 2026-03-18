@@ -288,6 +288,12 @@ class query_processor:
         output = self.cursor.fetchone()
         return output[0] if output else None
 
+    def get_file_name_from_hashed(self, accountID, hashed_name):
+        new_sql = f"SELECT file_name FROM files WHERE accountID = '{accountID}' and hashed_name = '{hashed_name}'"
+        self.cursor.execute(new_sql)
+        output = self.cursor.fetchone()
+        return output[0] if output else None
+
     def get_file_ID(self, accountID, filename):
         sql = "SELECT file_ID FROM files WHERE accountID = %s AND file_name = %s"
         self.cursor.execute(sql, (accountID, filename))

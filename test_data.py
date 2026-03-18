@@ -40,7 +40,7 @@ email = "urnaa@gmail.com"
 account_type = "Bank"
 account_currency = "GBP"
 query = query_processor()
-for filename in os.listdir(exp_folder):
+for filename in os.listdir(folder_path):
     if (filename.endswith(".csv") or filename.endswith(".pdf")): 
 
         crypto = cryptography()
@@ -49,19 +49,35 @@ for filename in os.listdir(exp_folder):
         userID = query.insert_user(username, password, email)
         accountID = query.insert_account(userID, account_name, account_type, account_currency)
 
-        file_path = os.path.join(exp_folder, filename)
+        file_path = os.path.join(folder_path, filename)
 
-        if (filename.endswith(".csv")):
-            parsing = ParsingCSV(file_path)
-        else:
-            try:
-                parsing = ParsingPDF(file_path)
-            except:
-                parsing = HSBC_PDF_CONVERSION(file_path)
+        sub_save_folder = os.path.join(save_folder,f"account_{accountID}")
+        if not os.path.exists(sub_save_folder):
+            os.makedirs(sub_save_folder)
 
-        print("parsed: ", filename)
-        file_ID = crypto.encrypt(save_folder, exp_folder, filename, password, accountID)
-        processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
+        if os.path.exists(sub_save_folder):
+        # needs to be fixed
+            for encrypted_file in os.listdir(sub_save_folder):
+                decrypted = crypto.decrypt(sub_save_folder, password, username, account_name, hashed_filename=encrypted_file)
+                if os.path.getsize(file_path) == len(decrypted):
+                    with open(file_path, 'rb') as file:
+                        if file.read() == decrypted:
+                            existing_name = query.get_file_name_from_hashed(accountID, encrypted_file)
+                            print(f"The same file already exists: {existing_name}")
+                        else:
+
+                            if (filename.endswith(".csv")):
+                                parsing = ParsingCSV(file_path)
+                            else:
+                                try:
+                                    parsing = ParsingPDF(file_path)
+                                except:
+                                    parsing = HSBC_PDF_CONVERSION(file_path)
+
+                            print("parsed: ", filename)
+                            file_ID = crypto.encrypt(sub_save_folder, folder_path, filename, password, accountID)
+                            processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
+
     else:
         raise Exception("Incompatible file/s has been submitted.")
 

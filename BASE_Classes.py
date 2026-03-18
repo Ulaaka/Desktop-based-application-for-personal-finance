@@ -194,11 +194,10 @@ class cryptography:
 
         new_filename = filename[:-4] + str(datetime.now())
 
-        """        destination = os.path.join(save_folder, new_filename)
+        destination = os.path.join(save_folder, new_filename)
         with open(destination, 'wb') as file:
             file.write(encrypted)
-    """
-
+    
         new_query = "INSERT INTO files (accountID, file_name, hashed_name) VALUES (%s, %s, %s)"
         self.cursor.execute(new_query, (accountID,  filename, new_filename))
         file_ID = self.cursor.lastrowid
@@ -206,14 +205,19 @@ class cryptography:
         return file_ID
 
         # file needs to be deleted from the original folder
-    def decrypt_with_filename(self, enc_storage_path, filename, password, username, account_name):
+    def decrypt(self, enc_storage_path, password, username, account_name, filename=None, hashed_filename=None):
         query = query_processor()
-
         userID = query.get_userID(username)
         accountID = query.get_accountID(account_name, userID)
-        hashed_filename = query.get_hashed_name(accountID, filename)
 
-        file_path = os.path.join(enc_storage_path, hashed_filename)
+        if filename:
+            # even if the account name is changed, ID would stay the same
+            hashed_name = query.get_hashed_name(accountID, filename)
+        
+        if hashed_filename:
+            hashed_name = hashed_filename
+
+        file_path = os.path.join(enc_storage_path, hashed_name)
 
         with open(file_path, "rb") as file:
             data = file.read()
@@ -225,6 +229,12 @@ class cryptography:
         decrypted = fernet.decrypt(data)
 
         return decrypted
+
+        
+
+        
+    
+    # needs to decrypt files under an account
     
 
 
