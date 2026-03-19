@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import *
 from PyQt5 import QtCore
 from database_connection import database
-from BASE_Classes import password_class
+from BASE_Classes import password_class, cryptography
 from qtwidgets import PasswordEdit
 from system_functions import system_functions
 import os, certifi, sys
@@ -221,18 +221,19 @@ class login_page(QWidget):
         username_local = self.username.text()
         password_local = self.password.text()
         password_manager = password_class()
+        crypto = cryptography()
 
         if not username_local or not password_local:
             QMessageBox.warning(self, 'Error', 'Please enter both of the credentials, thank you')
             return
 
-        # needs to add a timer of 1 minute
         sql = f"SELECT hashed_password FROM users WHERE username = %s"
         self.cursor.execute(sql, (username_local, ))
         result = self.cursor.fetchone()
 
         if result and password_manager.check_password(password_local, result[0]):
-                self.controller.show_dashboard()
+                key = crypto.generate_key(password_local)
+                self.controller.show_dashboard(key)
         else:
             QMessageBox.warning(self, 'Error', 'Password or Username is wrong')
             return
@@ -644,9 +645,10 @@ class MainApp(QMainWindow):
         layout.addWidget(logout_btn)
         self.dashboard_page.setLayout(layout)
 
-    def show_dashboard(self):
+    def show_dashboard(self, key):
+        self.key = key
         self.stacked_widget.setCurrentIndex(1)
-        self.setMinimumSize(1000, 700) 
+        self.setMinimumSize(1000, 700)
         self.setMaximumSize(16777215, 16777215)
 
     def show_login(self):

@@ -137,17 +137,17 @@ class password_class:
     # https://stackoverflow.com/questions/74932694/checking-password-validation-in-python
     def check_password_safety(self, password):
         if len(password) >= 8 and re.search(r"\d", password) and re.search(r"[A-Za-z]", password) and re.search(r"[!$@%]", password):
-            return True 
+            return True
         else:
             return False
-    
+
     def hash_password(self, password):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     # later used to check the password
     def check_password(self, plain_text_password, hashed_password):
         return bcrypt.checkpw(plain_text_password, hashed_password)
-    
+
     def change_password(self, userID, new_password):
         hashed = self.hash_password(new_password)
         query = f"""
@@ -159,7 +159,7 @@ class password_class:
         self.db.commit()
         print("changed the password successfully")
         return hashed
-    
+
     # https://www.geeksforgeeks.org/python/check-if-email-address-valid-or-not-in-python/
     def check_email_validity(self, email):
         regex = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}"
@@ -168,7 +168,6 @@ class password_class:
             return True
         return False
 
-    
 # https://stackoverflow.com/questions/66218337/encrypt-and-protect-file-with-python
 #https://stackoverflow.com/questions/42568262/how-to-encrypt-text-with-a-password-in-python
 class cryptography:
@@ -178,6 +177,7 @@ class cryptography:
         self.cursor = connection.cursor
 
     def generate_key(self, password):
+
         hashed = SHA256.new(password.encode()).digest()
         return base64.urlsafe_b64encode(hashed)
 
@@ -202,7 +202,6 @@ class cryptography:
         file_ID = self.cursor.lastrowid
         self.db.commit()
         return file_ID
-
 
         # file needs to be deleted from the original folder
     def decrypt(self, enc_storage_path, password, username, account_name, filename=None, hashed_filename=None):
