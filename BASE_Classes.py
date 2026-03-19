@@ -176,7 +176,6 @@ class cryptography:
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
-        self.salt = b'HuhTengereesZayatai'
 
     def generate_key(self, password):
         hashed = SHA256.new(password.encode()).digest()
@@ -197,12 +196,13 @@ class cryptography:
         destination = os.path.join(save_folder, new_filename)
         with open(destination, 'wb') as file:
             file.write(encrypted)
-    
+
         new_query = "INSERT INTO files (accountID, file_name, hashed_name) VALUES (%s, %s, %s)"
         self.cursor.execute(new_query, (accountID,  filename, new_filename))
         file_ID = self.cursor.lastrowid
         self.db.commit()
         return file_ID
+
 
         # file needs to be deleted from the original folder
     def decrypt(self, enc_storage_path, password, username, account_name, filename=None, hashed_filename=None):
@@ -213,7 +213,7 @@ class cryptography:
         if filename:
             # even if the account name is changed, ID would stay the same
             hashed_name = query.get_hashed_name(accountID, filename)
-        
+
         if hashed_filename:
             hashed_name = hashed_filename
 
