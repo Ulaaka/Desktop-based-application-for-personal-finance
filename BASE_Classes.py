@@ -175,19 +175,19 @@ class cryptography:
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
+        self.query = query_processor()
 
     def generate_key(self, password):
 
         hashed = SHA256.new(password.encode()).digest()
         return base64.urlsafe_b64encode(hashed)
 
-    def encrypt(self, save_folder, folder_path, filename, password, accountID):
+    def encrypt(self, save_folder, folder_path, filename, key, accountID):
 
         file_path = os.path.join(folder_path, filename)
         with open(file_path, 'rb') as file:
             data = file.read()
 
-        key = self.generate_key(password)
         fernet = Fernet(key)
         encrypted = fernet.encrypt(data)
 
@@ -204,14 +204,11 @@ class cryptography:
         return file_ID
 
         # file needs to be deleted from the original folder
-    def decrypt(self, enc_storage_path, password, username, account_name, filename=None, hashed_filename=None):
-        query = query_processor()
-        userID = query.get_userID(username)
-        accountID = query.get_accountID(account_name, userID)
+    def decrypt(self, enc_storage_path, key, accountID, filename=None, hashed_filename=None):
 
         if filename:
             # even if the account name is changed, ID would stay the same
-            hashed_name = query.get_hashed_name(accountID, filename)
+            hashed_name = self.query.get_hashed_name(accountID, filename)
 
         if hashed_filename:
             hashed_name = hashed_filename
@@ -220,8 +217,6 @@ class cryptography:
 
         with open(file_path, "rb") as file:
             data = file.read()
-
-        key = self.generate_key(password)
 
         fernet = Fernet(key)
 
