@@ -22,6 +22,7 @@ def open_temp_file(temp_name):
 
 # needs to be fixed
 def check_file_exists(sub_save_folder):
+
     found = False
     for encrypted_file in os.listdir(sub_save_folder):
         decrypted = crypto.decrypt(sub_save_folder, password, username, account_name, hashed_filename=encrypted_file)
@@ -81,6 +82,7 @@ for filename in os.listdir(folder_path):
                         found = True
                         print(f"The file {filename} already exists as: {existing_name}")
                         break
+
         if found is False:
             if (filename.endswith(".csv")):
                 parsing = ParsingCSV(file_path)
