@@ -7,42 +7,22 @@ import pandas as pd
 
 
 class ProcessingDF:
-    def __init__(self, df, username, password, email,  account_name, account_type, file_ID, account_currency):
+    def __init__(self, df, file_ID, accountID):
 
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
-
+        self.accountID = accountID
         self.query = query_processor()
-
-        self.username = username
-        self.password = password
-        self.email = email
-        self.acc_name = account_name
-        self.acc_type = account_type
-        self.acc_currency = account_currency
         self.file_ID = file_ID
 
         if isinstance(df, list):
             for i in df:
-                self.insert_all(i)
+                self.insert_transaction(self.accountID, i)
         else:
-            self.insert_all(df)
+            self.insert_transaction(self.accountID, df)
 
-    def delete_user(self):
-        """
-        All data relating to the user is deleted
-        """
-        sql = f"DELETE FROM users WHERE username = %s"
-        self.cursor.execute(sql, (self.username,))
-        self.db.commit()
-
-    def insert_all(self, dtb):
-        userID = self.query.insert_user(self.username, self.password, self.email)
-        accountID = self.query.insert_account(userID, self.acc_name, self.acc_type, self.acc_currency)
-        self.insert_transaction(userID, accountID, dtb)
-
-    def insert_transaction(self, userID, accountID, dtb):
+    def insert_transaction(self, accountID, dtb):
         parser = ParsingBase()
         query = query_processor()
 
@@ -54,7 +34,6 @@ class ProcessingDF:
             category = query.return_updated_category(row[2])
             row[1] = parser.classify_transaction_type(row[1])
             transaction_list.append((accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], category, Decimal(row[3]),  Decimal(row[4])))
-        
         self.query.insert_into_transactions(transaction_list)
 
     def change_to_date(self, date_string):

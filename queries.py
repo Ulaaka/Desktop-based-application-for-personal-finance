@@ -240,6 +240,14 @@ class query_processor:
         else:
             categoryID = self.insert_into_categories(userID, category_sentence, category_list, category_name)
         return categoryID
+    
+    def delete_user(self):
+        """
+        All data relating to the user is deleted
+        """
+        sql = f"DELETE FROM users WHERE username = %s"
+        self.cursor.execute(sql, (self.username,))
+        self.db.commit()
 
     # function for returning the category based on the tokens of words in the list
     def get_category(self, userID, category_list):

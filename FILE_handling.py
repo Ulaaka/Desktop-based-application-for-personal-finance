@@ -12,15 +12,10 @@ email = "urnaa@gmail.com"
 account_type = "Bank"
 account_currency = "GBP"
 
-
 class file_handling():
-    def __init__(self, username, password, account_name, email, account_type, account_currency):
-        self.username = username
-        self.password = password
-        self.account_name = account_name
-        self.email = email
-        self.account_type = account_type
-        self.account_currency = account_currency
+    def __init__(self, accountID, key):
+        self.accountID = accountID
+        self.key = key
         self.crypto = cryptography()
         self.password_manager = password_class()
         self.query = query_processor()
@@ -38,11 +33,11 @@ class file_handling():
         os.system(f"open {temp_name}")
 
     # needs to be fixed
-    def check_file_exists(self, sub_save_folder, file_path, accountID, filename):
+    def check_file_exists(self, sub_save_folder, file_path, filename):
 
         found = False
         for encrypted_file in os.listdir(sub_save_folder):
-            decrypted = self.crypto.decrypt(sub_save_folder, password, username, account_name, hashed_filename=encrypted_file)
+            decrypted = self.crypto.decrypt(sub_save_folder, self.key, self.accountID, hashed_filename=encrypted_file)
             # check the size of the file, avoiding reading the whole files
 
             if os.path.getsize(file_path) == len(decrypted):
@@ -50,12 +45,39 @@ class file_handling():
                 with open(file_path, 'rb') as file:
                     if file.read() == decrypted:
                         # find the submitted existing file_name in the folder
-                        existing_name = self.query.get_file_name_from_hashed(accountID, encrypted_file)
+                        existing_name = self.query.get_file_name_from_hashed(self.accountID, encrypted_file)
                         found = True
                         print(f"The file {filename} already exists as: {existing_name}")
                         break
 
         return found
+    
+    def process_files_in_folder(self):
+        query = query_processor()
+        for filename in os.listdir(config('FOLDER_PATH')):
+            if (filename.endswith(".csv") or filename.endswith(".pdf")): 
+
+                file_path = os.path.join(config('FOLDER_PATH'), filename)
+
+                # create the folder for the user's account
+                sub_save_folder = os.path.join(config('SAVE_FOLDER'),f"account_{self.accountID}")
+                if not os.path.exists(sub_save_folder):
+                    os.makedirs(sub_save_folder)
+
+                flag = self.check_file_exists(sub_save_folder, file_path, filename)
+
+                if flag is False:
+                    if (filename.endswith(".csv")):
+                        parsing = ParsingCSV(file_path)
+                    else:
+                        try:
+                            parsing = ParsingPDF(file_path)
+                        except:
+                            parsing = HSBC_PDF_CONVERSION(file_path)
+
+                    print("parsed: ", filename)
+                    file_ID = crypto.encrypt(sub_save_folder, folder_path, filename, password, accountID)
+                    processor = ProcessingDF(parsing.df, username, password, email, account_name, account_type, file_ID,  account_currency)
 
 
 
