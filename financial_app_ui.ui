@@ -398,7 +398,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Sidebar</string>
+             <string>Sidebar </string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
@@ -407,8 +407,8 @@
             </property>
             <property name="iconSize">
              <size>
-              <width>30</width>
-              <height>30</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="checkable">
@@ -434,12 +434,18 @@
              </size>
             </property>
             <property name="text">
-             <string> Home</string>
+             <string> Home    </string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
               <normaloff>:/icons/icons_financial_app/home_icon.png</normaloff>
               <normalon>:/icons/icons_financial_app/home_icon.png</normalon>:/icons/icons_financial_app/home_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -471,6 +477,12 @@
               <normaloff>:/icons/icons_financial_app/upload_icon.png</normaloff>
               <normalon>:/icons/icons_financial_app/upload_icon.png</normalon>:/icons/icons_financial_app/upload_icon.png</iconset>
             </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
             <property name="checkable">
              <bool>true</bool>
             </property>
@@ -494,7 +506,7 @@
              </size>
             </property>
             <property name="text">
-             <string> Files</string>
+             <string>  Files</string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
