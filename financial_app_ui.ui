@@ -1022,5 +1022,37 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>exit_button_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>163</x>
+     <y>546</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>191</x>
+     <y>603</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>exit_button_1</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>46</x>
+     <y>542</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>63</x>
+     <y>604</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
