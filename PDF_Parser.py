@@ -6,6 +6,11 @@ import pandas as pd
 import re
 
 class ParsingPDF:
+
+    """
+    Parses the file with pdf format
+    """
+
     def __init__(self, pdf_name):
 
         flavor_choice = self.flavor_decision(pdf_name, 0)
@@ -34,6 +39,7 @@ class ParsingPDF:
 
                 self.df.append(new_dataframe)
 
+    # Selects the valid headers of the csv file dataframe
     def select_header(self, index, header_Values, size_columns):
             string = True
             unique = True
@@ -58,17 +64,8 @@ class ParsingPDF:
             else:
                 return 0
 
+    # Selects the header of the dataframe
     def find_header(self, df):
-        print("----------------------------------------")
-        """        new_df = df.loc[0:min(15, len(df))]
-        new_df['index'] = new_df.index
-        try:
-            header_index = new_df.apply(lambda row: self.select_header(row['index'], row.tolist(), len(df.columns)), axis=1)
-            print(header_index)
-        except:
-            header_index = 0
-        return header_index"""
-
         for i in range(min(15, len(df))):
             row = df.iloc[i]
 
@@ -76,7 +73,6 @@ class ParsingPDF:
             string = True
             unique = True
             length = True
-            # fsafad
             length_count = 0
             for item in header_Values:
                 if(item != ''):
@@ -96,6 +92,7 @@ class ParsingPDF:
                 return i
         return 0
 
+    # Cleans the returned dataframe after extraction of pdf file
     def pre_clean_up(self, value):
         if value is None or not value or not isinstance(value, str):
             return value
@@ -114,6 +111,7 @@ class ParsingPDF:
 
         return value
 
+    # Cleans dataframe/s extracted from pdf pages, by checking the validity and requirements
     def clean_up(self, df, idx):
 
         df = df.drop_duplicates()
@@ -153,6 +151,7 @@ class ParsingPDF:
 
         return dataframe_list
 
+    # Read pdf based on the given flavor
     def run_camelot(self, name, flavor_camelot):
         if (flavor_camelot == "stream"):
             tables = camelot.read_pdf(name, flavor=flavor_camelot ,pages='all', row_tol = 20)
@@ -160,6 +159,7 @@ class ParsingPDF:
             tables = camelot.read_pdf(name, flavor=flavor_camelot, pages='all', line_scale=40)
         return tables
 
+    # Chooses the right method for extracting dataframe from pages of pdf after detecting number of rectangles
     def flavor_decision(self, name, idx):
         with pdfplumber.open(name) as pdf:
             page = pdf.pages[idx]
