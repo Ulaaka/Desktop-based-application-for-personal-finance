@@ -5,11 +5,17 @@ from django.utils.html import strip_tags
 from database_connection import database
 
 class system_functions:
+
+    """
+    Manages the functions for authentication the user
+    """
+
     def __init__(self):
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
 
+    # Generates random digits for user authentication for 2FA
     def generate_random_digits(self, digits_size):
         digits_string = ''
         for i in range(digits_size):
@@ -19,6 +25,7 @@ class system_functions:
         return digits_string
 
     # https://sendlayer.com/blog/how-to-send-email-with-django/
+    # Sends the random digits the users email
     def send_reset_digits(self, digits_size, username):
 
         email_query = "SELECT email_address FROM users WHERE username = %s"

@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtSlot, QFile, QTextStream
 from financial_app import Ui_MainWindow
 
 class MainWindow(QMainWindow):
+
     def __init__(self):
         super(MainWindow, self).__init__()
 
