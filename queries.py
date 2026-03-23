@@ -441,7 +441,7 @@ class query_processor:
         else:
             category = output[1]
         return category
-    # Returns corresponding unique descriptions and categoryIDs of each category name
+    # Returns corresponding unique descriptions and categoryIDs of each category names
     def show_description_list_by_category_name(self, userID, category_name):
         query = """
             SELECT category_sentence, categoryID, 
@@ -453,6 +453,7 @@ class query_processor:
         result = self.cursor.fetchall()
         return result if result else None
 
+    # Associate the description with the category name, and its close transactions
     def add_description_into_list_category(self, userID, description, category_name):
         close_transaction_ids = self.find_close_transactions(description)
         categoryID = self.insert_category(userID, description, close_transaction_ids[1], category_name)
