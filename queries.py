@@ -442,10 +442,11 @@ class query_processor:
         else:
             category = output[1]
         return category
+
     # Returns corresponding unique descriptions and categoryIDs of each category names
     def show_description_list_by_category_name(self, userID, category_name):
         query = """
-            SELECT category_sentence, categoryID, 
+            SELECT category_sentence, categoryID
             FROM categories
             WHERE userID = %s AND category_name = %s
             ORDER BY categoryID ASC
