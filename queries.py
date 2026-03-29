@@ -457,7 +457,7 @@ class query_processor:
         self.update_category(category_name, close_transaction_ids[0])
         return categoryID if categoryID else None
 
-    # after the description list is shown, the user can remove
+    # after the description list is shown, the user can remove category
     def remove_description_from_list_category(self, userID, categoryID, category_name):
         query_delete = """
             DELETE FROM categories
@@ -468,7 +468,7 @@ class query_processor:
         # removed category name
         return category_name
 
-    # use the category name of the removed description
+    # use the category name of the removed description of the category
     def update_transaction_after_deletion_description(self, accountID, category_name):
         query = """
             SELECT transactionID, description
