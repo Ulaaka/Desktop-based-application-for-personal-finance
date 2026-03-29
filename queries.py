@@ -489,7 +489,7 @@ class query_processor:
                 self.update_category(new_category, i)
 
     # Changes the description of the transaction, needs to change the category after that
-    def change_description(self, new_description, transactionID):
+    def change_description_and_update(self, new_description, transactionID):
         query = """
             UPDATE transactions
             SET description = %s
