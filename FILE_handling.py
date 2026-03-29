@@ -83,3 +83,15 @@ class file_handling():
             else:
                 raise Exception("Incompatible file/s has been submitted.")
 
+    # Shows existing files IDs and filename submitted in the account
+    def show_files(self, accountID):
+        query = """
+        SELECT file_ID, file_name
+        WHERE accountID = %s
+        ORDER BY added_at DESC
+        """
+        self.cursor.execute(query, (accountID,))
+        result = self.cursor.fetchall()
+        return result if result else None
+
+    def 

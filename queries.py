@@ -281,11 +281,8 @@ class query_processor:
         result = self.cursor.fetchall()
 
         tuple_to_dictionary = {tuple(json.loads(category_list)): (categoryID, category_name) for categoryID, category_list, category_name in result}
-
         priority_list = [(len([item for item in category_list if item in i]), len(i)) for i in tuple_to_dictionary]
-
         max_category = max(priority_list, key=lambda x: (x[0], -x[1]))
-
         position = priority_list.index(max_category)
 
         key = list(tuple_to_dictionary)[position]
@@ -486,6 +483,20 @@ class query_processor:
             for (i, j)in result:
                 new_category = self.return_updated_category(j)
                 self.update_category(new_category, i)
+
+    # Changes the description of the transaction
+    def change_description(self, new_description, transactionID):
+
+        query = """
+            UPDATE transactions
+            SET description = %s
+            WHERE transactionID = %s
+        """
+
+        self.cursor.execute(query, (new_description, transactionID))
+        self.db.commit()
+
+
 
 
 
