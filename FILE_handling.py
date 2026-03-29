@@ -87,6 +87,7 @@ class file_handling():
     def show_files(self, accountID):
         query = """
         SELECT file_ID, file_name
+        FROM files
         WHERE accountID = %s
         ORDER BY added_at DESC
         """

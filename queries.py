@@ -394,11 +394,8 @@ class query_processor:
         self.cursor.execute(query, parameter)
         self.db.commit()
 
-    # needs to search for similar description to apply the same category in the database
-    # Updates the category of the selected transaction and its close transactions
-    def change_category(self, userID, category, transactionID):
-        self.update_category(category, transactionID)
-
+    # Returns the description of the transaction given the transaction ID
+    def return_description_given_transactionID(self, transactionID):
         description_query =  """
             SELECT description
             FROM transactions
@@ -409,6 +406,13 @@ class query_processor:
 
         # the description of the transaction
         description = self.cursor.fetchone()[0]
+        return description if description else None
+
+    # needs to search for similar description to apply the same category in the database
+    # Updates the category of the selected transaction and its close transactions
+    def change_category(self, userID, category, transactionID):
+        self.update_category(category, transactionID)
+        description = self.return_description_given_transactionID(transactionID)
 
         close_transaction_ids = self.find_close_transactions(description)
         categoryID = self.insert_category(userID, description, close_transaction_ids[1], category)
@@ -484,9 +488,8 @@ class query_processor:
                 new_category = self.return_updated_category(j)
                 self.update_category(new_category, i)
 
-    # Changes the description of the transaction
+    # Changes the description of the transaction, needs to change the category after that
     def change_description(self, new_description, transactionID):
-
         query = """
             UPDATE transactions
             SET description = %s
@@ -495,6 +498,24 @@ class query_processor:
 
         self.cursor.execute(query, (new_description, transactionID))
         self.db.commit()
+
+        new_category = self.return_updated_category(new_description)
+        self.update_category(new_category, transactionID)
+
+    # Show list of accounts give user ID
+    def show_accounts(self, userID):
+        query = """
+            SELECT accountID
+            FROM accounts
+            WHERE userID = %s
+        """
+        self.cursor.execute(query, (userID,))
+        result = self.cursor.fetchall()
+        return result if result else None
+
+
+
+
 
 
 
