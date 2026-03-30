@@ -46,23 +46,23 @@
         <number>0</number>
        </property>
        <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <property name="spacing">
           <number>0</number>
          </property>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>170</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
          <item>
           <widget class="QLineEdit" name="lineEdit">
            <property name="minimumSize">
@@ -73,7 +73,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>300</width>
+             <width>400</width>
              <height>40</height>
             </size>
            </property>
@@ -474,7 +474,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Sidebar </string>
+             <string>   Sidebar</string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
@@ -504,7 +504,7 @@
              </size>
             </property>
             <property name="text">
-             <string> Home    </string>
+             <string>      Home</string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
@@ -534,7 +534,7 @@
              </size>
             </property>
             <property name="text">
-             <string> Upload</string>
+             <string>    Upload</string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
@@ -564,12 +564,18 @@
              </size>
             </property>
             <property name="text">
-             <string>  Files</string>
+             <string>      Files</string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
               <normaloff>:/icons/icons_financial_app/file_icon.png</normaloff>
               <normalon>:/icons/icons_financial_app/file_icon.png</normalon>:/icons/icons_financial_app/file_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -588,12 +594,18 @@
              </size>
             </property>
             <property name="text">
-             <string>Stats</string>
+             <string>     Stats</string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
               <normaloff>:/icons/icons_financial_app/chart_icon.png</normaloff>
               <normalon>:/icons/icons_financial_app/chart_icon.png</normalon>:/icons/icons_financial_app/chart_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -612,12 +624,18 @@
              </size>
             </property>
             <property name="text">
-             <string> Profile</string>
+             <string>   Profile</string>
             </property>
             <property name="icon">
              <iconset resource="../Desktop/resource.qrc">
               <normaloff>:/icons/icons_financial_app/profile_icon.png</normaloff>
               <normalon>:/icons/icons_financial_app/profile_icon.png</normalon>:/icons/icons_financial_app/profile_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -642,6 +660,12 @@
              <iconset resource="../Desktop/resource.qrc">
               <normaloff>:/icons/icons_financial_app/settings_icon.png</normaloff>
               <normalon>:/icons/icons_financial_app/settings_icon.png</normalon>:/icons/icons_financial_app/settings_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>

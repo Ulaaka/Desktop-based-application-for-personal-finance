@@ -60,6 +60,7 @@
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     padding: 5px 10px;
+    margin-right: 5px;
     background-color: #fff;
     color: #313a46;
 }
@@ -73,11 +74,15 @@
 /* Search button style */
 #search_button {
     border: none;
+    border-radius: 15px;
+
 }
 
 #search_button:hover {
     background-color: rgba(86, 101, 115, 0.1);
-    border-radius: 4px;
+    border-radius: 2px;
+    border-radius: 15px;
+
 }
 
 /*  Account button style */
@@ -88,7 +93,7 @@
 
 #account_button:hover {
     background-color: rgba(86, 101, 115, 0.1);
-    border-radius: 20px;
+    border-radius: 15px;
 }
 
 /*  Sidebar button style */
