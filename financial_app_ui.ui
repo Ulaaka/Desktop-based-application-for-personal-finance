@@ -734,9 +734,9 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>5</number>
             </property>
-            <widget class="QWidget" name="page">
+            <widget class="QWidget" name="home_page">
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
                <widget class="QLabel" name="label_3">
@@ -747,7 +747,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="page_6">
+            <widget class="QWidget" name="stats_page">
              <widget class="QLabel" name="label_8">
               <property name="geometry">
                <rect>
@@ -762,7 +762,7 @@
               </property>
              </widget>
             </widget>
-            <widget class="QWidget" name="page_2">
+            <widget class="QWidget" name="upload_page">
              <widget class="QLabel" name="label_4">
               <property name="geometry">
                <rect>
@@ -777,7 +777,7 @@
               </property>
              </widget>
             </widget>
-            <widget class="QWidget" name="page_3">
+            <widget class="QWidget" name="files_page">
              <widget class="QLabel" name="label_5">
               <property name="geometry">
                <rect>
@@ -792,7 +792,7 @@
               </property>
              </widget>
             </widget>
-            <widget class="QWidget" name="page_4">
+            <widget class="QWidget" name="profile_page">
              <widget class="QLabel" name="label_6">
               <property name="geometry">
                <rect>
