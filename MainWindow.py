@@ -5,8 +5,11 @@ from PyQt5.QtCore import pyqtSlot, QFile, QTextStream
 from financial_app import Ui_MainWindow
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, controller , key):
         super(MainWindow, self).__init__()
+
+        self.controller = controller
+        self.key = key
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)

@@ -9,6 +9,8 @@ from system_functions import system_functions
 import os, certifi, sys
 from system_functions import system_functions
 from functools import partial
+from MainWindow import MainWindow
+
 
 color_dic = {
 "login_page": {
@@ -646,10 +648,9 @@ class MainApp(QMainWindow):
         self.dashboard_page.setLayout(layout)
 
     def show_dashboard(self, key):
-        self.key = key
-        self.stacked_widget.setCurrentIndex(1)
-        self.setMinimumSize(1000, 700)
-        self.setMaximumSize(16777215, 16777215)
+        self.main_window = MainWindow(controller=self, key=key)
+        self.main_window.show()
+        self.show_login.close()
 
     def show_login(self):
         self.stacked_widget.setCurrentIndex(0)
