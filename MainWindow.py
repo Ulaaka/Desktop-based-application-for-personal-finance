@@ -23,8 +23,7 @@ class MainWindow(QMainWindow):
         self.ui.upload_button_2.clicked.connect(self.upload_page_show)
 
         self.ui.file_button_1.clicked.connect(self.file_page_show)
-        self.ui.file_button_1.clicked.connect(self.file_page_show)
-
+        self.ui.file_button_2.clicked.connect(self.file_page_show)
 
         self.ui.stats_button_1.clicked.connect(self.stats_page_show)
         self.ui.stats_button_2.clicked.connect(self.stats_page_show)
@@ -43,7 +42,7 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentWidget(self.ui.upload_page)
 
     def file_page_show(self):
-        self.ui.stackedWidget.setCurrentWidget(self.ui.file_button_2)
+        self.ui.stackedWidget.setCurrentWidget(self.ui.files_page)
 
     def stats_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.stats_page)
