@@ -145,6 +145,8 @@ class MainWindow(QMainWindow):
 
         self.ui.account_name_label.setObjectName('no_account_label')
 
+        self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
         self.ui.full_menu_widget.hide()
         self.ui.stackedWidget.setCurrentIndex(0)
         self.buttons_connected()
@@ -162,6 +164,7 @@ class MainWindow(QMainWindow):
         if self.account_name is None:
             self.account_name = options[0]
             self.accountID = self.query.get_accountID(options[0], self.userID)
+            self.ui.account_name_label.setText(options[0])
 
         accountID = self.query.get_accountID(self.account_name, self.userID)
         transactions = self.query.get_transactions(accountID)
