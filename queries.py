@@ -324,11 +324,13 @@ class query_processor:
     # Returns the hashed name of the encrypted file
     def get_hashed_name(self, accountID, name_file=None, fileID=None):
         if name_file:
-            new_sql = f"SELECT hashed_name FROM files WHERE accountID = '{accountID}' and file_name = '{name_file}'"
+            new_sql = "SELECT hashed_name FROM files WHERE accountID = %s and file_name = %s"
+            selected = name_file
         if fileID:
-            new_sql = f"SELECT hashed_name FROM files WHERE accountID = '{accountID}' and file_ID = '{fileID}'"
-
-        self.cursor.execute(new_sql)
+            new_sql = "SELECT hashed_name FROM files WHERE accountID = %s and file_ID = %s"
+            selected = fileID
+        self.cursor = self.connection.cursor
+        self.cursor.execute(new_sql, (accountID, selected))
         output = self.cursor.fetchone()
         return output[0] if output else None
 
@@ -381,6 +383,7 @@ class query_processor:
         query = "DELETE FROM files WHERE file_ID = %s"
         self.cursor.execute(query, (file_ID, ))
         self.db.commit()
+        print("file deleted")
 
     # Returns the list of words from the description of the selected transaction
     # plus_list = words to be used to identify close transactions

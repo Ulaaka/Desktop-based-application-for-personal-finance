@@ -20,10 +20,8 @@ class Disclaimer_window(QDialog):
         self.ui = Ui_Disclaimer()
         self.fileID = fileID
         self.accountID = parent.accountID
-        self.key = parent.key
-        self.ui.setupUi(self)
         self.query = query_processor()
-        self.file_handle = file_handling()
+        self.ui.setupUi(self)
         self.signal_connect()
 
     def signal_connect(self):
@@ -36,12 +34,24 @@ class Disclaimer_window(QDialog):
         self.setObjectName("disclaimer_widget")
 
     def proceed_button_clicked(self):
-        if self.query.delete_file(self.fileID) and self.file_handle.delete_encrypted_file(self.fileID, self.accountID):
-            self.close()
+        print("button activated")
+        hashed_name = self.query.get_hashed_name(self.accountID, fileID=self.fileID)
+
+        self.query.delete_file(self.fileID)
+        self.delete_encrypted_file(self.accountID, hashed_name)
+        self.parent().show_files()
+        self.close()
 
     def cancel_button_clicked(self):
         self.close()
 
+    def delete_encrypted_file(self, accountID, hashed_name):
+        sub_save_folder = os.path.join(config('SAVE_FOLDER'),f"account_{accountID}")
+        for encrypted_file in os.listdir(sub_save_folder):
+            if (hashed_name == encrypted_file):
+                file_path = os.path.join(sub_save_folder, encrypted_file)
+                os.remove(file_path)
+                print("file removed from folder")
 
 class Live_output_window(QDialog):
     def __init__(self, parent, saved_print):
@@ -226,7 +236,7 @@ class MainWindow(QMainWindow):
         if not self.accountID:
             return
         files = query.get_files(self.accountID)
-        if len(files) == 0:
+        if files is None:
             self.set_files(False)
             self.ui.no_file_label.setText(f"No files found for '{self.account_name}'")
         else:
@@ -268,6 +278,7 @@ class MainWindow(QMainWindow):
                 item_button.clicked.connect(lambda click, id=fileID: self.delete_fileID(id))
 
     def delete_fileID(self, fileID):
+        print(fileID)
         disclaimer = Disclaimer_window(fileID, self)
         disclaimer.show()
 
