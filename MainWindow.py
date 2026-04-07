@@ -1,18 +1,45 @@
 import sys,  shutil, pycountry, os
 from decouple import config
-from PyQt5.QtWidgets import QMainWindow, QApplication, QCompleter, QFileDialog, QMessageBox
-from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QApplication, QCompleter, QFileDialog, QMessageBox, QDialog, QHeaderView, QPushButton, QHBoxLayout
+from PyQt5.QtCore import Qt, QPoint, pyqtSignal, QObject
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from financial_app import Ui_MainWindow
 from account_selection_panel import account_selection_form
 from account_add_page import account_add_page_form
+from disclaimer_widget import Ui_Disclaimer
 from queries import query_processor
 from Table_View import ListModel
 from FILE_handling import file_handling
 from live_output_widget import live_output_page
 from BASE_Classes import cryptography
+from datetime import datetime
 
-class Live_output_window(QtWidgets.QDialog):
+class Disclaimer_window(QDialog):
+    def __init__(self, fileID, parent):
+        super().__init__(parent)
+        self.ui = Ui_Disclaimer()
+        self.fileID = fileID
+        self.ui.setupUi(self)
+        self.query = query_processor()
+        self.signal_connect()
+
+    def signal_connect(self):
+        self.ui.proceed_button.clicked.connect(self.proceed_button_clicked)
+        self.ui.cancel_button.clicked.connect(self.cancel_button_clicked)
+        self.ui.proceed_button.setObjectName("proceed_button")
+        self.ui.cancel_button.setObjectName("cancel_button")
+        self.ui.disclaimer_label.setObjectName("no_account_label")
+        self.ui.button_widget_disclaimer.setObjectName('button_widget_disclaimer')
+        self.setObjectName("disclaimer_widget")
+
+    def proceed_button_clicked(self):
+        if self.query.delete_file(self.fileID):
+            self.close()
+
+    def cancel_button_clicked(self):
+        self.close()
+
+class Live_output_window(QDialog):
     def __init__(self, parent, saved_print):
         super().__init__(parent)
         self.key = parent.key
@@ -58,8 +85,8 @@ class Live_output_window(QtWidgets.QDialog):
         sys.stdout = self.saved_print
 
 # custom class for capturing print outputs
-class Stream(QtCore.QObject):
-    input_text = QtCore.pyqtSignal(str)
+class Stream(QObject):
+    input_text = pyqtSignal(str)
 
     def write(self, text):
         self.input_text.emit(text)
@@ -67,7 +94,7 @@ class Stream(QtCore.QObject):
     def flush(self):
         sys.stdout.flush()
 
-class Account_selection_page(QtWidgets.QDialog):
+class Account_selection_page(QDialog):
     chose_account = pyqtSignal(str, int) 
     def __init__(self, parent):
         super().__init__(parent)
@@ -76,7 +103,7 @@ class Account_selection_page(QtWidgets.QDialog):
 
         self.ui = account_selection_form()
         self.ui.setupUi(self)
-        self.setWindowFlags(QtCore.Qt.Popup)
+        self.setWindowFlags(Qt.Popup)
 
         self.completer = QCompleter(self.ui.accounts_list.model(), self)
         self.completer.setFilterMode(Qt.MatchContains)
@@ -123,7 +150,7 @@ class Account_selection_page(QtWidgets.QDialog):
         self.account_add_page = Account_add_page(currency_list, self)
         self.account_add_page.show()
 
-class Account_add_page(QtWidgets.QDialog):
+class Account_add_page(QDialog):
     def __init__(self, currencies, parent):
         super().__init__(parent)
         self.userID = parent.userID
@@ -166,6 +193,7 @@ class MainWindow(QMainWindow):
         self.status_panel = False
 
         self.ui = Ui_MainWindow()
+        self.file_handle = file_handling(self.accountID, self.key)
 
         self.ui.setupUi(self)
         self.MainWindow_signals_connection()
@@ -189,17 +217,66 @@ class MainWindow(QMainWindow):
             else:
                 self.show_table()
 
+    def show_files(self):
+        query = query_processor()
+        if not self.accountID:
+            return
+        files = query.get_files(self.accountID)
+        if len(files) == 0:
+            self.set_files(False)
+            self.ui.no_file_label.setText(f"No files found for '{self.account_name}'")
+        else:
+             self.set_files(True)
+             tree_model = QStandardItemModel()
+             tree_model.setHorizontalHeaderLabels(["Name", "Size", "Kind", "Date Added", ""])
+
+             for  tuple in files:
+                items = []
+                for col_index, col_val in enumerate(tuple[1:]):
+                    if (col_index == 1):
+                        converted_size_str = self.file_handle.convert_file_size(col_val)
+                        item = QStandardItem(converted_size_str)
+                        item.setData(int(col_val), Qt.UserRole)
+                    elif (col_index == 3):
+                        item = QStandardItem(str(col_val))
+                        item.setData(str(col_val),  Qt.UserRole)
+                    else:
+                        item = QStandardItem(col_val)
+                        if (col_index == 0):
+                             # associated fileID for filename item
+                            item.setData(tuple[0], Qt.UserRole)
+                        else:
+                            item.setData(col_val, Qt.UserRole)
+                    items.append(item)
+                for item in items:
+                    item.setEditable(False)
+                tree_model.appendRow(items)
+                tree_model.setSortRole(Qt.UserRole)
+
+             self.ui.treeView.setModel(tree_model)
+
+             for row_index, _ in enumerate(files):
+                item_button = QPushButton("Remove")
+                item_button.setObjectName("item_button")
+                item_button.setFixedWidth(70)
+                self.ui.treeView.setIndexWidget(tree_model.index(row_index, 4), item_button)
+                fileID = tree_model.data(tree_model.index(row_index, 0), Qt.UserRole)
+                item_button.clicked.connect(lambda click, id=fileID: self.delete_fileID(id))
+
+    def delete_fileID(self, fileID):
+        disclaimer = Disclaimer_window(fileID, self)
+        disclaimer.show()
+
     def show_table(self):
         query = query_processor()
         if not self.accountID:
             return
 
         transactions = query.get_transactions(self.accountID)
-        if transactions.empty:
+        if len(transactions) == 0:
             self.set_table(False)
             self.ui.no_account_label.setText(f"No transaction found for '{self.account_name}'")
         else:
-            print("transactions found!!!!!")
             self.set_table(True)
             self.model = ListModel(transactions, self)
             self.ui.tableView.setModel(self.model)
@@ -219,6 +296,12 @@ class MainWindow(QMainWindow):
             self.ui.home_stacked.setCurrentWidget(self.ui.table_page)
         else:
             self.ui.home_stacked.setCurrentWidget(self.ui.no_account_page)
+
+    def set_files(self, flag):
+        if flag:
+            self.ui.files_stack.setCurrentWidget(self.ui.files_tree_page)
+        else:
+            self.ui.files_stack.setCurrentWidget(self.ui.no_file_page)
 
     def upload_file(self):
         if (not self.accountID):
@@ -291,13 +374,14 @@ class MainWindow(QMainWindow):
         self.ui.upload_file_button.setObjectName('upload_file_button')
 
         self.ui.no_account_label.setObjectName("no_account_label")
-        self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.account_name_label.setObjectName("account_name_label")
         self.ui.account_name_label.mousePressEvent = self.label_click
 
         self.ui.full_menu_widget.hide()
         self.ui.stackedWidget.setCurrentIndex(0)
-
+        self.ui.treeView.setObjectName("treeView")
+        self.ui.treeView.header().setSectionResizeMode(QHeaderView.Stretch)
     def home_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page)
         self.show_table()
@@ -308,6 +392,8 @@ class MainWindow(QMainWindow):
 
     def file_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.files_page)
+        self.ui.files_stack.setCurrentWidget(self.ui.files_tree_page)
+        self.show_files()
 
     def stats_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.stats_page)

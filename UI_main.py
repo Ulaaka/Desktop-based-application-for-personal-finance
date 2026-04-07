@@ -103,6 +103,7 @@ class login_page(QWidget):
     def handle_login(self):
         username_local = self.username.text()
         password_local = self.password.text()
+        query = query_processor()
         password_manager = password_class()
         crypto = cryptography()
 
@@ -110,11 +111,11 @@ class login_page(QWidget):
             QMessageBox.warning(self, 'Error', 'Please enter both of the credentials, thank you')
             return
 
-        result = self.query.get_hashed_password(username_local)
+        result = query.get_hashed_password(username_local)
 
         if result and password_manager.check_password(password_local, result[0]):
                 key = crypto.generate_key(password_local)
-                userID = self.query.get_userID(username_local)
+                userID = query.get_userID(username_local)
                 self.controller.show_dashboard(key, userID)
         else:
             QMessageBox.warning(self, 'Error', 'Password or Username is wrong')

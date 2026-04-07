@@ -224,7 +224,7 @@ class cryptography:
 
     # Encrypts the user file (filename) from folder_path to the save_folder
     # Returns the unique file id
-    def encrypt(self, save_folder, folder_path, filename, key, accountID, str_size, file_type):
+    def encrypt(self, save_folder, folder_path, filename, key, accountID, size_file, file_type):
         file_path = os.path.join(folder_path, filename)
         with open(file_path, 'rb') as file:
             data = file.read()
@@ -232,14 +232,15 @@ class cryptography:
         fernet = Fernet(key)
         encrypted = fernet.encrypt(data)
 
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        new_filename = filename[:-4] + str(timestamp)
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        pure_filename = filename[:-4]
+        new_filename = pure_filename + str(timestamp)
 
         destination = os.path.join(save_folder, new_filename)
         with open(destination, 'wb') as file:
             file.write(encrypted)
 
-        file_ID = self.query.insert_into_files(accountID,  filename, new_filename, str_size, file_type)
+        file_ID = self.query.insert_into_files(accountID,  filename, new_filename, size_file, file_type)
         return file_ID
 
     # Decrypts the user file given filename or hashed_filename

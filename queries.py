@@ -210,7 +210,7 @@ class query_processor:
         accountID = self.cursor.lastrowid
         self.db.commit()
         return accountID
-    
+
     # Inserts new transaction into the database
     def insert_into_transactions(self, transaction_list):
         sql = """INSERT IGNORE INTO transactions (accountID, file_ID, transaction_date, transaction_type, description, category, amount, balance) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
@@ -225,9 +225,9 @@ class query_processor:
         self.db.commit()
         return categoryID
 
-    def insert_into_files(self, accountID,  filename, new_filename, str_size, file_type):
+    def insert_into_files(self, accountID,  filename, new_filename, size_file, file_type):
         new_query = "INSERT INTO files (accountID, file_name, hashed_name, file_size, file_type) VALUES (%s, %s, %s, %s, %s)"
-        self.cursor.execute(new_query, (accountID,  filename, new_filename, str_size, file_type))
+        self.cursor.execute(new_query, (accountID,  filename, new_filename, size_file, file_type))
         file_ID = self.cursor.lastrowid
         self.db.commit()
         return file_ID
@@ -340,6 +340,7 @@ class query_processor:
         
     def get_hashed_password(self, username):
         sql = f"SELECT hashed_password FROM users WHERE username = %s"
+        self.cursor = self.connection.cursor
         self.cursor.execute(sql, (username, ))
         result = self.cursor.fetchone()
         return result if result else None
@@ -357,15 +358,24 @@ class query_processor:
         self.cursor.execute(sql, (accountID, filename))
         output = self.cursor.fetchone()
         return output[0] if output else None
+    
+    # Shows existing files IDs and filename submitted in the account
+    def get_files(self, accountID):
+        query = """
+        SELECT file_ID, file_name, file_size, file_type, added_at
+        FROM files
+        WHERE accountID = %s
+        ORDER BY added_at DESC
+        """
+        self.cursor = self.connection.cursor
+        self.cursor.execute(query, (accountID,))
+        result = self.cursor.fetchall()
+        return result if result else None
 
     # Deleted the file, associating transactions
-    def delete_file(self, username, account_name, filename):
-        userID = self.get_userID(username)
-        accountID = self.get_accountID(account_name, userID)
-        file_ID = self.get_file_ID(accountID, filename)
-
-        sql = f"DELETE FROM transactions WHERE file_ID = '{file_ID}'"
-        self.cursor.execute(sql)
+    def delete_file(self, file_ID):
+        query = "DELETE FROM files WHERE file_ID = %s"
+        self.cursor.execute(query, (file_ID, ))
         self.db.commit()
 
     # Returns the list of words from the description of the selected transaction

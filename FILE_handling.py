@@ -26,7 +26,7 @@ class file_handling():
         suffix_str = ".csv"
         if (pdf_flag):
             suffix_str = ".pdf"
-
+        # https://stackoverflow.com/a/75398222
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix_str) as tmp:
             tmp.write(decrypted_text)
             tmp.flush()
@@ -90,12 +90,9 @@ class file_handling():
                             parsing = ParsingPDF(file_path)
                         except:
                             parsing = HSBC_PDF_CONVERSION(file_path)
-                    # print("parsed: ", filename)
                     parsed_count+=1
                     size_file = os.path.getsize(file_path)
-                    str_size = self.convert_file_size(size_file)
-
-                    file_ID = self.crypto.encrypt(sub_save_folder, config('FOLDER_PATH'), filename, self.key, self.accountID, str_size, file_type)
+                    file_ID = self.crypto.encrypt(sub_save_folder, config('FOLDER_PATH'), filename, self.key, self.accountID, size_file, file_type)
                     ProcessingDF(parsing.df, file_ID, self.accountID)
                 else:
                     existing_file_output.append(result[1])
@@ -107,26 +104,14 @@ class file_handling():
             for i in existing_file_output:
                 print(i)
 
-    # Shows existing files IDs and filename submitted in the account
-    def show_files(self, accountID):
-        query = """
-        SELECT file_ID, file_name
-        FROM files
-        WHERE accountID = %s
-        ORDER BY added_at DESC
-        """
-        self.cursor.execute(query, (accountID,))
-        result = self.cursor.fetchall()
-        return result if result else None
-
     def convert_file_size(self, size):
-        str_size = ""
+        converted_size = ""
         if (size < 1024):
-            str_size = f"{size}Bytes"
+            converted_size = f"{size} Bytes"
         elif (size < 1024**2):
-            str_size = f"{size/1024:.1f}KB"
+            converted_size = f"{size/1024:.1f} KB"
         elif (size < 1024**3):
-            str_size = f"{size/1024**2:.1f}MB"
+            converted_size = f"{size/1024**2:.1f} MB"
         else:
-            str_size =  f"{size/1024**3:.1f}GB"
-        return str_size
+            converted_size =  f"{size/1024**3:.1f} GB"
+        return converted_size
