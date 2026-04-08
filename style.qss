@@ -235,7 +235,27 @@ QWidget#disclaimer_widget{
 QWidget#button_widget_disclaimer{
     background-color: #fff;
 }
+// new lines
+QLineEdit#lineEdit_input_field:disabled {
+    background-color: transparent;
+    border: 2px solid grey;
+    border-radius: 1px;
+    padding: 12px;
+    color: black;
+    font-size: 14px;
+}
 
+QLineEdit#comboBox2_input_field:disabled{
+    background-color: transparent;
+    border: 2px solid grey;
+    border-radius: 1px;
+    padding: 12px;
+    color: black;
+    font-size: 14px;
+}
 
-
-
+QLabel#account_control_labels{
+    background-color: black;
+    color: white;
+    border-radius: 15px;
+}

@@ -343,7 +343,7 @@ class query_processor:
         header_columns = [column[0] for column in self.cursor.description]
         df = pd.DataFrame(output, columns=header_columns)
         return df
-        
+
     def get_hashed_password(self, username):
         sql = f"SELECT hashed_password FROM users WHERE username = %s"
         self.cursor = self.connection.cursor
@@ -365,6 +365,17 @@ class query_processor:
         output = self.cursor.fetchone()
         return output[0] if output else None
     
+    def update_account(self, name, type, currency, accountID):
+        query = """
+            UPDATE accounts
+            SET account_name = %s
+            SET account_type = %s
+            SET account_currency = %s
+            WHERE accountID = %s
+        """
+        self.cursor.execute(query, (name, type, currency,accountID))
+        self.db.commit()
+
     # Shows existing files IDs and filename submitted in the account
     def get_files(self, accountID):
         query = """
@@ -378,12 +389,23 @@ class query_processor:
         result = self.cursor.fetchall()
         return result if result else None
 
+    def get_type_account_currency(self, account_name, userID):
+        query = "SELECT account_type, account_currency FROM accounts WHERE account_name = %s AND userID = %s"
+        self.cursor.execute(query, (account_name, userID))
+        result = self.cursor.fetchone()
+        return result if result else None
+
+    def get_create_update_account(self,  account_name, userID):
+        query = "SELECT created_at, updated_at FROM accounts WHERE account_name = %s AND userID = %s"
+        self.cursor.execute(query, (account_name, userID))
+        result = self.cursor.fetchone()
+        return result if result else None
+
     # Deleted the file, associating transactions
     def delete_file(self, file_ID):
         query = "DELETE FROM files WHERE file_ID = %s"
         self.cursor.execute(query, (file_ID, ))
         self.db.commit()
-        print("file deleted")
 
     # Returns the list of words from the description of the selected transaction
     # plus_list = words to be used to identify close transactions

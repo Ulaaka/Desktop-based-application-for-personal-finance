@@ -1,6 +1,6 @@
 import sys,  shutil, pycountry, os
 from decouple import config
-from PyQt5.QtWidgets import QMainWindow, QApplication, QCompleter, QFileDialog, QMessageBox, QDialog, QHeaderView, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QApplication, QCompleter, QFileDialog, QMessageBox, QDialog, QHeaderView, QPushButton, QWidget
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal, QObject
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from financial_app import Ui_MainWindow
@@ -114,6 +114,7 @@ class Account_selection_page(QDialog):
         super().__init__(parent)
 
         self.userID = parent.userID
+        self.currency_list = parent.currency_list
 
         self.ui = account_selection_form()
         self.ui.setupUi(self)
@@ -160,8 +161,7 @@ class Account_selection_page(QDialog):
         self.adjustSize()
 
     def add_accounts(self):
-        currency_list = [f"{currency.alpha_3} - {currency.name} " for currency in pycountry.currencies]
-        self.account_add_page = Account_add_page(currency_list, self)
+        self.account_add_page = Account_add_page(self.currency_list, self)
         self.account_add_page.show()
 
 class Account_add_page(QDialog):
@@ -195,6 +195,90 @@ class Account_add_page(QDialog):
         self.parent().parent().update_account(account_name, accountID)
         self.close()
 
+class Account_control_page(QWidget):
+    def __init__(self, current_account, parent):
+        super().__init__(parent)
+        self.current_account = current_account
+        self.userID = parent.userID
+        self._parent = parent
+        self.currencies = parent.currency_list
+        self.objective = 0
+        self.query = query_processor()
+        self.account_control_signals_connect()
+
+    def account_control_signals_connect(self):
+        parent_window = self._parent
+
+        parent_window.ui.stackedWidget.setCurrentWidget(parent_window.ui.account_page)
+
+        parent_window.ui.comboBox_2.addItems(self.currencies)
+
+        currency_search = parent_window.ui.comboBox_2.lineEdit()
+        #currency_search.setPlaceholderText("Search currency...")
+        currency_search.setStyleSheet("background-color: transparent; color: black; border: 2px solid black;")
+
+        completer = QCompleter(parent_window.ui.comboBox_2.model(), self)
+        completer.setFilterMode(Qt.MatchContains)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        currency_search.setCompleter(completer)
+
+        parent_window.ui.change_button.clicked.connect(self.objective_toggler)
+        parent_window.ui.lineEdit_2.setStyleSheet("background-color: transparent; color: black; border: 2px solid black;")
+        parent_window.ui.comboBox.setStyleSheet("background-color: transparent; color: black; border: 2px solid black;")
+        parent_window.ui.change_button.setStyleSheet("background-color: transparent; color: black; border: 2px solid black;")
+
+        for label in [
+            parent_window.ui.account_name_change_label,
+            parent_window.ui.account_type_change_label,
+            parent_window.ui.account_currency_change_label,
+            parent_window.ui.account_created_label,
+            parent_window.ui.account_update_label,
+            parent_window.ui.account_update_value,
+            parent_window.ui.label_10account_created_value
+        ]:
+            label.setStyleSheet("background-color: transparent; color: black;")
+
+        result = self.query.get_create_update_account(self.current_account, self.userID)
+        parent_window.ui.label_10account_created_value.setText(str(result[0]))
+        parent_window.ui.account_update_value.setText(str(result[1]))
+        self.show_account_control_page()
+
+    def show_account_control_page(self):
+        parent_window = self._parent
+        parent_window.ui.lineEdit_2.setPlaceholderText(self.current_account)
+        result = self.query.get_type_account_currency(self.current_account, self.userID)
+        parent_window.ui.comboBox.setEditable(True)
+        parent_window.ui.comboBox.setCurrentText(result[0])
+        parent_window.ui.comboBox_2.setCurrentText(result[1])
+        self.activate(False)
+
+    def activate(self, flag):
+        parent_window = self._parent
+        parent_window.ui.lineEdit_2.setEnabled(flag)
+        parent_window.ui.comboBox.setEnabled(flag)
+        parent_window.ui.comboBox_2.setEnabled(flag)
+
+    def objective_toggler(self):
+        self.objective = 1 - self.objective
+        self.manage_change_account()
+
+    def manage_change_account(self):
+        if (self.objective == 1):
+            flag = True
+        else:
+            flag = False
+        self.activate(flag)
+
+    def get_answer(self):
+        parent_window = self._parent
+        account_name = parent_window.ui.comboBox_2.currentText()
+        account_type = parent_window.ui.comboBox.currentText()
+        account_currency = account_name[:3]
+        accountID = self.query.get_accountID(self.current_account, self.userID)
+        self.query.update_account(account_name, account_type, account_currency, accountID)
+        self.show_account_control_page()
+
+
 class MainWindow(QMainWindow):
     def __init__(self, controller , key, userID):
         super(MainWindow, self).__init__()
@@ -205,6 +289,8 @@ class MainWindow(QMainWindow):
         self.account_name = None
         self.accountID = None
         self.status_panel = False
+        self.currency_list = [f"{currency.alpha_3} - {currency.name} " for currency in pycountry.currencies]
+
 
         self.ui = Ui_MainWindow()
         self.file_handle = file_handling(self.accountID, self.key)
@@ -215,6 +301,10 @@ class MainWindow(QMainWindow):
         self.accounts_selection_show()
 
     def label_click(self,event):
+        current_account = self.ui.account_name_label.text()
+        Account_control_page(current_account, self)
+
+    def manage_account_page(self, current_account):
         pass
 
     def manage_home_page(self):
@@ -397,6 +487,8 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(0)
         self.ui.treeView.setObjectName("treeView")
         self.ui.treeView.header().setSectionResizeMode(QHeaderView.Stretch)
+
+
     def home_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page)
         self.show_table()
