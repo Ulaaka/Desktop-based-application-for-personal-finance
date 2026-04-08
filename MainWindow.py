@@ -26,7 +26,6 @@ class MainWindow(QMainWindow):
         self.status_panel = False
         self.currency_list = [f"{currency.alpha_3} - {currency.name} " for currency in pycountry.currencies]
 
-
         self.ui = Ui_MainWindow()
         self.file_handle = file_handling(self.accountID, self.key)
 
@@ -109,7 +108,8 @@ class MainWindow(QMainWindow):
                 view_button.clicked.connect(lambda clicked, id=fileID: self.view_file_with_ID(id))
 
     def view_file_with_ID(self, id):
-        self.file_handle.view_file(fileID=id)
+        file_handle = file_handling(self.accountID, self.key)
+        file_handle.view_file(fileID=id)
 
     def delete_fileID(self, fileID):
         print(fileID)
@@ -227,7 +227,6 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(0)
         self.ui.treeView.header().setSectionResizeMode(QHeaderView.Stretch)
 
-
     def home_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page)
         self.show_table()
@@ -255,6 +254,12 @@ class MainWindow(QMainWindow):
         self.accountID = accountID
         self.ui.account_name_label.setText(option)
         self.show_table()
+
+        # when the file window close
+    def closeEvent(self, event):
+        for file in self.file_handle.temp_files:
+            self.file_handle.delete_temp_file(file)
+        event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

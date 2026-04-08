@@ -32,12 +32,12 @@ class file_handling():
         return tmp.name
 
     def view_file(self, original_filename=None, fileID=None):
+        flag = False
         query = query_processor()
         sub_save_folder = os.path.join(config('SAVE_FOLDER'),f"account_{self.accountID}")
 
         if fileID:
             current_filename = query.get_file_name(self.accountID, fileID=fileID)
-            print(current_filename)
         elif original_filename:
             current_filename = original_filename
             decrypted_text = self.crypto.decrypt(sub_save_folder, self.key, self.accountID,filename=original_filename)

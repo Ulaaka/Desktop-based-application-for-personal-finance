@@ -1077,6 +1077,11 @@
                         <disabled/>
                        </palette>
                       </property>
+                      <property name="font">
+                       <font>
+                        <bold>true</bold>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Account Name:     </string>
                       </property>
@@ -1120,6 +1125,11 @@
                         <disabled/>
                        </palette>
                       </property>
+                      <property name="font">
+                       <font>
+                        <bold>true</bold>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Account Type:        </string>
                       </property>
@@ -1135,6 +1145,11 @@
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <bold>true</bold>
+                       </font>
                       </property>
                       <property name="text">
                        <string>Account Currency:</string>
@@ -1255,6 +1270,11 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <item>
                   <widget class="QLabel" name="account_created_label">
+                   <property name="font">
+                    <font>
+                     <bold>true</bold>
+                    </font>
+                   </property>
                    <property name="text">
                     <string>Created:</string>
                    </property>
@@ -1288,6 +1308,11 @@
                  </item>
                  <item>
                   <widget class="QLabel" name="account_update_label">
+                   <property name="font">
+                    <font>
+                     <bold>true</bold>
+                    </font>
+                   </property>
                    <property name="text">
                     <string>Updated:</string>
                    </property>
