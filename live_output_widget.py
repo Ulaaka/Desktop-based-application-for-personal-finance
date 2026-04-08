@@ -11,18 +11,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class live_output_page(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
+class Ui_live_output_window(object):
+    def setupUi(self, live_output_window):
+        live_output_window.setObjectName("live_output_window")
+        live_output_window.resize(774, 216)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
-        Form.setSizePolicy(sizePolicy)
-        Form.setMinimumSize(QtCore.QSize(750, 0))
-        self.verticalLayout = QtWidgets.QVBoxLayout(Form)
+        sizePolicy.setHeightForWidth(live_output_window.sizePolicy().hasHeightForWidth())
+        live_output_window.setSizePolicy(sizePolicy)
+        live_output_window.setMinimumSize(QtCore.QSize(750, 0))
+        self.verticalLayout = QtWidgets.QVBoxLayout(live_output_window)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.textBrowser = QtWidgets.QTextBrowser(Form)
+        self.textBrowser = QtWidgets.QTextBrowser(live_output_window)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -33,9 +34,9 @@ class live_output_page(object):
         self.textBrowser.setObjectName("textBrowser")
         self.verticalLayout.addWidget(self.textBrowser)
 
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        self.retranslateUi(live_output_window)
+        QtCore.QMetaObject.connectSlotsByName(live_output_window)
 
-    def retranslateUi(self, Form):
+    def retranslateUi(self, live_output_window):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
+        live_output_window.setWindowTitle(_translate("live_output_window", "Form"))

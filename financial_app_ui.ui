@@ -1050,8 +1050,35 @@
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
+                      <property name="palette">
+                       <palette>
+                        <active>
+                         <colorrole role="WindowText">
+                          <brush brushstyle="SolidPattern">
+                           <color alpha="217">
+                            <red>255</red>
+                            <green>255</green>
+                            <blue>255</blue>
+                           </color>
+                          </brush>
+                         </colorrole>
+                        </active>
+                        <inactive>
+                         <colorrole role="WindowText">
+                          <brush brushstyle="SolidPattern">
+                           <color alpha="217">
+                            <red>255</red>
+                            <green>255</green>
+                            <blue>255</blue>
+                           </color>
+                          </brush>
+                         </colorrole>
+                        </inactive>
+                        <disabled/>
+                       </palette>
+                      </property>
                       <property name="text">
-                       <string>Account Name</string>
+                       <string>Account Name:     </string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1066,8 +1093,35 @@
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
+                      <property name="palette">
+                       <palette>
+                        <active>
+                         <colorrole role="WindowText">
+                          <brush brushstyle="SolidPattern">
+                           <color alpha="217">
+                            <red>255</red>
+                            <green>255</green>
+                            <blue>255</blue>
+                           </color>
+                          </brush>
+                         </colorrole>
+                        </active>
+                        <inactive>
+                         <colorrole role="WindowText">
+                          <brush brushstyle="SolidPattern">
+                           <color alpha="217">
+                            <red>255</red>
+                            <green>255</green>
+                            <blue>255</blue>
+                           </color>
+                          </brush>
+                         </colorrole>
+                        </inactive>
+                        <disabled/>
+                       </palette>
+                      </property>
                       <property name="text">
-                       <string>Account Type</string>
+                       <string>Account Type:        </string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1083,7 +1137,7 @@
                        </sizepolicy>
                       </property>
                       <property name="text">
-                       <string>Account Currency</string>
+                       <string>Account Currency:</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1210,19 +1264,19 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLabel" name="label_10account_created_value">
+                  <widget class="QLabel" name="account_created_value">
                    <property name="text">
                     <string>TextLabel</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <spacer name="account_created_value">
+                  <spacer name="horizontalSpacer_4">
                    <property name="orientation">
                     <enum>Qt::Orientation::Horizontal</enum>
                    </property>
                    <property name="sizeType">
-                    <enum>QSizePolicy::Policy::Minimum</enum>
+                    <enum>QSizePolicy::Policy::Preferred</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1260,7 +1314,7 @@
                   <height>50</height>
                  </size>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0">
                  <item>
                   <spacer name="horizontalSpacer_3">
                    <property name="orientation">

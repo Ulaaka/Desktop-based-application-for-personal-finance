@@ -5,6 +5,8 @@ from nltk.corpus import stopwords
 from geotext import GeoText
 import json
 import pandas as pd
+import pymysql
+
 class query_processor:
 
     """
@@ -246,10 +248,7 @@ class query_processor:
     def insert_account(self, userID, acc_name, acc_type, acc_currency):
         accountID = self.get_accountID(acc_name, userID)
         if accountID is None:
-            try:
-                accountID = self.insert_into_accounts(userID, acc_name, acc_type, acc_currency)
-            except:
-                print("could not execute insert_into_accounts ")
+            accountID = self.insert_into_accounts(userID, acc_name, acc_type, acc_currency)
         return accountID
 
     # New category insertion/update with check of if the category already exists
@@ -366,14 +365,16 @@ class query_processor:
         return output[0] if output else None
     
     def update_account(self, name, type, currency, accountID):
+        from datetime import datetime
+
         query = """
-            UPDATE accounts
-            SET account_name = %s
-            SET account_type = %s
-            SET account_currency = %s
-            WHERE accountID = %s
+        UPDATE accounts
+        SET account_name = %s, account_type = %s, account_currency = %s, updated_at = %s
+        WHERE accountID = %s;
         """
-        self.cursor.execute(query, (name, type, currency,accountID))
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        self.cursor.execute(query, (name, type, currency, current_time, accountID))
         self.db.commit()
 
     # Shows existing files IDs and filename submitted in the account
