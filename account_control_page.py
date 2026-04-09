@@ -64,9 +64,9 @@ class Account_control_page(QWidget):
         disclaimer_window.show()
 
     def objective_toggler(self):
-        if (self.objective == 1):
-            self.get_answer()
         self.objective = 1 - self.objective
+        if (self.objective == 0):
+            self.get_answer()
         self.manage_change_account()
 
     def manage_change_account(self):
@@ -85,8 +85,11 @@ class Account_control_page(QWidget):
         if not account_name:
             QMessageBox.warning(self, 'Error', 'Account Name section cant be empty')
             return
-
-        self.query.update_account(account_name, account_type, account_currency, self.accountID)
-        parent_window.update_account(account_name, self.accountID)
+        # after updating 1st account, needs to catch the changed account
+        self.accountID = parent_window.accountID 
+        self.query.update_account(self.accountID, account_name, account_type, account_currency)
+        parent_window.update_parent(account_name, self.accountID)
         self.current_account = account_name
         self.show_account_control_page()
+
+

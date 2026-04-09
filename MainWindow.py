@@ -13,6 +13,7 @@ from FILE_handling import file_handling
 from stream import Stream
 from account_selection_and_add_window import Account_selection_page
 from account_control_page import Account_control_page
+from profile_page import Profile_page
 
 class MainWindow(QMainWindow):
     def __init__(self, controller , key, userID):
@@ -39,9 +40,6 @@ class MainWindow(QMainWindow):
         if current_account == "Not selected":
             return
         Account_control_page(current_account, self)
-
-    def manage_account_page(self, current_account):
-        pass
 
     def manage_home_page(self):
         query = query_processor()
@@ -100,13 +98,10 @@ class MainWindow(QMainWindow):
                 view_button = QPushButton("View")
                 item_button.setObjectName("item_button")
                 view_button.setObjectName("view_button")
-                #item_button.setFixedWidth(70)
-                #view_button.setFixedWidth(70)
                 self.ui.treeView.setIndexWidget(tree_model.index(row_index, 4), item_button)
                 self.ui.treeView.setIndexWidget(tree_model.index(row_index, 5), view_button)
                 fileID = tree_model.data(tree_model.index(row_index, 0), Qt.UserRole)
                 item_button.clicked.connect(lambda click, id=fileID: self.delete_fileID(id))
-                # needs to be fized
                 view_button.clicked.connect(lambda clicked, id=fileID: self.view_file_with_ID(id))
 
     def view_file_with_ID(self, id):
@@ -227,7 +222,9 @@ class MainWindow(QMainWindow):
 
         self.ui.full_menu_widget.hide()
         self.ui.stackedWidget.setCurrentIndex(0)
+
         self.ui.treeView.header().setSectionResizeMode(QHeaderView.Stretch)
+
 
     def home_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page)
@@ -239,7 +236,7 @@ class MainWindow(QMainWindow):
 
     def file_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.files_page)
-        self.ui.files_stack.setCurrentWidget(self.ui.files_tree_page)
+        #self.ui.files_stack.setCurrentWidget(self.ui.files_tree_page)
         self.show_files()
 
     def stats_page_show(self):
@@ -247,6 +244,8 @@ class MainWindow(QMainWindow):
 
     def profile_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.profile_page)
+        profile_page = Profile_page(self.account_name, self)
+        profile_page.show()
 
     def settings_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.settings_page)

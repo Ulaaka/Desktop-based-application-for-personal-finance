@@ -127,7 +127,14 @@ QLabel#account_currency_change_label,
 QLabel#account_created_label,
 QLabel#account_update_label,
 QLabel#account_update_value,
-QLabel#account_created_value {
+QLabel#account_created_value,
+QLabel#username_change_label,
+QLabel#email_change_label,
+QLabel#user_created_label,
+QLabel#user_created_value,
+QLabel#user_accounts_label,
+QLabel#user_accounts_value,
+QLabel#no_file_label {
     background-color: transparent;
     color: black;
     border-radius: 15px;
@@ -149,7 +156,9 @@ QLineEdit#account_name_type {
     font-size: 14px;
 }
 
-QLineEdit#lineEdit_2 {
+QLineEdit#lineEdit_2,
+QLineEdit#username_change_value,
+QLineEdit#email_change_value{
     background-color: transparent;
     color: black;
     border: 2px solid black;
@@ -214,14 +223,18 @@ QPushButton#upload_file_button:hover {
     color: black;
 }
 
-QPushButton#change_button {
+QPushButton#change_button,
+QPushButton#username_change_button,
+QPushButton#email_change_button {
     background-color: #313a46;
     color: white;
     border: 2px solid black;
     border-radius: 4px;
 }
 
-QPushButton#change_button:hover{
+QPushButton#change_button:hover,
+QPushButton#username_change_button:hover,
+QPushButton#email_change_button:hover{
     background-color: rgba(86, 101, 115, 0.1);
     color : black;
 }
@@ -232,7 +245,8 @@ QPushButton#item_button{
     border-radius: 30px;
 }
 
-QPushButton#view_button{
+QPushButton#view_button,
+QPushButton#see_account{
     background-color: white;
     color: green;
     border-radius: 30px;
@@ -247,6 +261,7 @@ QPushButton#delete_account{
 
 QPushButton#item_button:hover,
 QPushButton#view_button:hover,
+QPushButton#see_account:hover,
 QPushButton#proceed_button:hover,
 QPushButton#cancel_button:hover,
 QPushButton#delete_account:hover {
@@ -269,7 +284,8 @@ QPushButton#cancel_button{
 
 QTableView#tableView,
 QTreeView#treeView,
-QTextBrowser#textBrowser {
+QTextBrowser#textBrowser,
+QTreeView#accounts_treeView {
     color: black;
     background-color: transparent;
 }

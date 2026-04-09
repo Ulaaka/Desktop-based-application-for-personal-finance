@@ -6,6 +6,8 @@ from geotext import GeoText
 import json
 import pandas as pd
 import pymysql
+from datetime import datetime
+
 
 class query_processor:
 
@@ -369,17 +371,29 @@ class query_processor:
         output = self.cursor.fetchone()
         return output[0] if output else None
     
-    def update_account(self, name, type, currency, accountID):
-        from datetime import datetime
-
-        query = """
-        UPDATE accounts
-        SET account_name = %s, account_type = %s, account_currency = %s, updated_at = %s
-        WHERE accountID = %s;
-        """
+    def update_account(self, accountID, account_name, account_type=None, account_currency=None):
+        parameter = [account_name]
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        top_query = "UPDATE accounts SET account_name = %s"
+        bottom_query = " WHERE accountID = %s"
 
-        self.cursor.execute(query, (name, type, currency, current_time, accountID))
+        if account_type:
+            top_query+=", account_type = %s"
+            parameter.append(account_type)
+
+        if account_currency:
+            top_query+=", account_currency = %s"
+            parameter.append(account_currency)
+
+        top_query+=", updated_at = %s"
+        parameter.extend([current_time, accountID])
+        query = top_query + bottom_query
+        self.cursor.execute(query, parameter)
+        self.db.commit()
+
+    def update_username(self, userID, new_username):
+        query = "UPDATE users SET username = %s WHERE userID = %s"
+        self.cursor.execute(query, (new_username, userID))
         self.db.commit()
 
     # Shows existing files IDs and filename submitted in the account
@@ -412,6 +426,18 @@ class query_processor:
         self.cursor.execute(query, (account_name, userID))
         result = self.cursor.fetchone()
         return result if result else None
+
+    def get_user_info(self, userID):
+        query = "SELECT username, email_address, created_at FROM users WHERE userID = %s"
+        self.cursor.execute(query, (userID,))
+        result = self.cursor.fetchone()
+        return result if result else None
+
+    def get_number_of_accounts(self, userID):
+        query = "SELECT account_name FROM accounts WHERE userID = %s"
+        self.cursor.execute(query, (userID,))
+        result = self.cursor.fetchall()
+        return [account[0] for account in result] if result else None
 
     # Deleted the file, associating transactions
     def delete_file(self, file_ID):
