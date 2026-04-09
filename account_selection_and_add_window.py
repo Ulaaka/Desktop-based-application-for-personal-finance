@@ -96,4 +96,3 @@ class Account_add_page(QDialog):
             self.close()
             QMessageBox.warning(self.parent().parent(), 'Error', 'Please enter all information')
             return
-

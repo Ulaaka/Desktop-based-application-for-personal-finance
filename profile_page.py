@@ -90,14 +90,18 @@ class Profile_page(QWidget):
         parent_window = self._parent
         state = self.mail_button_state
         self.mail_button_state = not state
-        self.activate(self.mail_button_state, "mail")
 
-        code = system_functions().send_reset_digits(6, userID=self.userID)
-        confirmation_window = Change_confirmation_page(code, self)
-        global_pos = parent_window.ui.email_change_button.mapToGlobal(QPoint(0,0))
-        confirmation_window.move(global_pos.x(), global_pos.y() + parent_window.ui.email_change_button.height())
-        confirmation_window.start_time()
-        confirmation_window.show()
+        if (self.mail_button_state is True):
+            confirmation_window = Change_confirmation_page(self)
+            global_pos = parent_window.ui.email_change_button.mapToGlobal(QPoint(0,0))
+            confirmation_window.move(global_pos.x(), global_pos.y() + parent_window.ui.email_change_button.height())
+            confirmation_window.start_time()
+            confirmation_window.show()
+
+        if (self.mail_button_state is False):
+            email = parent_window.ui.email_change_value.text()
+            self.query.update_user(self.userID, new_email=email)
+            self.show_profile_page()
 
     def navigate_to_account_control(self, name):
         parent_window = self._parent

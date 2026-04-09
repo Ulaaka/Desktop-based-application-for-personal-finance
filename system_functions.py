@@ -66,10 +66,11 @@ class manage_seconds_qt():
         self.timer = timer
         self.label = label
         self.expire_func = expire_func
+        # Update the timer
+        self.timer.timeout.connect(self.time_out)
 
     def begin_timer(self):
         self.remaining = self.duration
-        self.timer.timeout.connect(self.time_out)
         self.timer.start(1000)
 
     def time_out(self):

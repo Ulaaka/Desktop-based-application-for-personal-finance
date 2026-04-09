@@ -399,8 +399,11 @@ class query_processor:
             top_query+=" username = %s"
             parameter.append(new_username)
 
-        if new_username:
-            top_query+=", email_address = %s"
+        if new_email:
+            if new_username:
+                top_query+=", email_address = %s"
+            else:
+                top_query+=" email_address = %s"
             parameter.append(new_email)
 
         query = top_query + bottom_query

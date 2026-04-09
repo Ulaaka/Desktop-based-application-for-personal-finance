@@ -18,7 +18,6 @@ class Disclaimer_window(QDialog):
         self.signal_connect()
 
     def signal_connect(self):
-        self.setObjectName("disclaimer_widget")
         self.ui.proceed_button.clicked.connect(self.proceed_button_clicked)
         self.ui.cancel_button.clicked.connect(self.cancel_button_clicked)
 

@@ -112,7 +112,7 @@
    <item>
     <widget class="QLabel" name="timer_label">
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -121,7 +121,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widget_4" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,1">
       <item>
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
@@ -140,6 +140,12 @@
         <property name="text">
          <string>submit</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -149,7 +155,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>107</width>
+          <width>94</width>
           <height>15</height>
          </size>
         </property>
@@ -162,6 +168,12 @@
     <widget class="QPushButton" name="resend_button">
      <property name="text">
       <string>Did not get the code?</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="autoRepeat">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
