@@ -126,14 +126,12 @@ class MainWindow(QMainWindow):
             return
 
         self.transactions = query.get_transactions(self.accountID)
-
         if len(self.transactions) == 0:
             self.set_table(False)
             self.ui.no_account_label.setText(f"No transaction found for '{self.account_name}'")
         else:
             self.set_table(True)
             self.transactions = self.transactions.sort_values(by=self.transactions.columns[3], ascending=False)
-
             date_list = self.transactions.iloc[:, 3].tolist()
 
             min_date = min(date_list).date()
@@ -145,7 +143,6 @@ class MainWindow(QMainWindow):
 
             self.ui.start_date_edit.setDate(QDate(self.start_date.year, self.start_date.month, self.start_date.day))
             self.ui.end_date_edit.setDate(QDate(self.end_date.year, self.end_date.month, self.end_date.day))
-
             if (self.start_date < min_date and self.end_date > max_date):
                 return
             else:
@@ -153,18 +150,27 @@ class MainWindow(QMainWindow):
 
             self.model = ListModel(self.filter_transaction, self)
             self.data = self.filter_transaction
-            self.ui.tableView.setModel(self.model)
+
+            # https://www.youtube.com/watch?v=53bZSTSLUqI
+            proxy_model = QSortFilterProxyModel()
+            proxy_model.setSourceModel(self.model)
+            proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+            proxy_model.setFilterKeyColumn(5)
+            self.ui.lineEdit.textChanged.connect(proxy_model.setFilterRegExp)
+
+            self.ui.tableView.setModel(proxy_model)
+            for row_index in range(len(self.filter_transaction)):
+                transaction_id = self.filter_transaction.iloc[row_index].iloc[0]
+                remove_button = QPushButton("Remove")
+                remove_button.setObjectName("item_button")
+                index = proxy_model.mapFromSource(self.model.index(row_index, 9))
+                self.ui.tableView.setIndexWidget(index, remove_button)
+                remove_button.clicked.connect(lambda clicked, id=transaction_id, row=row_index: self.handle_remove_button(id))
 
             hidden_columns = [0, 1, 2]
             for i in hidden_columns:
                 self.ui.tableView.setColumnHidden(i, True)
 
-        for row_index in range(len(self.filter_transaction)):
-            transaction_id = self.filter_transaction.iloc[row_index].iloc[0]
-            remove_button = QPushButton("Remove")
-            remove_button.setObjectName("item_button")
-            self.ui.tableView.setIndexWidget(self.model.index(row_index, 9), remove_button)
-            remove_button.clicked.connect(lambda clicked, id=transaction_id, row=row_index: self.handle_remove_button(id))
 
     def handle_remove_button(self, id):
         query = query_processor()
@@ -300,7 +306,6 @@ class MainWindow(QMainWindow):
 
     def effectiveWinId(self):
         return super().effectiveWinId()
-
 
     def home_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page)
