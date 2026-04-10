@@ -2,7 +2,6 @@ from change_confirmation import Ui_change_confirmation
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt, QTimer
 from system_functions import manage_seconds_qt, system_functions
-
 class Change_confirmation_page(QDialog):
     def __init__(self, parent):
         super().__init__(parent)

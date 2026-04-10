@@ -15,7 +15,8 @@ from stream import Stream
 from account_selection_and_add_window import Account_selection_page
 from account_control_page import Account_control_page
 from profile_page import Profile_page
-from ui_support_functions import ui_support_functions
+from system_functions import system_functions
+from thread_worker import Thread_worker
 
 class MainWindow(QMainWindow):
     def __init__(self, controller , key, userID):
@@ -33,10 +34,12 @@ class MainWindow(QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.file_handle = file_handling(self.accountID, self.key)
+        self.system = system_functions()
 
         self.ui.setupUi(self)
         self.MainWindow_signals_connection()
         self.manage_home_page()
+        self.ui.comboBox_3.activated.connect(self.download_dataframe)
         self.accounts_selection_show()
 
     def label_click(self,event):
@@ -58,7 +61,6 @@ class MainWindow(QMainWindow):
                 self.update_account(options[0], accountID)
             else:
                 self.show_table()
-
 
     def show_files(self):
         query = query_processor()
@@ -124,30 +126,31 @@ class MainWindow(QMainWindow):
             return
 
         self.transactions = query.get_transactions(self.accountID)
-        self.transactions = self.transactions.sort_values(by=self.transactions.columns[3], ascending=False)
 
-        date_list = self.transactions.iloc[:, 3].tolist()
-
-        min_date = min(date_list).date()
-        max_date = max(date_list).date()
-
-        if self.start_date is None and self.end_date is None:
-            self.start_date = min_date
-            self.end_date = max_date
-
-        self.ui.start_date_edit.setDate(QDate(self.start_date.year, self.start_date.month, self.start_date.day))
-        self.ui.end_date_edit.setDate(QDate(self.end_date.year, self.end_date.month, self.end_date.day))
-
-        if (self.start_date < min_date and self.end_date > max_date):
-            return
-        else:
-            self.filter_transaction = self.transactions[self.transactions.iloc[:, 3].dt.date.between(self.start_date, self.end_date)]
-
-        if len(self.filter_transaction) == 0:
+        if len(self.transactions) == 0:
             self.set_table(False)
             self.ui.no_account_label.setText(f"No transaction found for '{self.account_name}'")
         else:
             self.set_table(True)
+            self.transactions = self.transactions.sort_values(by=self.transactions.columns[3], ascending=False)
+
+            date_list = self.transactions.iloc[:, 3].tolist()
+
+            min_date = min(date_list).date()
+            max_date = max(date_list).date()
+
+            if self.start_date is None and self.end_date is None:
+                self.start_date = min_date
+                self.end_date = max_date
+
+            self.ui.start_date_edit.setDate(QDate(self.start_date.year, self.start_date.month, self.start_date.day))
+            self.ui.end_date_edit.setDate(QDate(self.end_date.year, self.end_date.month, self.end_date.day))
+
+            if (self.start_date < min_date and self.end_date > max_date):
+                return
+            else:
+                self.filter_transaction = self.transactions[self.transactions.iloc[:, 3].dt.date.between(self.start_date, self.end_date)]
+
             self.model = ListModel(self.filter_transaction, self)
             self.data = self.filter_transaction
             self.ui.tableView.setModel(self.model)
@@ -205,12 +208,19 @@ class MainWindow(QMainWindow):
         self.print_output.input_text.connect(self.get_output)
         sys.stdout = self.print_output
 
+
         # process the files
         files_process = file_handling(self.accountID, self.key)
-        files_process.process_files_in_folder()
+        self.worker = Thread_worker(files_process.process_files_in_folder)
+        self.worker.done.connect(self.kill_progress)
+        self.worker.start()
+        #files_process.process_files_in_folder()
         self.live_output.ui.textBrowser.adjustSize()
         self.live_output.adjustSize()
         self.live_output.show()
+
+    def kill_progress(self):
+        pass
 
     def accounts_selection_show(self):
         if not self.status_panel:
@@ -265,6 +275,19 @@ class MainWindow(QMainWindow):
 
         self.ui.start_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=True))
         self.ui.end_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=False))
+    
+    def download_dataframe(self):
+        download_type = self.ui.comboBox_3.currentText()
+        if ("CSV" in download_type):
+            self.worker = Thread_worker(lambda: self.system.create_csv(self.account_name, self.filter_transaction))
+            self.worker.done.connect(self.kill_progress)
+            self.worker.start()
+            #self.system.create_csv(self.account_name, self.filter_transaction)
+        elif ("PDF" in download_type):
+            self.worker = Thread_worker(lambda: self.system.create_pdf(self.account_name, self.filter_transaction))
+            self.worker.done.connect(self.kill_progress)
+            self.worker.start()
+            #self.system.create_pdf(self.account_name, self.filter_transaction)
 
     def get_filter_date(self, start=None):
         if start is True:

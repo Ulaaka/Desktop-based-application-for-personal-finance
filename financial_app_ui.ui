@@ -966,13 +966,45 @@
                        </property>
                        <layout class="QHBoxLayout" name="horizontalLayout_22">
                         <item>
+                         <widget class="QComboBox" name="comboBox_3">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>145</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>145</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <item>
+                           <property name="text">
+                            <string>Download (CSV)</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Download (PDF)</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                        <item>
                          <spacer name="horizontalSpacer_10">
                           <property name="orientation">
                            <enum>Qt::Orientation::Horizontal</enum>
                           </property>
                           <property name="sizeHint" stdset="0">
                            <size>
-                            <width>315</width>
+                            <width>166</width>
                             <height>10</height>
                            </size>
                           </property>

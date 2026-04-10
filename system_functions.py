@@ -1,9 +1,15 @@
-import random, os
+import random
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from database_connection import database
 from queries import query_processor
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.image import imread
+from datetime import datetime
+from pathlib import Path
+
 
 class system_functions:
 
@@ -59,6 +65,35 @@ class system_functions:
             return number
         except:
             return None
+
+    # https://www.youtube.com/watch?v=JjamKgAmB-4&t=273s
+    def create_pdf(self, account_name, df):
+        # Source - https://stackoverflow.com/a/62662388
+        current_time = datetime.now().strftime("%Y-%m-%d")
+        file_name = f"{account_name}_financial_report_{current_time}.pdf"
+        file_path = str(Path.home() / "Downloads"/file_name)
+
+        df = df.iloc[:, 3:]
+        rows_count = 9
+        with PdfPages(file_path) as pdf:
+            for mark in range(0, len(df), rows_count):
+                section = df.iloc[mark:mark + rows_count]
+                _, ax = plt.subplots(figsize=(8, 6))
+
+                info = ax.table(cellText= section.values, colLabels=section.columns, loc='center')
+                ax.axis('off')
+                info.set_fontsize(30)
+                info.scale(1.2,2.5)
+                pdf.savefig()
+
+    def create_csv(self, account_name, df):
+        df = df.iloc[:, 3:]
+        # Source - https://stackoverflow.com/a/45141782
+        current_time = datetime.now().strftime("%Y-%m-%d")
+        file_name = f"{account_name}_financial_report_{current_time}.csv"
+        file_path = str(Path.home() / "Downloads"/file_name)
+        df.to_csv(file_path, sep=',', encoding='utf-8', index=False, header=True)
+
 
 class manage_seconds_qt():
     def __init__(self, label, timer, duration, expire_func=None):

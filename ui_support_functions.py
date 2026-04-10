@@ -1,5 +1,4 @@
-from PyQt5.QtWidgets import QCompleter
-from PyQt5.QtCore import Qt
+
 class ui_support_functions:
     color_dic = {
         "login_page": {
@@ -75,9 +74,3 @@ class ui_support_functions:
                 }}
             '''
             return line
-
-    def set_completer(self, search, model):
-        self.completer = QCompleter(model, search)
-        self.completer.setFilterMode(Qt.MatchContains)
-        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-        search.setCompleter(self.completer)
