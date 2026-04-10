@@ -1,8 +1,9 @@
 import sys,  shutil, pycountry
 from decouple import config
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QHeaderView, QPushButton, QWidget
-from PyQt5.QtCore import Qt, QPoint, QModelIndex
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QHeaderView, QPushButton, QWidget, QCompleter
+from PyQt5.QtCore import Qt, QPoint, QDate, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from datetime import datetime
 
 from financial_app import Ui_MainWindow
 from disclaimer_window import Disclaimer_window
@@ -14,6 +15,7 @@ from stream import Stream
 from account_selection_and_add_window import Account_selection_page
 from account_control_page import Account_control_page
 from profile_page import Profile_page
+from ui_support_functions import ui_support_functions
 
 class MainWindow(QMainWindow):
     def __init__(self, controller , key, userID):
@@ -26,6 +28,8 @@ class MainWindow(QMainWindow):
         self.accountID = None
         self.status_panel = False
         self.currency_list = [f"{currency.alpha_3} - {currency.name} " for currency in pycountry.currencies]
+        self.start_date = None
+        self.end_date = None
 
         self.ui = Ui_MainWindow()
         self.file_handle = file_handling(self.accountID, self.key)
@@ -54,6 +58,7 @@ class MainWindow(QMainWindow):
                 self.update_account(options[0], accountID)
             else:
                 self.show_table()
+
 
     def show_files(self):
         query = query_processor()
@@ -118,22 +123,41 @@ class MainWindow(QMainWindow):
         if not self.accountID:
             return
 
-        transactions = query.get_transactions(self.accountID)
-        if len(transactions) == 0:
+        self.transactions = query.get_transactions(self.accountID)
+        self.transactions = self.transactions.sort_values(by=self.transactions.columns[3], ascending=False)
+
+        date_list = self.transactions.iloc[:, 3].tolist()
+
+        min_date = min(date_list).date()
+        max_date = max(date_list).date()
+
+        if self.start_date is None and self.end_date is None:
+            self.start_date = min_date
+            self.end_date = max_date
+
+        self.ui.start_date_edit.setDate(QDate(self.start_date.year, self.start_date.month, self.start_date.day))
+        self.ui.end_date_edit.setDate(QDate(self.end_date.year, self.end_date.month, self.end_date.day))
+
+        if (self.start_date < min_date and self.end_date > max_date):
+            return
+        else:
+            self.filter_transaction = self.transactions[self.transactions.iloc[:, 3].dt.date.between(self.start_date, self.end_date)]
+
+        if len(self.filter_transaction) == 0:
             self.set_table(False)
             self.ui.no_account_label.setText(f"No transaction found for '{self.account_name}'")
         else:
             self.set_table(True)
-            self.model = ListModel(transactions, self)
-            self.data = transactions
+            self.model = ListModel(self.filter_transaction, self)
+            self.data = self.filter_transaction
             self.ui.tableView.setModel(self.model)
 
             hidden_columns = [0, 1, 2]
             for i in hidden_columns:
                 self.ui.tableView.setColumnHidden(i, True)
 
-        for row_index in range(len(transactions)):
-            transaction_id = transactions.iloc[row_index].iloc[0]
+        for row_index in range(len(self.filter_transaction)):
+            transaction_id = self.filter_transaction.iloc[row_index].iloc[0]
             remove_button = QPushButton("Remove")
             remove_button.setObjectName("item_button")
             self.ui.tableView.setIndexWidget(self.model.index(row_index, 9), remove_button)
@@ -148,6 +172,8 @@ class MainWindow(QMainWindow):
         self.account_name = new_account_name
         self.accountID = new_accountID
         self.ui.account_name_label.setText(new_account_name)
+        self.start_date = None
+        self.end_date = None
         self.show_table()
 
     def set_table(self, flag):
@@ -228,7 +254,6 @@ class MainWindow(QMainWindow):
         self.ui.settings_button_2.clicked.connect(self.settings_page_show)
 
         self.ui.account_button.clicked.connect(self.accounts_selection_show)
-
         self.ui.upload_file_button.clicked.connect(self.upload_file)
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.account_name_label.mousePressEvent = self.label_click
@@ -238,10 +263,26 @@ class MainWindow(QMainWindow):
 
         self.ui.treeView.header().setSectionResizeMode(QHeaderView.Stretch)
 
+        self.ui.start_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=True))
+        self.ui.end_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=False))
+
+    def get_filter_date(self, start=None):
+        if start is True:
+            value = self.ui.start_date_edit.date()
+            self.start_date  = value.toPyDate()
+        elif start is False:
+            value = self.ui.end_date_edit.date()
+            self.end_date  = value.toPyDate()
+        self.show_table()
+
+    def effectiveWinId(self):
+        return super().effectiveWinId()
+
 
     def home_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page)
         self.show_table()
+
 
     def upload_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.upload_page)

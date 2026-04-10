@@ -128,6 +128,9 @@
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
          </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Policy::Minimum</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>108</width>
@@ -176,8 +179,14 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>90</width>
+           <width>80</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="text">
@@ -840,7 +849,7 @@
        <item>
         <widget class="QWidget" name="main_widget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -854,19 +863,46 @@
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>70</height>
+              <height>0</height>
              </size>
             </property>
             <property name="currentIndex">
              <number>0</number>
             </property>
             <widget class="QWidget" name="home_page">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <layout class="QHBoxLayout" name="horizontalLayout_20">
               <item>
                <widget class="QStackedWidget" name="home_stacked">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
                 <widget class="QWidget" name="no_account_page">
                  <layout class="QVBoxLayout" name="verticalLayout_6">
                   <item>
@@ -888,16 +924,44 @@
                  </layout>
                 </widget>
                 <widget class="QWidget" name="table_page">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_21">
                   <item>
                    <widget class="QWidget" name="widget_24" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_4">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_4" stretch="12,0">
+                     <item>
+                      <widget class="QTableView" name="tableView">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                      </widget>
+                     </item>
                      <item>
                       <widget class="QWidget" name="widget_25" native="true">
                        <property name="minimumSize">
                         <size>
                          <width>0</width>
-                         <height>50</height>
+                         <height>40</height>
                         </size>
                        </property>
                        <layout class="QHBoxLayout" name="horizontalLayout_22">
@@ -908,14 +972,14 @@
                           </property>
                           <property name="sizeHint" stdset="0">
                            <size>
-                            <width>493</width>
-                            <height>20</height>
+                            <width>315</width>
+                            <height>10</height>
                            </size>
                           </property>
                          </spacer>
                         </item>
                         <item>
-                         <widget class="QLabel" name="table_edit_label">
+                         <widget class="QLabel" name="start_date_label">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                             <horstretch>0</horstretch>
@@ -923,12 +987,12 @@
                            </sizepolicy>
                           </property>
                           <property name="text">
-                           <string>Select Data Range: </string>
+                           <string>Select Start Date: </string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QDateEdit" name="table_date_edit">
+                         <widget class="QDateEdit" name="start_date_edit">
                           <property name="minimumSize">
                            <size>
                             <width>100</width>
@@ -937,11 +1001,18 @@
                           </property>
                          </widget>
                         </item>
+                        <item>
+                         <widget class="QLabel" name="end_date_label">
+                          <property name="text">
+                           <string>Select End Date</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QDateEdit" name="end_date_edit"/>
+                        </item>
                        </layout>
                       </widget>
-                     </item>
-                     <item>
-                      <widget class="QTableView" name="tableView"/>
                      </item>
                     </layout>
                    </widget>
@@ -953,6 +1024,12 @@
              </layout>
             </widget>
             <widget class="QWidget" name="stats_page">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <widget class="QLabel" name="label_8">
               <property name="geometry">
                <rect>
@@ -968,6 +1045,12 @@
              </widget>
             </widget>
             <widget class="QWidget" name="upload_page">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
                <widget class="QStackedWidget" name="upload_stack">

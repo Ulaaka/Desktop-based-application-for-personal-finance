@@ -137,7 +137,8 @@ QLabel#user_accounts_value,
 QLabel#no_file_label,
 QLabel#confirmation_label,
 QLabel#timer_label,
-QLabel#table_edit_label {
+QLabel#start_date_label,
+QLabel#end_date_label {
     background-color: transparent;
     color: black;
     border-radius: 15px;
@@ -318,7 +319,8 @@ QWidget#change_confirmation{
 }
 
 /* Date Range */
-QDateEdit#table_date_edit{
+QDateEdit#start_date_edit,
+QDateEdit#end_date_edit{
     background-color: transparent;
     color: black;
 }

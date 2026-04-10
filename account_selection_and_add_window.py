@@ -14,15 +14,11 @@ class Account_selection_page(QDialog):
         self.currency_list = parent.currency_list
 
         self.ui = account_selection_form()
+
         self.ui.setupUi(self)
         self.setWindowFlags(Qt.Popup)
 
-        self.completer = QCompleter(self.ui.accounts_list.model(), self)
-        self.completer.setFilterMode(Qt.MatchContains)
-        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-
-        self.ui.lineEdit.setCompleter(self.completer)
-
+        self.set_completer(self.ui.lineEdit, self.ui.accounts_list.model())
         self.account_selection_signals_connection()
         self.show_accounts()
 
@@ -45,6 +41,12 @@ class Account_selection_page(QDialog):
         query = query_processor()
         accountID = query.get_accountID(option, self.userID)
         self.chose_account.emit(option, accountID)
+
+    def set_completer(self, search, model):
+        self.completer = QCompleter(model, search)
+        self.completer.setFilterMode(Qt.MatchContains)
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        search.setCompleter(self.completer)
 
     def update_list(self):
         if (self.ui.accounts_list.count() > 0):
