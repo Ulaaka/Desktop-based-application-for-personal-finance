@@ -7,6 +7,7 @@ from Widgets.thread_worker import Thread_worker
 class Home_page():
     def __init__(self, parent):
         self._parent = parent
+        self.transactions = None
 
     def show_table(self):
             parent_window = self._parent
@@ -58,6 +59,8 @@ class Home_page():
 
     def set_select_dates(self):
         parent_window = self._parent
+        if self.transactions is None:
+            return
         self.transactions = self.transactions.sort_values(by=self.transactions.columns[3], ascending=False)
         date_list = self.transactions.iloc[:, 3].tolist()
 

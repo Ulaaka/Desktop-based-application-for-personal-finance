@@ -18,7 +18,6 @@ class file_handling():
         self.accountID = accountID
         self.key = key
         self.userID = userID
-        self.crypto = cryptography()
         self.query = query_processor()
         self.temp_files = []
 
@@ -34,6 +33,8 @@ class file_handling():
         return tmp.name
 
     def view_file(self, original_filename=None, fileID=None):
+        crypto = cryptography()
+
         flag = False
         query = query_processor()
         sub_save_folder = os.path.join(config('SAVE_FOLDER'),f"account_{self.accountID}")
@@ -42,9 +43,8 @@ class file_handling():
             current_filename = query.get_file_name(self.accountID, fileID=fileID)
         elif original_filename:
             current_filename = original_filename
-            decrypted_text = self.crypto.decrypt(sub_save_folder, self.key, self.accountID,filename=original_filename)
 
-        decrypted_text = self.crypto.decrypt(sub_save_folder, self.key, self.accountID,filename=current_filename)
+        decrypted_text = crypto.decrypt(sub_save_folder, self.key, self.accountID,filename=current_filename)
         if (current_filename.split(".")[1] == "pdf"):
             flag = True
         temp_name = self.show_decrypted_pdf(decrypted_text, pdf_flag=flag)
@@ -68,12 +68,14 @@ class file_handling():
 
     # Checks if the file with the same content exists by checking the save folder for encrypted files
     def check_file_exists(self, sub_save_folder, file_path, filename):
+        crypto = cryptography()
+
 
         found = False
         output = ""
 
         for encrypted_file in os.listdir(sub_save_folder):
-            decrypted = self.crypto.decrypt(sub_save_folder, self.key, self.accountID, hashed_filename=encrypted_file)
+            decrypted = crypto.decrypt(sub_save_folder, self.key, self.accountID, hashed_filename=encrypted_file)
             # check the size of the file, avoiding reading the whole files
 
             if os.path.getsize(file_path) == len(decrypted):
@@ -90,10 +92,13 @@ class file_handling():
 
     # The functions for handling the parsing of the user input files
     def process_files_in_folder(self):
+        crypto = cryptography()
+
         dir = os.listdir(config('FOLDER_PATH'))
         parsed_count = 0
         existing_file_output = []
         for filename in dir:
+            print(filename)
             if (filename.endswith(".csv") or filename.endswith(".pdf")): 
                 file_type = 'PDF Document'
                 if filename.endswith(".csv"):
@@ -119,12 +124,13 @@ class file_handling():
                             parsing = HSBC_PDF_CONVERSION(file_path)
                     parsed_count+=1
                     size_file = os.path.getsize(file_path)
-                    file_ID = self.crypto.encrypt(sub_save_folder, config('FOLDER_PATH'), filename, self.key, self.accountID, size_file, file_type)
+                    file_ID = crypto.encrypt(sub_save_folder, config('FOLDER_PATH'), filename, self.key, self.accountID, size_file, file_type)
                     ProcessingDF(parsing.df, file_ID, self.userID, self.accountID)
                 else:
                     existing_file_output.append(result[1])
             else:
-                raise Exception("Incompatible file/s has been submitted.")
+                print("Incompatible file/s has been submitted")
+                return
         print(f"{parsed_count}/{len(dir)} files loaded successfully")
         if (len(existing_file_output) > 0):
             print(f"Skipped duplicates:\n")

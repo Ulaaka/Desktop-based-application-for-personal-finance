@@ -615,9 +615,9 @@ class query_processor:
         return result if result else None
 
     # Associate the description with the category name, and its close transactions
-    def add_description_into_list_category(self, userID, description, category_name):
-        close_transaction_ids = self.find_close_transactions(description)
-        categoryID = self.insert_category(userID, description, close_transaction_ids[1], category_name)
+    def add_description_into_list_category(self, userID, accountID, description, category_name):
+        close_transaction_ids = self.find_close_transactions(description, accountID)
+        categoryID = self.insert_category(userID, accountID, description, close_transaction_ids[1], category_name)
         self.update_category(category_name, close_transaction_ids[0])
         return categoryID if categoryID else None
 
@@ -632,7 +632,7 @@ class query_processor:
 
     # use the category name of the removed description of the category
     # when category is deleted, updates the transactions
-    def update_transaction_after_deletion_description(self, categoryID):
+    def update_transaction_after_deletion_description(self, userID, accountID, categoryID):
         query = """
             SELECT transactionID, description
             FROM transactions
@@ -643,11 +643,11 @@ class query_processor:
         result = self.cursor.fetchall()
         if result:
             for (i, j)in result:
-                new_category = self.return_updated_category(j)
+                new_category = self.return_updated_category(userID, accountID, j)
                 self.update_category(new_category, i)
 
     # Changes the description of the transaction, needs to change the category after that
-    def change_description_and_update(self, new_description, transactionID):
+    def change_description_and_update(self, userID, accountID,  new_description, transactionID):
         query = """
             UPDATE transactions
             SET description = %s
@@ -657,7 +657,7 @@ class query_processor:
         self.cursor.execute(query, (new_description, transactionID))
         self.db.commit()
 
-        new_category = self.return_updated_category(new_description)
+        new_category = self.return_updated_category(userID, accountID, new_description)
         self.update_category(new_category, transactionID)
 
     def return_accounts_given_userID(self, userID):

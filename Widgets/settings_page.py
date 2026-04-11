@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMessageBox, QLineEdit, QPushButton, QHeaderView
 from PyQt5.QtCore import QPoint, QSortFilterProxyModel, Qt
 
 from queries import query_processor
-from BASE_Classes import password_class
+from BASE_Classes import password_class, cryptography
 from Widgets.change_confirmation_window import Change_confirmation_page
 from Widgets.Table_View import ListModelCategory
 from Widgets.home_page import Home_page
@@ -30,6 +30,7 @@ class Change_password_page():
         )
 
     def change_password(self):
+        crypto = cryptography()
         parent_window = self._parent
         current_password = parent_window.ui.current_password_line.text()
         new_password = parent_window.ui.new_password_line.text()
@@ -59,6 +60,8 @@ class Change_password_page():
                 if result:
                     parent_window.ui.current_password_line.clear()
                     parent_window.ui.new_password_line.clear()
+                    key = crypto.generate_key(new_password)
+                    parent_window.key = key
                     QMessageBox.information(
                         parent_window, "Confirmation", "Password Changed")
                     return
@@ -73,6 +76,9 @@ class Change_password_page():
                 parent_window.ui.current_password_line.clear()
                 parent_window.ui.new_password_line.clear()
                 self.objective = 0
+                key = crypto.generate_key(new_password)
+                parent_window.key = key
+
                 QMessageBox.information(
                     parent_window, "Confirmation", "Password Changed")
                 return
@@ -96,10 +102,12 @@ class Delete_user_account():
     def __init__(self, parent):
         self._parent = parent
         self.query = query_processor()
+        self.delete_user_signals_connect()
 
     def delete_user_signals_connect(self):
         parent_window = self._parent
         parent_window.ui.delete_user_button_2.clicked.connect(self.delete_user)
+        parent_window.ui.delete_user_line.setEchoMode(QLineEdit.Password)
 
     def delete_user(self):
         parent_window = self._parent
@@ -116,51 +124,67 @@ class Change_category():
     def __init__(self, parent):
         self._parent = parent
         self.home_page = Home_page(parent)
+        self.query = query_processor()
         self.signals_connect()
 
     def signals_connect(self):
-        self._parent.ui.category_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        parent_window = self._parent
+        parent_window.ui.category_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        parent_window.ui.category_table.verticalHeader().setVisible(False)
+        parent_window.ui.stackedWidget_2.setCurrentWidget(parent_window.ui.category_table_page)
 
     def show_category_table(self):
         parent_window = self._parent
-        query = query_processor()
         if not parent_window.accountID:
+            QMessageBox.warning(parent_window, "error", "Please create an account first")
             return
 
-        self.categories = query.get_category_info(parent_window.userID, parent_window.accountID, asDF=True)
+        self.categories = self.query.get_category_info(parent_window.userID, parent_window.accountID, asDF=True)
+        # add extra row to allow for category add
+        self.categories.loc[len(self.categories)] = [-1, "", "", ""]
 
-        if len(self.categories) == 0:
-            self.set_category_table(False)
-            parent_window.ui.no_categories_label.setText(f"No category found for '{parent_window.account_name}'")
-        else:
-            self.set_category_table(True)
+        self.set_category_table(True)
 
-            # -- TABLE LOADING -- 
-            self.model = ListModelCategory(self.categories, parent_window, self)
-            self.data = self.categories
+        # -- TABLE LOADING -- 
+        self.model = ListModelCategory(self.categories, parent_window, self)
+        self.data = self.categories
 
-            # Set the search filter for the table
-            # inspired from:  https://www.youtube.com/watch?v=53bZSTSLUqI
+        # Set the search filter for the table
+        # inspired from:  https://www.youtube.com/watch?v=53bZSTSLUqI
 
-            proxy_model = QSortFilterProxyModel()
-            proxy_model.setSourceModel(self.model)
-            proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
-            proxy_model.setFilterKeyColumn(3)
-            parent_window.ui.category_line.textChanged.connect(proxy_model.setFilterRegExp)
-            parent_window.ui.category_table.setModel(proxy_model)
+        proxy_model = QSortFilterProxyModel()
+        proxy_model.setSourceModel(self.model)
+        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        proxy_model.setFilterKeyColumn(2)
+        parent_window.ui.category_line.textChanged.connect(proxy_model.setFilterRegExp)
+        parent_window.ui.category_table.setModel(proxy_model)
 
-            hidden_columns = [0, 1]
-            for i in hidden_columns:
-                parent_window.ui.tableView.setColumnHidden(i, True)
-
-            for row_index in range(len(self.categories)):
-                category_id = self.categories.iloc[row_index].iloc[0]
+        for row_index in range(len(self.categories)):
+            index_button = proxy_model.index(row_index, self.model.columnCount() - 1)
+            category_id = self.categories.iloc[row_index].iloc[0]
+            if (len(self.categories) == 1 or row_index >= len(self.categories) - 1):
+                add_button = QPushButton("Add")
+                add_button.setObjectName("view_button")
+                parent_window.ui.category_table.setIndexWidget(index_button, add_button)
+                add_button.clicked.connect(lambda : self.hand_add_button())
+            else:
                 remove_button = QPushButton("Remove")
                 remove_button.setObjectName("item_button")
-                index_button = proxy_model.index(row_index, self.model.columnCount() - 1)
                 parent_window.ui.category_table.setIndexWidget(index_button, remove_button)
                 remove_button.clicked.connect(lambda clicked, id=category_id: self.handle_remove_button(id))
 
+        hidden_columns = [0, 1]
+        for i in hidden_columns:
+            parent_window.ui.category_table.setColumnHidden(i, True)
+
+    def hand_add_button(self):
+        parent_window = self._parent
+        description = self.model.description
+        name = self.model.name
+
+        categoryID = self.query.add_description_into_list_category(parent_window.userID, parent_window.accountID, description, name)
+        self.show_category_table()
+        self.home_page.show_table()
 
     def set_category_table(self, flag):
         parent_window = self._parent

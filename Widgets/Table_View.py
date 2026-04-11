@@ -42,8 +42,7 @@ class ListModel(QAbstractTableModel):
                 # if does not want to
                 # update_category()
             if column == 5:
-                # 
-                if self.query.change_description_and_update(value, transactionID):
+                if self.query.change_description_and_update(main_window.userID, main_window.accountID, value, transactionID):
                     self.home_page.show_table()
             return True
         return False
@@ -73,8 +72,11 @@ class ListModelCategory(QAbstractTableModel):
         self._parent = parent
         self.userID = parent.userID
         self.home_page = home_page
+        self.description = None
+        self.name = None
 
     def rowCount(self, index):
+        # for adding new categories
         return self._data.shape[0]
 
     def columnCount(self, parent=None):
@@ -86,11 +88,10 @@ class ListModelCategory(QAbstractTableModel):
 
                 column = int(index.column())
 
-                # ✅ ONLY FIX: protect extra column
                 if column < self._data.shape[1]:
-                    value = self._data.iloc[index.row(), column]
+                    value = self._data.iloc[index.row(), index.column()]
                 else:
-                    value = ""   # extra column
+                    value = "" 
 
                 return str(value)
 
@@ -101,11 +102,19 @@ class ListModelCategory(QAbstractTableModel):
             column = int(index.column())
             row = int(index.row())
             categoryID = int(self._data.iloc[row, 0])
+            self._data.iloc[row, column] = value
+            # save the changes if its last row
+            if row == self._data.shape[0] - 1:
+                # category sentence change
+                if column == 2:
+                    self.description = value
+                elif column == 3:
+                    self.name = value
 
-            if column < self._data.shape[1]:
-                self._data.iloc[row, column] = value
+            if column == 2:
+                pass
 
-            if column == 5:
+            if column == 3:
                 pass
 
             return True
@@ -119,7 +128,7 @@ class ListModelCategory(QAbstractTableModel):
             if col < self._data.shape[1]:
                 return self._data.columns[col]
             else:
-                return ""   # extra column header
+                return ""
 
     def flags(self, index):
         return (

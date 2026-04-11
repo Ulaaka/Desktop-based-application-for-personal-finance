@@ -4,6 +4,8 @@ from Widgets.live_output_window import Live_output_window
 from FILE_handling import file_handling
 from Widgets.stream import Stream
 from Widgets.thread_worker import Thread_worker
+from decouple import config
+
 
 class Upload_page():
     def __init__(self, parent):
@@ -18,8 +20,7 @@ class Upload_page():
         file_paths, _ = QFileDialog.getOpenFileNames(parent_window, 'Open File', "", "CSV Files (*.csv);;PDF Files (*.pdf)")
         if file_paths:
             for file_path in file_paths:
-                # config('FOLDER_PATH')
-                shutil.copy(file_path, "/Users/nyamdorjbat-erdene/Final_year/exp_folder")
+                shutil.copy(file_path, config('FOLDER_PATH'))
 
         saved_stdout = sys.stdout
         self.print_output = Stream()
