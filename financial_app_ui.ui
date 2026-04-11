@@ -87,7 +87,7 @@
             <string/>
            </property>
            <property name="placeholderText">
-            <string>Search</string>
+            <string>Search Transactions</string>
            </property>
           </widget>
          </item>
@@ -861,6 +861,21 @@
           </size>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="sizePolicy">
@@ -876,7 +891,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>5</number>
+             <number>7</number>
             </property>
             <widget class="QWidget" name="home_page">
              <property name="sizePolicy">
@@ -886,6 +901,21 @@
               </sizepolicy>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QStackedWidget" name="home_stacked">
                 <property name="sizePolicy">
@@ -946,6 +976,21 @@
                      </size>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="12,0">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="QTableView" name="tableView">
                        <property name="minimumSize">
@@ -1205,7 +1250,16 @@
              </widget>
             </widget>
             <widget class="QWidget" name="account_page">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <layout class="QVBoxLayout" name="verticalLayout_12">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QWidget" name="widget_5" native="true">
                 <property name="maximumSize">
@@ -1262,6 +1316,21 @@
                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,1">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
                   <widget class="QWidget" name="edit_account_labels_widget" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -1491,6 +1560,21 @@
                  </size>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
                   <widget class="QLabel" name="account_created_label">
                    <property name="font">
@@ -1627,6 +1711,21 @@
                <widget class="QStackedWidget" name="files_stack">
                 <widget class="QWidget" name="files_tree_page">
                  <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QTreeView" name="treeView">
                     <property name="sortingEnabled">
@@ -1659,6 +1758,21 @@
               <item>
                <widget class="QWidget" name="widget_6" native="true">
                 <layout class="QVBoxLayout" name="verticalLayout_15">
+                 <property name="spacing">
+                  <number>-1</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
                   <widget class="QWidget" name="widget_8" native="true">
                    <property name="minimumSize">
@@ -2063,9 +2177,39 @@
               <item>
                <widget class="QWidget" name="widget_20" native="true">
                 <layout class="QHBoxLayout" name="horizontalLayout_19" stretch="1,4">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
                   <widget class="QWidget" name="widget_22" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_17">
+                    <property name="spacing">
+                     <number>-1</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
                     <item>
                      <widget class="QPushButton" name="delete_user_button">
                       <property name="sizePolicy">
@@ -2134,6 +2278,47 @@
                     </item>
                     <item>
                      <spacer name="verticalSpacer_5">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Policy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>5</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="change_category_button">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>180</width>
+                        <height>60</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Change Categories</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="autoExclusive">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="verticalSpacer_8">
                       <property name="orientation">
                        <enum>Qt::Orientation::Vertical</enum>
                       </property>
@@ -2219,7 +2404,469 @@
                  </item>
                  <item>
                   <widget class="QWidget" name="widget_23" native="true">
-                   <layout class="QVBoxLayout" name="verticalLayout_18"/>
+                   <layout class="QVBoxLayout" name="verticalLayout_18">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QStackedWidget" name="settings_stack">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="currentIndex">
+                       <number>2</number>
+                      </property>
+                      <widget class="QWidget" name="delete_user_account_page">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_19" stretch="0,4">
+                        <property name="spacing">
+                         <number>-1</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>10</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QWidget" name="widget_26" native="true">
+                          <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="2,1,1">
+                           <property name="leftMargin">
+                            <number>40</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>40</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="QLineEdit" name="delete_user_line">
+                             <property name="minimumSize">
+                              <size>
+                               <width>0</width>
+                               <height>30</height>
+                              </size>
+                             </property>
+                             <property name="placeholderText">
+                              <string>Type Your Password</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="delete_user_button_2">
+                             <property name="sizePolicy">
+                              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                               <horstretch>0</horstretch>
+                               <verstretch>0</verstretch>
+                              </sizepolicy>
+                             </property>
+                             <property name="minimumSize">
+                              <size>
+                               <width>0</width>
+                               <height>30</height>
+                              </size>
+                             </property>
+                             <property name="text">
+                              <string>Submit</string>
+                             </property>
+                             <property name="checkable">
+                              <bool>true</bool>
+                             </property>
+                             <property name="autoExclusive">
+                              <bool>true</bool>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <spacer name="horizontalSpacer_11">
+                             <property name="orientation">
+                              <enum>Qt::Orientation::Horizontal</enum>
+                             </property>
+                             <property name="sizeType">
+                              <enum>QSizePolicy::Policy::Expanding</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                              <size>
+                               <width>40</width>
+                               <height>20</height>
+                              </size>
+                             </property>
+                            </spacer>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QWidget" name="widget_27" native="true">
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>50</height>
+                           </size>
+                          </property>
+                          <layout class="QVBoxLayout" name="verticalLayout_20">
+                           <property name="leftMargin">
+                            <number>40</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>40</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="QLabel" name="label_6">
+                             <property name="font">
+                              <font>
+                               <pointsize>15</pointsize>
+                              </font>
+                             </property>
+                             <property name="text">
+                              <string>By deleting the user account, please note your data will be permanently deleted, resulting in not being able to recover lost data. Please be careful to proceed.</string>
+                             </property>
+                             <property name="wordWrap">
+                              <bool>true</bool>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <spacer name="verticalSpacer_6">
+                             <property name="orientation">
+                              <enum>Qt::Orientation::Vertical</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                              <size>
+                               <width>20</width>
+                               <height>40</height>
+                              </size>
+                             </property>
+                            </spacer>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="empty_page"/>
+                      <widget class="QWidget" name="category_change_page">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_25">
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QStackedWidget" name="stackedWidget_2">
+                          <widget class="QWidget" name="category_table_page">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <layout class="QVBoxLayout" name="verticalLayout_26" stretch="0,13">
+                            <property name="leftMargin">
+                             <number>12</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="rightMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>0</number>
+                            </property>
+                            <item>
+                             <widget class="QLineEdit" name="category_line">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="placeholderText">
+                               <string>Search Categories</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QTableView" name="category_table"/>
+                            </item>
+                           </layout>
+                          </widget>
+                          <widget class="QWidget" name="page_4">
+                           <layout class="QVBoxLayout" name="verticalLayout_27">
+                            <item>
+                             <widget class="QLabel" name="no_categories_label">
+                              <property name="text">
+                               <string>TextLabel</string>
+                              </property>
+                              <property name="alignment">
+                               <set>Qt::AlignmentFlag::AlignCenter</set>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="privacy_note_page">
+                       <layout class="QVBoxLayout" name="verticalLayout_23">
+                        <item>
+                         <widget class="QWidget" name="widget_32" native="true">
+                          <layout class="QVBoxLayout" name="verticalLayout_24">
+                           <item>
+                            <widget class="QLabel" name="label_7">
+                             <property name="text">
+                              <string>Privacy Note</string>
+                             </property>
+                             <property name="wordWrap">
+                              <bool>true</bool>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="change_password_page">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_21" stretch="2,2">
+                        <item>
+                         <widget class="QWidget" name="widget_28" native="true">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <layout class="QHBoxLayout" name="horizontalLayout_24" stretch="3,2">
+                           <property name="spacing">
+                            <number>0</number>
+                           </property>
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>0</number>
+                           </property>
+                           <item>
+                            <widget class="QWidget" name="widget_30" native="true">
+                             <property name="sizePolicy">
+                              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                               <horstretch>0</horstretch>
+                               <verstretch>0</verstretch>
+                              </sizepolicy>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_22">
+                              <property name="spacing">
+                               <number>-1</number>
+                              </property>
+                              <property name="leftMargin">
+                               <number>40</number>
+                              </property>
+                              <property name="topMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="rightMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="bottomMargin">
+                               <number>20</number>
+                              </property>
+                              <item>
+                               <widget class="QLineEdit" name="current_password_line">
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>30</height>
+                                 </size>
+                                </property>
+                                <property name="placeholderText">
+                                 <string>Current Password</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QLineEdit" name="new_password_line">
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>30</height>
+                                 </size>
+                                </property>
+                                <property name="placeholderText">
+                                 <string>New Password</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QWidget" name="widget_31" native="true">
+                                <property name="maximumSize">
+                                 <size>
+                                  <width>16777215</width>
+                                  <height>40</height>
+                                 </size>
+                                </property>
+                                <layout class="QHBoxLayout" name="horizontalLayout_25" stretch="0,0,0">
+                                 <item>
+                                  <spacer name="horizontalSpacer_13">
+                                   <property name="orientation">
+                                    <enum>Qt::Orientation::Horizontal</enum>
+                                   </property>
+                                   <property name="sizeHint" stdset="0">
+                                    <size>
+                                     <width>108</width>
+                                     <height>13</height>
+                                    </size>
+                                   </property>
+                                  </spacer>
+                                 </item>
+                                 <item>
+                                  <widget class="QPushButton" name="change_password_button_settings">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>40</height>
+                                    </size>
+                                   </property>
+                                   <property name="text">
+                                    <string>submit</string>
+                                   </property>
+                                   <property name="checkable">
+                                    <bool>true</bool>
+                                   </property>
+                                   <property name="autoExclusive">
+                                    <bool>true</bool>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <spacer name="horizontalSpacer_14">
+                                   <property name="orientation">
+                                    <enum>Qt::Orientation::Horizontal</enum>
+                                   </property>
+                                   <property name="sizeHint" stdset="0">
+                                    <size>
+                                     <width>40</width>
+                                     <height>20</height>
+                                    </size>
+                                   </property>
+                                  </spacer>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="forgot_password_button_settings">
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>40</height>
+                                 </size>
+                                </property>
+                                <property name="text">
+                                 <string>Forgot the password?</string>
+                                </property>
+                                <property name="checkable">
+                                 <bool>true</bool>
+                                </property>
+                                <property name="autoExclusive">
+                                 <bool>true</bool>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                           <item>
+                            <spacer name="horizontalSpacer_12">
+                             <property name="orientation">
+                              <enum>Qt::Orientation::Horizontal</enum>
+                             </property>
+                             <property name="sizeType">
+                              <enum>QSizePolicy::Policy::Preferred</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                              <size>
+                               <width>253</width>
+                               <height>20</height>
+                              </size>
+                             </property>
+                            </spacer>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QWidget" name="widget_29" native="true"/>
+                        </item>
+                       </layout>
+                      </widget>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                 </layout>

@@ -112,7 +112,7 @@ class login_page(QWidget):
             QMessageBox.warning(self, 'Error', 'Please enter both of the credentials, thank you')
             return
 
-        result = query.get_hashed_password(username_local)
+        result = query.get_hashed_password(username=username_local)
 
         if result and password_manager.check_password(password_local, result[0]):
                 key = crypto.generate_key(password_local)
@@ -536,6 +536,10 @@ class User_authentication(QMainWindow):
         os.environ['SSL_CERT_FILE'] = certifi.where()
         os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
         django.setup()
+
+    def start_login(self):
+        self.login = User_authentication()
+        self.login.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

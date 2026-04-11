@@ -276,19 +276,25 @@ class query_processor:
         return categoryID
 
     # Deleted the user, resulting in cascading effect
-    def delete_user(self, username):
+    def delete_user(self, userID):
         """
         All data relating to the user is deleted
         """
-        sql = "DELETE FROM users WHERE username = %s"
-        self.cursor.execute(sql, (username,))
+        sql = "DELETE FROM users WHERE userID = %s"
+        self.cursor.execute(sql, (userID,))
         self.db.commit()
 
-    def get_category_info(self, userID, accountID):
-        sql_categories  = "SELECT categoryID, category_list, category_name FROM categories WHERE userID = %s and accountID = %s ORDER BY categoryID"
+    def get_category_info(self, userID, accountID, asDF=None):
+        # categoryID, category_list, category_name
+        sql_categories  = "SELECT categoryID, category_list, category_sentence, category_name FROM categories WHERE userID = %s and accountID = %s ORDER BY categoryID"
         self.cursor.execute(sql_categories, (userID, accountID))
         result = self.cursor.fetchall()
-        return result if result else None
+        if not asDF:
+            return result if result else None
+        else:
+            header_columns = [column[0] for column in self.cursor.description]
+            df = pd.DataFrame(result, columns=header_columns)
+            return df
 
     # Returns the category based on the tokens of words in the list
     def get_category(self, userID, accountID, category_list):
@@ -297,7 +303,7 @@ class query_processor:
 
         try:
             result = self.get_category_info(userID, accountID)
-            category_dictionary = {tuple(json.loads(category_list)): (categoryID, category_name) for categoryID, category_list, category_name in result}
+            category_dictionary = {tuple(json.loads(category_list)): (categoryID, category_name) for categoryID, category_list, _, category_name in result}
 
             priority_list = [(len([item for item in category_list if item in i]), len(i)) for i in category_dictionary]
             max_category = max(priority_list, key=lambda x: (x[0], -x[1]))
@@ -350,10 +356,15 @@ class query_processor:
         df = pd.DataFrame(output, columns=header_columns)
         return df
 
-    def get_hashed_password(self, username):
-        sql = "SELECT hashed_password FROM users WHERE username = %s"
+    def get_hashed_password(self, username=None, userID=None):
+        if username:
+            sql = "SELECT hashed_password FROM users WHERE username = %s"
+            select = username
+        elif userID:
+            sql = "SELECT hashed_password FROM users WHERE userID = %s"
+            select = userID
         self.cursor = self.connection.cursor
-        self.cursor.execute(sql, (username, ))
+        self.cursor.execute(sql, (select, ))
         result = self.cursor.fetchone()
         return result if result else None
 
@@ -611,26 +622,24 @@ class query_processor:
         return categoryID if categoryID else None
 
     # after the description list is shown, the user can remove category
-    def remove_description_from_list_category(self, userID, categoryID, category_name):
+    def remove_description_from_list_category(self, categoryID):
         query_delete = """
             DELETE FROM categories
-            WHERE userID = %s AND categoryID = %s"""
+            WHERE categoryID = %s"""
 
-        self.cursor.execute(query_delete, (userID, categoryID))
+        self.cursor.execute(query_delete, (categoryID, ))
         self.db.commit()
-        # removed category name
-        return category_name
 
     # use the category name of the removed description of the category
     # when category is deleted, updates the transactions
-    def update_transaction_after_deletion_description(self, accountID, category_name):
+    def update_transaction_after_deletion_description(self, categoryID):
         query = """
             SELECT transactionID, description
             FROM transactions
-            WHERE accountID = %s AND category = %s
+            WHERE categoryID = %s
         """
 
-        self.cursor.execute(query, (accountID, category_name))
+        self.cursor.execute(query, (categoryID, ))
         result = self.cursor.fetchall()
         if result:
             for (i, j)in result:

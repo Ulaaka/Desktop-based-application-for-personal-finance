@@ -50,7 +50,7 @@ class Home_page():
                     transaction_id = self.filter_transaction.iloc[row_index].iloc[0]
                     remove_button = QPushButton("Remove")
                     remove_button.setObjectName("item_button")
-                    index_button = proxy_model.mapFromSource(self.model.index(row_index, 9))
+                    index_button = proxy_model.index(row_index, self.model.columnCount() - 1)
                     # add remove button
                     parent_window.ui.tableView.setIndexWidget(index_button, remove_button)
                     remove_button.clicked.connect(lambda clicked, id=transaction_id: self.handle_remove_button(id))

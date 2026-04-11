@@ -1,8 +1,10 @@
 from change_confirmation import Ui_change_confirmation
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from system_functions import manage_seconds_qt, system_functions
 class Change_confirmation_page(QDialog):
+    finished = pyqtSignal() 
+
     def __init__(self, parent):
         super().__init__(parent)
         self.userID = parent.userID
@@ -43,10 +45,9 @@ class Change_confirmation_page(QDialog):
         self.timer_manager.begin_timer()
 
     def submit_code(self):
-        parent_window =  self._parent
         entered_code =self.ui.confirmation_line.text()
         if entered_code == str(self.code):
             self.close()
-            parent_window.activate(parent_window.mail_button_state, "mail")
+            self.finished.emit()
         else:
             return

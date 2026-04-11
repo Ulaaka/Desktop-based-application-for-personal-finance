@@ -12,6 +12,7 @@ from profile_page import Profile_page
 from upload_Page import Upload_page
 from files_page import Files_page
 from home_page import Home_page
+from settings_page import Change_password_page, Delete_user_account, Change_category
 
 class MainWindow(QMainWindow):
     def __init__(self, controller , key, userID):
@@ -33,6 +34,7 @@ class MainWindow(QMainWindow):
         self.upload_manager = Upload_page(self)
         self.file_manager = Files_page(self)
         self.account_manager = Account_selection_page(self)
+        self.query = query_processor()
 
         self.ui.setupUi(self)
         self.MainWindow_signals_connection()
@@ -111,6 +113,13 @@ class MainWindow(QMainWindow):
         self.ui.upload_file_button.clicked.connect(self.upload_manager.upload_file)
         self.ui.upload_file_button.clicked.connect(self.home_manager.set_select_dates)
 
+        self.ui.change_category_button.clicked.connect(self.change_category_handle)
+        self.ui.change_password_button.clicked.connect(self.change_password_handle)
+        self.ui.delete_user_button.clicked.connect(self.delete_user_handle)
+        self.ui.logout_button.clicked.connect(self.logout_handle)
+        self.ui.privacy_note_button.clicked.connect(self.privacy_note_handle)
+
+
         self.ui.account_name_label.mousePressEvent = self.account_label_clicked
 
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -120,6 +129,25 @@ class MainWindow(QMainWindow):
         self.ui.end_date_edit.editingFinished.connect(lambda: self.home_manager.get_filter_date(start=False))
 
         self.ui.comboBox_3.activated.connect(self.home_manager.download_table)
+    
+    def change_category_handle(self):
+        self.ui.settings_stack.setCurrentWidget(self.ui.category_change_page)
+        self.category_change_handle = Change_category(self)
+        self.category_change_handle.show_category_table()
+
+    def change_password_handle(self):
+        self.ui.settings_stack.setCurrentWidget(self.ui.change_password_page)
+        self.change_password_handler = Change_password_page(self)
+
+    def delete_user_handle(self):
+        self.ui.settings_stack.setCurrentWidget(self.ui.delete_user_account_page)
+        self.delete_user_handler = Delete_user_account(self)
+
+    def logout_handle(self):
+        self.log_out()
+
+    def privacy_note_handle(self):
+        self.ui.settings_stack.setCurrentWidget(self.ui.privacy_note_page)
 
     def account_label_clicked(self, event):
         current_account = self.ui.account_name_label.text()
@@ -149,12 +177,17 @@ class MainWindow(QMainWindow):
 
     def settings_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.settings_page)
+        self.ui.settings_stack.setCurrentWidget(self.ui.empty_page)
 
         # when the file window close
     def closeEvent(self, event):
         for file in self.file_handle.temp_files:
             self.file_handle.delete_temp_file(file)
         event.accept()
+
+    def log_out(self):
+        self.controller.start_login()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

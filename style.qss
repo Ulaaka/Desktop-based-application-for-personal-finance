@@ -100,7 +100,12 @@ QPushButton#search_button:hover {
     border-radius: 15px;
 }
 
-QLineEdit#lineEdit {
+QLineEdit#lineEdit,
+QLineEdit#current_password_line,
+QLineEdit#new_password_line,
+QLineEdit#delete_user_line,
+QLineEdit#category_line
+{
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     padding: 5px 10px;
@@ -109,12 +114,16 @@ QLineEdit#lineEdit {
     color: #313a46;
 }
 
-QLineEdit#lineEdit:focus {
+QLineEdit#lineEdit:focus,
+QLineEdit#current_password_line:focus,
+QLineEdit#new_password_line:focus,
+QLineEdit#delete_user_line:focus,
+QLineEdit#category_line
+{
     border: 1px solid #70B9FE;
     background-color: #f0f8ff;
     color: #313a46;
 }
-
 
 /*  Label */
 
@@ -139,7 +148,10 @@ QLabel#confirmation_label,
 QLabel#timer_label,
 QLabel#start_date_label,
 QLabel#end_date_label,
-QLabel#progress_label {
+QLabel#progress_label,
+QLabel#label_6,
+QLabel#label_7,
+QLabel#no_categories_label{
     background-color: transparent;
     color: black;
     border-radius: 15px;
@@ -241,8 +253,11 @@ QPushButton#email_change_button,
 QPushButton#code_submit_button,
 QPushButton#delete_user_button,
 QPushButton#change_password_button,
+QPushButton#change_category_button,
 QPushButton#privacy_note_button,
-QPushButton#logout_button{
+QPushButton#logout_button,
+QPushButton#change_password_button_settings,
+QPushButton#delete_user_button_2{
     background-color: #313a46;
     color: white;
     border: 2px solid black;
@@ -252,10 +267,14 @@ QPushButton#logout_button{
 QPushButton#change_button:hover,
 QPushButton#username_change_button:hover,
 QPushButton#email_change_button:hover,
-QPushButton#code_submit_button:hover{
+QPushButton#code_submit_button:hover,
+QPushButton#change_password_button_settings:hover,
+QPushButton#delete_user_button_2:hover{
     background-color: rgba(86, 101, 115, 0.1);
     color : black;
 }
+
+
 
 QPushButton#item_button{
     background-color: white;
@@ -298,17 +317,20 @@ QPushButton#cancel_button{
     border-radius: 30px;
 }
 
-QPushButton#resend_button{
+QPushButton#resend_button,
+QPushButton#forgot_password_button_settings{
     border: none;
     color: black;
 }
-QPushButton#resend_button:hover {
+QPushButton#resend_button:hover,
+QPushButton#forgot_password_button_settings:hover{
     text-decoration: underline;
 }
 
 /*  View  */
 
 QTableView#tableView,
+QTableView#category_table,
 QTreeView#treeView,
 QTextBrowser#textBrowser,
 QTreeView#accounts_treeView {

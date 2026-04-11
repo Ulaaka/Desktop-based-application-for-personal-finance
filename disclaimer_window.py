@@ -10,10 +10,11 @@ class Disclaimer_window(QDialog):
         super().__init__(parent)
         self.ui = Ui_Disclaimer()
         self.fileID = fileID
+        self.userID = parent.userID
         self.accountID = parent.accountID
         self.key = parent.key
         self.query = query_processor()
-        self.file_handle = file_handling(self.accountID,  self.key)
+        self.file_handle = file_handling(self.userID, self.accountID,  self.key)
         self.ui.setupUi(self)
         self.signal_connect()
 

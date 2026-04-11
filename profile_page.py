@@ -93,6 +93,7 @@ class Profile_page(QWidget):
 
         if (self.mail_button_state is True):
             confirmation_window = Change_confirmation_page(self)
+            confirmation_window.finished.connect(self.capture_result)
             global_pos = parent_window.ui.email_change_button.mapToGlobal(QPoint(0,0))
             confirmation_window.move(global_pos.x(), global_pos.y() + parent_window.ui.email_change_button.height())
             confirmation_window.start_time()
@@ -110,5 +111,7 @@ class Profile_page(QWidget):
         account_control = Account_control_page(name, parent_window)
         account_control.show()
 
-    def code_confirmation_show(self):
-        pass
+    def capture_result(self):
+        self.activate(self.mail_button_state, "mail")
+
+

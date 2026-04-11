@@ -175,7 +175,6 @@ class password_class:
     # Checks the stored hashed password with the user input when checking credentials
     def check_password(self, plain_text_password, hashed_password):
         password_byte = plain_text_password.encode('utf-8')
-
         hashed_password = hashed_password.encode('utf-8')
 
         return bcrypt.checkpw(password_byte, hashed_password)
