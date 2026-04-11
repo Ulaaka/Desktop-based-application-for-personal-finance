@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QDialog, QCompleter, QMessageBox, QApplication
-from PyQt5.QtCore import Qt,pyqtSignal
+from PyQt5.QtWidgets import QDialog, QCompleter, QMessageBox
+from PyQt5.QtCore import Qt,pyqtSignal, QSortFilterProxyModel
 from account_selection_panel import account_selection_form
 from account_add_page import account_add_page_form
 from queries import query_processor
@@ -43,6 +43,7 @@ class Account_selection_page(QDialog):
         self.chose_account.emit(option, accountID)
 
     def set_completer(self, search, model):
+
         self.completer = QCompleter(model, search)
         self.completer.setFilterMode(Qt.MatchContains)
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)

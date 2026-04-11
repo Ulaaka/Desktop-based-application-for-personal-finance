@@ -1,6 +1,6 @@
 import sys,  shutil, pycountry
 from decouple import config
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QHeaderView, QPushButton, QWidget, QCompleter
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QHeaderView, QPushButton, QWidget
 from PyQt5.QtCore import Qt, QPoint, QDate, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from datetime import datetime
@@ -159,6 +159,11 @@ class MainWindow(QMainWindow):
             self.ui.lineEdit.textChanged.connect(proxy_model.setFilterRegExp)
 
             self.ui.tableView.setModel(proxy_model)
+
+            hidden_columns = [0, 1, 2]
+            for i in hidden_columns:
+                self.ui.tableView.setColumnHidden(i, True)
+
             for row_index in range(len(self.filter_transaction)):
                 transaction_id = self.filter_transaction.iloc[row_index].iloc[0]
                 remove_button = QPushButton("Remove")
@@ -166,10 +171,6 @@ class MainWindow(QMainWindow):
                 index = proxy_model.mapFromSource(self.model.index(row_index, 9))
                 self.ui.tableView.setIndexWidget(index, remove_button)
                 remove_button.clicked.connect(lambda clicked, id=transaction_id, row=row_index: self.handle_remove_button(id))
-
-            hidden_columns = [0, 1, 2]
-            for i in hidden_columns:
-                self.ui.tableView.setColumnHidden(i, True)
 
 
     def handle_remove_button(self, id):
