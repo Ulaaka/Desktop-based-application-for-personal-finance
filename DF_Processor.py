@@ -11,7 +11,7 @@ class ProcessingDF:
     Processed the dataframe returned from parsing
     """
 
-    def __init__(self, df, file_ID, accountID):
+    def __init__(self, df, file_ID, userID, accountID):
 
         connection = database()
         self.db = connection.db
@@ -19,6 +19,7 @@ class ProcessingDF:
         self.accountID = accountID
         self.query = query_processor()
         self.file_ID = file_ID
+        self.userID = userID
 
         if isinstance(df, list):
             for i in df:
@@ -36,7 +37,7 @@ class ProcessingDF:
         transaction_list = []
         for _, row in dtb.iterrows():
             row = list(map(str, row.tolist()))
-            category = query.return_updated_category(row[2])
+            category = query.return_updated_category(self.userID, self.accountID, row[2])
             row[1] = parser.classify_transaction_type(row[1])
             transaction_list.append((accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], category, Decimal(row[3]),  Decimal(row[4])))
 

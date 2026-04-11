@@ -28,7 +28,7 @@ class Upload_page():
         sys.stdout = self.print_output
 
         # process the files
-        files_process = file_handling(parent_window.accountID, parent_window.key)
+        files_process = file_handling(parent_window.userID, parent_window.accountID, parent_window.key)
         self.worker = Thread_worker(files_process.process_files_in_folder)
         self.worker.start()
         self.live_output.ui.textBrowser.adjustSize()

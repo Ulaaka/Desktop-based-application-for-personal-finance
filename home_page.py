@@ -19,6 +19,7 @@ class Home_page():
                 self.set_table(False)
                 parent_window.ui.no_account_label.setText(f"No transaction found for '{parent_window.account_name}'")
             else:
+                print(self.transactions)
                 self.set_table(True)
                 self.set_select_dates()
 
@@ -60,6 +61,11 @@ class Home_page():
         parent_window = self._parent
         self.transactions = self.transactions.sort_values(by=self.transactions.columns[3], ascending=False)
         date_list = self.transactions.iloc[:, 3].tolist()
+
+        if len(date_list) == 0:
+            self.min_date = None
+            self.max_date = None
+            return
 
         self.min_date = min(date_list).date()
         self.max_date = max(date_list).date()

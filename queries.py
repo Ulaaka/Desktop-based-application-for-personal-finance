@@ -222,9 +222,9 @@ class query_processor:
         self.db.commit()
 
     # Inserts new category into the database
-    def insert_into_categories(self, userID, category_sentence, category_list, category_name):
-        query = "INSERT INTO categories (userID, category_sentence, category_list, category_name) VALUES (%s, %s, %s, %s)"
-        self.cursor.execute(query, (userID, category_sentence, json.dumps(category_list), category_name))
+    def insert_into_categories(self, userID, accountID, category_sentence, category_list, category_name):
+        query = "INSERT INTO categories (userID, accountID, category_sentence, category_list, category_name) VALUES (%s, %s, %s, %s, %s)"
+        self.cursor.execute(query, (userID, accountID, category_sentence, json.dumps(category_list), category_name))
         categoryID = self.cursor.lastrowid
         self.db.commit()
         return categoryID
@@ -254,8 +254,8 @@ class query_processor:
         return accountID
 
     # New category insertion/update with check of if the category already exists
-    def insert_category(self, userID, category_sentence, category_list, category_name):
-        result = self.get_category(userID, category_list)
+    def insert_category(self, userID, accountID, category_sentence, category_list, category_name):
+        result = self.get_category(userID, accountID, category_list)
         print(f"returned category: {result}")
         if result is not None:
             try:
@@ -267,11 +267,12 @@ class query_processor:
                 """
                 self.cursor.execute(query, (category_name, categoryID))
                 self.db.commit()
-                print("added category")
+                print("updated category")
             except:
                 print(f"could not update the category:{categoryID}")
         else:
-            categoryID = self.insert_into_categories(userID, category_sentence, category_list, category_name)
+            categoryID = self.insert_into_categories(userID, accountID, category_sentence, category_list, category_name)
+            print("inserted category")
         return categoryID
 
     # Deleted the user, resulting in cascading effect
@@ -283,19 +284,19 @@ class query_processor:
         self.cursor.execute(sql, (username,))
         self.db.commit()
 
-    def get_category_info(self, userID):
-        sql_categories  = "SELECT categoryID, category_list, category_name FROM categories WHERE userID = %s ORDER BY categoryID"
-        self.cursor.execute(sql_categories, (userID, ))
+    def get_category_info(self, userID, accountID):
+        sql_categories  = "SELECT categoryID, category_list, category_name FROM categories WHERE userID = %s and accountID = %s ORDER BY categoryID"
+        self.cursor.execute(sql_categories, (userID, accountID))
         result = self.cursor.fetchall()
         return result if result else None
 
     # Returns the category based on the tokens of words in the list
-    def get_category(self, userID, category_list):
+    def get_category(self, userID, accountID, category_list):
         # https://stackoverflow.com/a/37662298
         # https://dev.mysql.com/doc/refman/8.4/en/json-search-functions.html
 
         try:
-            result = self.get_category_info(userID)
+            result = self.get_category_info(userID, accountID)
             category_dictionary = {tuple(json.loads(category_list)): (categoryID, category_name) for categoryID, category_list, category_name in result}
 
             priority_list = [(len([item for item in category_list if item in i]), len(i)) for i in category_dictionary]
@@ -501,13 +502,14 @@ class query_processor:
         return plus_list, word_list
 
     # Returns transaction ids of close transactions given the user selected description
-    def find_close_transactions(self, description):
+    def find_close_transactions(self, description, accountID):
         # https://stackoverflow.com/questions/6259647/mysql-match-against-order-by-relevance-and-column
+        parameters = [accountID]
 
         plus_list, word_list = self.return_word_list(description)
-        parameters = [' '.join(plus_list)]
+        parameters.extend([' '.join(plus_list)])
 
-        query = "SELECT transactionID, description FROM transactions WHERE MATCH(description) AGAINST(%s IN NATURAL LANGUAGE MODE)"
+        query = "SELECT transactionID, description FROM transactions WHERE accountID = %s and MATCH(description) AGAINST(%s IN NATURAL LANGUAGE MODE)"
         self.cursor.execute(query, parameters)
 
         output = self.cursor.fetchall()
@@ -553,16 +555,15 @@ class query_processor:
 
     # needs to search for similar description to apply the same category in the database
     # Updates the category of the selected transaction and its close transactions
-    def change_category(self, userID, category, transactionID):
+    def change_category(self, userID, accountID, category, transactionID):
         # update the current transaction
         # transaction ID must be correct since its working
         self.update_category(category, transactionID)
         description = self.return_description_given_transactionID(transactionID)
         # this certainly work
-        close_transaction_ids = self.find_close_transactions(description)
+        close_transaction_ids = self.find_close_transactions(description, accountID)
 
-
-        categoryID = self.insert_category(userID, description, close_transaction_ids[1], category)
+        categoryID = self.insert_category(userID, accountID, description, close_transaction_ids[1], category)
 
         self.update_category(category, close_transaction_ids[0])
 
@@ -581,9 +582,9 @@ class query_processor:
         return result if result else None
 
     # Returns the updated category
-    def return_updated_category(self, description):
+    def return_updated_category(self, userID, accountID,  description):
         word_list = self.return_word_list(description)[1]
-        output = self.get_category(1, word_list)
+        output = self.get_category(userID, accountID, word_list)
         if (output is None):
             category = "Undefined"
         else:

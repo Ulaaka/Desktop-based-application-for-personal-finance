@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self.currency_list = [f"{currency.alpha_3} - {currency.name} " for currency in pycountry.currencies]
 
         self.ui = Ui_MainWindow()
-        self.file_handle = file_handling(self.accountID, self.key)
+        self.file_handle = file_handling(self.userID, self.accountID, self.key)
         self.home_manager = Home_page(self)
         self.upload_manager = Upload_page(self)
         self.file_manager = Files_page(self)

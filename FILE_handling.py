@@ -14,9 +14,10 @@ class file_handling():
     Contains functions for handling files
     """
 
-    def __init__(self, accountID, key):
+    def __init__(self, userID, accountID, key):
         self.accountID = accountID
         self.key = key
+        self.userID = userID
         self.crypto = cryptography()
         self.query = query_processor()
         self.temp_files = []
@@ -119,7 +120,7 @@ class file_handling():
                     parsed_count+=1
                     size_file = os.path.getsize(file_path)
                     file_ID = self.crypto.encrypt(sub_save_folder, config('FOLDER_PATH'), filename, self.key, self.accountID, size_file, file_type)
-                    ProcessingDF(parsing.df, file_ID, self.accountID)
+                    ProcessingDF(parsing.df, file_ID, self.userID, self.accountID)
                 else:
                     existing_file_output.append(result[1])
             else:

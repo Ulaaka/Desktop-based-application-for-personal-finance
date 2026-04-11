@@ -10,11 +10,12 @@ class Live_output_window(QDialog):
         super().__init__(parent)
         self.key = parent.key
         self.accountID = parent.accountID
+        self.userID = parent.userID
         self.saved_print = saved_print
 
         self.ui = Ui_live_output_window()
         self.crypto = cryptography()
-        self.file_handle = file_handling(self.accountID, self.key)
+        self.file_handle = file_handling(self.userID, self.accountID, self.key)
         self.query = query_processor()
 
         self.ui.setupUi(self)

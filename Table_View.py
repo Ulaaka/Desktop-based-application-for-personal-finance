@@ -7,6 +7,7 @@ class ListModel(QAbstractTableModel):
         super().__init__(parent)
         self._data = data
         self.query = query_processor()
+        self._parent = parent
         self.userID = parent.userID
         self.home_page = home_page
 
@@ -28,6 +29,7 @@ class ListModel(QAbstractTableModel):
                 return str(value)
 
     def setData(self, index, value, role):
+        main_window = self._parent
         if role == Qt.ItemDataRole.EditRole:
             column =int(index.column())
             row = int(index.row())
@@ -36,7 +38,7 @@ class ListModel(QAbstractTableModel):
             # change category
             if column == 6:
                 # applies changes to the closest transactions
-                self.query.change_category(self.userID, value, transactionID)
+                self.query.change_category(self.userID, main_window.accountID, value, transactionID)
                 self.home_page.show_table()
                 # if does not want to
                 # update_category()
