@@ -14,7 +14,7 @@ class Change_password_page():
         self.query = query_processor()
         self.objective = 0
         self.change_password_signals_connect()
-    
+
     def change_password_signals_connect(self):
         parent_window = self._parent
         parent_window.ui.change_password_button_settings.clicked.connect(self.change_password)
@@ -194,7 +194,7 @@ class Change_category():
 
     def load_buttons(self, proxy):
         parent_window = self._parent
-        for row_index in range(len(self.categories)):
+        for row_index in range(proxy.rowCount()):
             index_button = proxy.index(row_index, proxy.columnCount() - 1)
             category_id = self.categories.iloc[row_index].iloc[0]
             if (len(self.categories) == 1 or row_index >= len(self.categories) - 1):

@@ -34,6 +34,8 @@ class Profile_page(QWidget):
         parent_window.ui.username_change_value.setText(result[0])
         parent_window.ui.email_change_value.setText(result[1])
         parent_window.ui.user_created_value.setText(str(result[2]))
+        if not result_accounts:
+            return
         parent_window.ui.user_accounts_value.setText(str(len(result_accounts)))
         for account in result_accounts:
             item = QStandardItem(account)

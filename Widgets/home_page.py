@@ -56,7 +56,7 @@ class Home_page():
     def load_buttons(self, proxy):
         parent_window = self._parent
 
-        for row_index in range(len(self.transactions)):
+        for row_index in range(proxy.rowCount()):
             transaction_id = self.filter_transaction.iloc[row_index].iloc[0]
             remove_button = QPushButton("Remove")
             remove_button.setObjectName("item_button")

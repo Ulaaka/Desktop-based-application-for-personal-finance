@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QDialog
 from Widgets.disclaimer_widget import Ui_Disclaimer
 from queries import query_processor
 from FILE_handling import file_handling
+from Widgets.home_page import Home_page
 
 class Disclaimer_window(QDialog):
     def __init__(self, fileID, parent):
@@ -13,6 +14,7 @@ class Disclaimer_window(QDialog):
         self.key = parent.key
         self.query = query_processor()
         self.file_handle = file_handling(self.userID, self.accountID,  self.key)
+        self.home_page_handle = Home_page(parent)
         self.ui.setupUi(self)
         self.signal_connect()
 
@@ -25,7 +27,7 @@ class Disclaimer_window(QDialog):
         self.query.delete_file(self.fileID)
         self.file_handle.delete_encrypted_file(self.accountID, hashed_name)
         self.parent().file_manager.show_files()
-        self.parent().show_table()
+        self.home_page_handle.show_table()
         self.close()
 
     def cancel_button_clicked(self):
