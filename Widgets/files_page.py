@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import  QPushButton, QHeaderView
+from PyQt5.QtWidgets import  QPushButton, QHeaderView, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from Widgets.disclaimer_window import Disclaimer_window
@@ -18,11 +18,12 @@ class Files_page():
         parent_window = self._parent
         query = query_processor()
         if not parent_window.accountID:
+            self.set_files(False)
+            parent_window.ui.no_file_label.setText("No files to show, please create an account first")
             return
         self.files = query.get_files(parent_window.accountID)
         if self.files is None:
             self.set_files(False)
-            parent_window.ui.files_stack.setCurrentWidget(parent_window.ui.no_file_page)
             parent_window.ui.no_file_label.setText(f"No files found for '{parent_window.account_name}'")
         else:
              self.set_files(True)
@@ -77,6 +78,7 @@ class Files_page():
             self.tree_model.setSortRole(Qt.UserRole)
 
             parent_window.ui.files_treeView.setModel(self.tree_model)
+
     def set_files(self, flag):
         parent_window = self._parent
         if flag:
