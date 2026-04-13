@@ -76,10 +76,7 @@ class file_handling():
 
         for encrypted_file in os.listdir(sub_save_folder):
             decrypted = crypto.decrypt(sub_save_folder, self.key, self.accountID, hashed_filename=encrypted_file)
-            # check the size of the file, avoiding reading the whole files
-
             if os.path.getsize(file_path) == len(decrypted):
-                # if the same size, then read them
                 with open(file_path, 'rb') as file:
                     if file.read() == decrypted:
                         # find the submitted existing file_name in the folder
@@ -98,7 +95,6 @@ class file_handling():
         parsed_count = 0
         existing_file_output = []
         for filename in dir:
-            print(filename)
             if (filename.endswith(".csv") or filename.endswith(".pdf")): 
                 file_type = 'PDF Document'
                 if filename.endswith(".csv"):

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QPushButton, QComboBox
+from PyQt5.QtWidgets import QPushButton, QHeaderView
 from PyQt5.QtCore import Qt, QDate, QSortFilterProxyModel
 from queries import query_processor
 from Widgets.Table_View import ListModel
@@ -8,6 +8,17 @@ class Home_page():
     def __init__(self, parent):
         self._parent = parent
         self.transactions = None
+        self.home_signals_connect()
+
+    def home_signals_connect(self):
+        parent_window = self._parent
+        parent_window.ui.start_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=True))
+        parent_window.ui.end_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=False))
+        parent_window.ui.download_df_combo.activated.connect(self.download_table)
+        parent_window.ui.upload_file_button.clicked.connect(self.set_select_dates)
+        parent_window.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        parent_window.ui.tableView.verticalHeader().setVisible(False)
+
 
     def show_table(self):
             parent_window = self._parent

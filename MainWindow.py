@@ -30,21 +30,24 @@ class MainWindow(QMainWindow):
         self.currency_list = [f"{currency.alpha_3} - {currency.name} " for currency in pycountry.currencies]
 
         self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
         self.file_handle = file_handling(self.userID, self.accountID, self.key)
         self.home_manager = Home_page(self)
         self.upload_manager = Upload_page(self)
         self.file_manager = Files_page(self)
         self.account_manager = Account_selection_page(self)
+        self.profile_manager= Profile_page(self.account_name, self)
+
         self.query = query_processor()
         self.category_change_handle = Change_category(self)
 
-        self.ui.setupUi(self)
         self.MainWindow_signals_connection()
         self.home_page_handler()
 
     def home_page_handler(self):
         query = query_processor()
         options = query.compute_account_options(self.userID)
+
         if options is None:
             self.home_manager.set_table(False)
             self.ui.no_account_label.setText(f"No Account found")
@@ -112,9 +115,6 @@ class MainWindow(QMainWindow):
         self.ui.settings_button_2.clicked.connect(self.settings_page_show)
 
         self.ui.account_button.clicked.connect(self.account_page_handler)
-        self.ui.upload_file_button.clicked.connect(self.upload_manager.upload_file)
-
-        self.ui.upload_file_button.clicked.connect(self.home_manager.set_select_dates)
 
         self.ui.change_category_button.clicked.connect(self.change_category_handle)
         self.ui.change_password_button.clicked.connect(self.change_password_handle)
@@ -124,24 +124,12 @@ class MainWindow(QMainWindow):
 
         self.ui.account_name_label.mousePressEvent = self.account_label_clicked
 
-        self.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.files_treeView.header().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.category_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.category_table.verticalHeader().setVisible(False)
-        self.ui.tableView.verticalHeader().setVisible(False)
-        self.ui.stackedWidget_2.setCurrentWidget(self.ui.category_table_page)
-
-        self.ui.start_date_edit.editingFinished.connect(lambda: self.home_manager.get_filter_date(start=True))
-        self.ui.end_date_edit.editingFinished.connect(lambda: self.home_manager.get_filter_date(start=False))
-
-        self.ui.download_df_combo.activated.connect(self.home_manager.download_table)
-
         current_date = datetime.now()
-        self.ui.add_transaction_button.clicked.connect(self.upload_manager.add_transaction)
         self.ui.transaction_date_edit.setDate(QDate(current_date.year, current_date.month, current_date.day))
-    
+
     def change_category_handle(self):
         self.ui.settings_stack.setCurrentWidget(self.ui.category_change_page)
+        self.ui.stackedWidget_2.setCurrentWidget(self.ui.category_table_page)
         self.category_change_handle.show_category_table()
 
     def change_password_handle(self):
@@ -181,8 +169,7 @@ class MainWindow(QMainWindow):
 
     def profile_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.profile_page)
-        profile_page = Profile_page(self.account_name, self)
-        profile_page.show()
+        self.profile_manager.show()
 
     def settings_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.settings_page)

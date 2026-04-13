@@ -14,6 +14,12 @@ class Upload_page():
         self._parent = parent
         self.home_page = Home_page(parent)
         self.current_date = date.today()
+        self.upload_signals_connect()
+
+    def upload_signals_connect(self):
+        parent_window = self._parent
+        parent_window.ui.upload_file_button.clicked.connect(self.upload_file)
+        parent_window.ui.add_transaction_button.clicked.connect(self.add_transaction)
 
 
     def add_transaction(self):

@@ -21,8 +21,6 @@ class Profile_page(QWidget):
 
     def profile_signals_connect(self):
         parent_window = self._parent
-        # previous example
-
         parent_window.ui.username_change_button.clicked.connect(self.change_username)
         parent_window.ui.email_change_button.clicked.connect(self.change_user_mail)
 

@@ -133,6 +133,12 @@ class Change_category():
     def __init__(self, parent):
         self._parent = parent
         self.home_page = Home_page(parent)
+        self.category_signals_connect()
+
+    def category_signals_connect(self):
+        parent_window = self._parent
+        parent_window.ui.category_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        parent_window.ui.category_table.verticalHeader().setVisible(False)
 
     def show_category_table(self):
         query = query_processor()
