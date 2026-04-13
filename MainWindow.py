@@ -1,8 +1,9 @@
 import sys, pycountry
 from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView
-from PyQt5.QtCore import QPoint
+from PyQt5.QtCore import QPoint, QDate
 
 from queries import query_processor
+from datetime import datetime
 from FILE_handling import file_handling
 
 from Widgets.financial_app import Ui_MainWindow
@@ -133,6 +134,10 @@ class MainWindow(QMainWindow):
         self.ui.end_date_edit.editingFinished.connect(lambda: self.home_manager.get_filter_date(start=False))
 
         self.ui.download_df_combo.activated.connect(self.home_manager.download_table)
+
+        current_date = datetime.now()
+        self.ui.add_transaction_button.clicked.connect(self.upload_manager.add_transaction)
+        self.ui.transaction_date_edit.setDate(QDate(current_date.year, current_date.month, current_date.day))
     
     def change_category_handle(self):
         self.ui.settings_stack.setCurrentWidget(self.ui.category_change_page)

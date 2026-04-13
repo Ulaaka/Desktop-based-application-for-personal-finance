@@ -5,11 +5,37 @@ from FILE_handling import file_handling
 from Widgets.stream import Stream
 from Widgets.thread_worker import Thread_worker
 from decouple import config
-
+from queries import query_processor
+from Widgets.home_page import Home_page
 
 class Upload_page():
     def __init__(self, parent):
         self._parent = parent
+        self.home_page = Home_page(parent)
+
+    def add_transaction(self):
+        parent_window = self._parent
+        query = query_processor()
+        date = parent_window.ui.transaction_date_edit.date().toPyDate()
+        type = parent_window.ui.transaction_type_combo.currentText()
+        description = parent_window.ui.description_text.toPlainText()
+        amount = int(parent_window.ui.amount_transaction_line.text())
+        balance = int(parent_window.ui.balance_transaction_line.text())
+
+        if date and type and description and amount:
+            if not balance:
+                balance = 0
+            #transaction_list.append((accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], category, Decimal(row[3]),  Decimal(row[4])))
+            category = query.return_updated_category(parent_window.userID, parent_window.accountID, description)
+            transaction_list = [(parent_window.accountID, None, date, type, description, category, amount, balance)]
+            print(transaction_list)
+            query.insert_into_transactions(transaction_list)
+            self.home_page.show_table()
+        else:
+            QMessageBox.warning(
+            parent_window, "Error", "Password fill the required fields")
+            return
+
 
     def upload_file(self):
         parent_window = self._parent
