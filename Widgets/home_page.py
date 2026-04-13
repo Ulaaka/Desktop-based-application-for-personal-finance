@@ -32,8 +32,8 @@ class Home_page():
                     return
                 else:
                     self.filter_transaction = self.transactions[self.transactions.iloc[:, 3].dt.date.between(parent_window.start_date, parent_window.end_date)]
-                    parent_window.ui.start_date_edit.setDate(QDate(min_date.year, min_date.month, min_date.day))
-                    parent_window.ui.end_date_edit.setDate(QDate(max_date.year, max_date.month, max_date.day))
+                    parent_window.ui.start_date_edit.setDate(QDate(parent_window.start_date.year, parent_window.start_date.month, parent_window.start_date.day))
+                    parent_window.ui.end_date_edit.setDate(QDate(parent_window.end_date.year, parent_window.end_date.month, parent_window.end_date.day))
 
                 # -- TABLE LOADING -- 
                 self.model = ListModel(self.filter_transaction, parent_window, self)
