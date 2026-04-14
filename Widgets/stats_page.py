@@ -5,9 +5,6 @@ from PyQt5.QtGui import QPainter
 from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QPieSeries, QLineSeries, QValueAxis
 from queries import query_processor
 
-from queries import query_processor
-
-
 class Stats_page():
     def __init__(self, parent):
         self._parent = parent
@@ -52,6 +49,8 @@ class Stats_page():
         parent_window.ui.dateEdit.setCalendarPopup(True)
         parent_window.ui.transaction_type_box.currentTextChanged.connect(self.update_graph)
         parent_window.ui.value_box.currentTextChanged.connect(self.update_graph)
+        parent_window.ui.dateEdit.setDate(QDate(parent_window.start_date.year, parent_window.start_date.month, parent_window.start_date.day))
+        parent_window.ui.dateEdit_2.setDate(QDate(parent_window.end_date.year, parent_window.end_date.month, parent_window.end_date.day))
         parent_window.ui.dateEdit.dateChanged.connect(self.update_graph)
         parent_window.ui.dateEdit_2.dateChanged.connect(self.update_graph)
         parent_window.ui.download_chart_button.clicked.connect(self.download_graph)

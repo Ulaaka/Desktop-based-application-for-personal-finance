@@ -93,6 +93,21 @@ class system_functions:
         file_path = str(Path.home() / "Downloads"/file_name)
         df.to_csv(file_path, sep=',', encoding='utf-8', index=False, header=True)
 
+    def set_select_dates(self, transactions):
+        if transactions is None:
+            return
+        transactions = transactions.sort_values(by=transactions.columns[3], ascending=False)
+        date_list = transactions.iloc[:, 3].tolist()
+
+        if len(date_list) == 0:
+            min_date = None
+            max_date = None
+            return
+
+        min_date = min(date_list).date()
+        max_date = max(date_list).date()
+        return min_date, max_date, transactions
+
 
 class manage_seconds_qt():
     def __init__(self, label, timer, duration, expire_func=None):

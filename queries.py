@@ -536,7 +536,6 @@ class query_processor:
     def total_transfer_or_extreme_value(self, userID, accountID, transfer_toggle=None, max_toggle=None, date_lower=None, date_upper=None):
             # string to datetime conversion, could get useful
         parameter = [userID, accountID]
-        print(userID,accountID)
         toggle = "SUM"
         base_query = f"SELECT {toggle}(T.amount)" 
 
@@ -561,17 +560,13 @@ class query_processor:
 
         if (date_lower):
             query += " and T.transaction_date >= %s"
-            print(date_lower)
             parameter.append(date_lower)
 
         if (date_upper):
             query += " and T.transaction_date <= %s"
-            print(date_upper)
             parameter.append(date_upper)
 
         self.cursor.execute(query, tuple(parameter))
-        print(tuple(parameter))
-
         output = self.cursor.fetchone()
         return output[0] if output[0] is not None else 0
 

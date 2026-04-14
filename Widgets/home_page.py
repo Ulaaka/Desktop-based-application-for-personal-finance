@@ -15,6 +15,7 @@ class Home_page():
         self.filter_transaction = None
         self.current_time = datetime.now().strftime("%Y-%m-%d")
         self.download_folder_path = Path.home() / "Downloads"
+        self.system = system_functions()
         self.home_signals_connect()
 
     def home_signals_connect(self):
@@ -22,7 +23,7 @@ class Home_page():
         parent_window.ui.start_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=True))
         parent_window.ui.end_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=False))
         parent_window.ui.download_df_combo.activated.connect(self.download_table)
-        parent_window.ui.upload_file_button.clicked.connect(self.set_select_dates)
+        parent_window.ui.upload_file_button.clicked.connect(lambda clicked, transaction=self.transactions: self.system.set_select_dates(transaction))
         parent_window.ui.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         parent_window.ui.tableView.verticalHeader().setVisible(False)
         parent_window.ui.start_date_edit.setCalendarPopup(True)
@@ -42,11 +43,12 @@ class Home_page():
             else:
                 self.set_table(True)
 
-                min_date, max_date = self.set_select_dates()
+                min_date, max_date, transactions = self.system.set_select_dates(self.transactions)
+                self.transactions = transactions
 
                 if parent_window.start_date is None and parent_window.end_date is  None:
                     parent_window.start_date = min_date
-                    parent_window.end_date = max_date
+                    parent_window.end_date = datetime.today().date()
 
                 parent_window.ui.start_date_edit.setDate(QDate(parent_window.start_date.year, parent_window.start_date.month, parent_window.start_date.day))
                 parent_window.ui.end_date_edit.setDate(QDate(parent_window.end_date.year, parent_window.end_date.month, parent_window.end_date.day))
@@ -94,21 +96,6 @@ class Home_page():
             remove_button.clicked.connect(
                 lambda checked, id=transaction_id: self.handle_remove_button(id))
 
-    def set_select_dates(self):
-        if self.transactions is None:
-            return
-        self.transactions = self.transactions.sort_values(by=self.transactions.columns[3], ascending=False)
-        date_list = self.transactions.iloc[:, 3].tolist()
-
-        if len(date_list) == 0:
-            min_date = None
-            max_date = None
-            return
-
-        min_date = min(date_list).date()
-        max_date = max(date_list).date()
-        return min_date, max_date
-
     def handle_remove_button(self, id):
         query = query_processor()
         query.delete_transaction(int(id))
@@ -119,13 +106,12 @@ class Home_page():
             return
         parent_window = self._parent
         download_type = parent_window.ui.download_df_combo.currentText()
-        system = system_functions()
         if ("CSV" in download_type):
-            self.worker = Thread_worker(lambda: system.create_csv(parent_window.account_name, self.filter_transaction))
+            self.worker = Thread_worker(lambda: self.system.create_csv(parent_window.account_name, self.filter_transaction))
             self.worker.start()
 
         elif ("PDF" in download_type):
-            self.worker = Thread_worker(lambda: system.create_pdf(parent_window.account_name, self.filter_transaction))
+            self.worker = Thread_worker(lambda: self.system.create_pdf(parent_window.account_name, self.filter_transaction))
             self.worker.start()
 
     def get_filter_date(self, start=None):
