@@ -28,3 +28,7 @@ class Upload_page():
                 "Date Range", ["From", "To"]
             }
         }
+
+        self.graph_to_filter = {
+            "Summary" : ["transaction_type", "measure_type", "date_type"]
+        }
