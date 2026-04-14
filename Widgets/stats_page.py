@@ -38,20 +38,38 @@ class Stats_page():
             "Distribution" : self.create_distribution_graph
         }
 
+        self.transfer_toggle_dic = {
+            "Income" : True,
+            "Expense": False,
+            "All": None
+        }
+
+        self.max_toggle_dic = {
+            False: {
+                "Highest" : False,
+                "Lowest" : True
+            },
+            True: {
+                "Highest" : True,
+                "Lowest" : False
+            }
+        }
+
     def stats_signals_connect(self):
         parent_window = self._parent
         parent_window.ui.dateEdit_2.setCalendarPopup(True)
         parent_window.ui.dateEdit.setCalendarPopup(True)
-        parent_window.transaction_type_box.currentTextChanged.connect(self.update_graph)
-        parent_window.value_box.currentTextChanged.connect(self.update_graph)
-        parent_window.dateEdit.dateChanged.connect(self.update_graph)
-        parent_window.dateEdit_2.dateChanged.connect(self.update_graph)
-        parent_window.download_chart_button.clicked.connect(self.download_graph)
+        parent_window.ui.transaction_type_box.currentTextChanged.connect(self.update_graph)
+        parent_window.ui.value_box.currentTextChanged.connect(self.update_graph)
+        parent_window.ui.dateEdit.dateChanged.connect(self.update_graph)
+        parent_window.ui.dateEdit_2.dateChanged.connect(self.update_graph)
+        parent_window.ui.download_chart_button.clicked.connect(self.download_graph)
 
     def show_graph(self, graph):
         parent_window = self._parent
         self.set_graph_view = graph
         state = True if graph == "Summary" else False
+        # only active for Summary graph
         parent_window.ui.value_box.setEnabled(state)
         self.update_graph()
 
@@ -65,7 +83,7 @@ class Stats_page():
         self.delete_prev_graph()
 
         if self.graph_name in self.func_mapping:
-            graph_func = self.func_mapping.get(self.graph_name)()
+            graph_func = self.func_mapping[self.graph_name]()
         else:
             return
 
@@ -73,9 +91,28 @@ class Stats_page():
         self.set_graph_view = QChartView(graph_func)
         self.set_graph_view.setRenderHint(QPainter.Antialiasing)
         self.set_graph_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        # display on charts section
         parent_window.ui.charts_widget.addWidget(self.set_graph_view)
+
+    def get_date(self):
+        parent_window = self._parent
+        date_low_str = parent_window.ui.dateEdit.date().toPyDate().strftime("%Y-%m-%d")
+        date_up_str = parent_window.ui.dateEdit_2.date().toPyDate().strftime("%Y-%m-%d")
+        return date_low_str, date_up_str
+
+    def summary_arguments(self):
+        parent_window = self._parent
+        transaction_type_text = parent_window.ui.transaction_type_box.currentText()
+        mode_text = parent_window.ui.value_box.currentText()
+        result= self.get_date()
+
+        max_toggle = None
+        if transaction_type_text in self.transfer_toggle_dic:
+            transfer_toggle = self.transfer_toggle_dic[transaction_type_text]
+
+        if transfer_toggle in self.max_toggle_dic:
+            max_toggle = self.max_toggle_dic[transfer_toggle][mode_text]
+
+        return transfer_toggle, max_toggle, result[0], result[1]
 
     def download_graph(self):
         pass
