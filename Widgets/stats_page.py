@@ -33,12 +33,10 @@ class Stats_page():
         self.max_toggle_dic = {
             False: {
                 "Highest" : False,
-                "Lowest" : True
-            },
+                "Lowest" : True            },
             True: {
                 "Highest" : True,
-                "Lowest" : False
-            }
+                "Lowest" : False            }
         }
         self.stats_signals_connect()
         self.show_graph(self.graph_name)
@@ -49,12 +47,15 @@ class Stats_page():
         parent_window.ui.dateEdit.setCalendarPopup(True)
         parent_window.ui.transaction_type_box.currentTextChanged.connect(self.update_graph)
         parent_window.ui.value_box.currentTextChanged.connect(self.update_graph)
+
         parent_window.ui.dateEdit.setDate(QDate(parent_window.start_date.year, parent_window.start_date.month, parent_window.start_date.day))
         parent_window.ui.dateEdit_2.setDate(QDate(parent_window.end_date.year, parent_window.end_date.month, parent_window.end_date.day))
+
         parent_window.ui.dateEdit.dateChanged.connect(self.update_graph)
         parent_window.ui.dateEdit_2.dateChanged.connect(self.update_graph)
         parent_window.ui.download_chart_button.clicked.connect(self.download_graph)
         parent_window.ui.scrollAreaWidgetContents.setStyleSheet("background-color: #fff;")
+
         self.wipe_out_layout(parent_window.ui.scrollAreaWidgetContents.layout())
         for graph in list(self.func_mapping.keys()):
             opt_button = QPushButton(graph)
@@ -122,9 +123,10 @@ class Stats_page():
         result= self.get_date()
 
         graph = QChart()
-        graph.legend().hide()
         graph_series = QBarSeries()
+        graph.addSeries(graph_series) 
         if transaction_type_txt == "All":
+            bar_names = ["Income", "Expense"]
             try:
                 in_max_toggle = self.max_toggle_dic[True][value_txt]
                 out_max_toggle = self.max_toggle_dic[False][value_txt]
@@ -133,23 +135,58 @@ class Stats_page():
                 out_max_toggle = None
             income = self.query.total_transfer_or_extreme_value(parent_window.userID, accountID=parent_window.accountID , transfer_toggle=True, max_toggle=in_max_toggle, date_lower=result[0], date_upper=result[1])
             expense = self.query.total_transfer_or_extreme_value( parent_window.userID, accountID=parent_window.accountID , transfer_toggle=False, max_toggle=out_max_toggle, date_lower=result[0], date_upper=result[1])
-            int_bar = QBarSet("Income")
+            graph_series = QBarSeries()
+
+            int_bar = QBarSet(bar_names[0])
+            out_bar = QBarSet(bar_names[1])
+
             int_bar.append(int(income))
-            out_bar = QBarSet("Expense")
             out_bar.append(int(expense))
-            graph_series.append(int_bar)
-            graph_series.append(out_bar)
+
+            graph_series.append([int_bar, out_bar])
+
+            graph.addSeries(graph_series)
+
+            x_axis = QBarCategoryAxis()
+            x_axis.append(bar_names)
+            graph.addAxis(x_axis, Qt.AlignBottom)
+            graph_series.attachAxis(x_axis)
+
+            y_axis = QValueAxis()
+            y_axis.setRange(0, max(int(income), int(expense)))
+            y_axis.setLabelFormat("%d")
+            y_axis.setTickCount(5)
+            graph.addAxis(y_axis, Qt.AlignLeft)
+            graph_series.attachAxis(y_axis)
 
             graph.setTitle("Income vs Expense")
-        else:
-            transfer_toggle = self.transfer_toggle_dic[transaction_type_txt]
-            max_toggle = self.max_toggle_dic[transfer_toggle]
-            going = self.query.total_transfer_or_extreme_value(parent_window.userID, accountID=parent_window.accountID, transfer_toggle=transfer_toggle, max_toggle=max_toggle, date_lower=result[0], date_upper=result[1])
 
+        else:
+            max_toggle = None
+            transfer_toggle = self.transfer_toggle_dic[transaction_type_txt]
+            if transfer_toggle is not None and value_txt != "Total":
+                max_toggle = self.max_toggle_dic[transfer_toggle][value_txt]
+
+            going = self.query.total_transfer_or_extreme_value(parent_window.userID, accountID=parent_window.accountID, transfer_toggle=transfer_toggle, max_toggle=max_toggle, date_lower=result[0], date_upper=result[1])
             name = "Income" if transfer_toggle is True else "Expense"
             going_bar = QBarSet(name)
-            going_bar.append(float(going))
+            going_bar.append(int(going))
             graph_series.append(going_bar)
+            graph.addSeries(graph_series)
+
+            x_axis = QBarCategoryAxis()
+            x_axis.append(name)
+
+            y_axis = QValueAxis() 
+            y_axis.setRange(0, going)
+            y_axis.setLabelFormat("%d")
+            y_axis.setTickCount(5)
+
+            graph.addAxis(x_axis, Qt.AlignBottom)
+            graph.addAxis(y_axis, Qt.AlignLeft)
+            graph_series.attachAxis(x_axis)
+            graph_series.attachAxis(y_axis)
+
             graph.setTitle(name)
 
         return graph
