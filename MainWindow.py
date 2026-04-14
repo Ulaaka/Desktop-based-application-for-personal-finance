@@ -37,7 +37,6 @@ class MainWindow(QMainWindow):
         self.file_manager = Files_page(self)
         self.account_manager = Account_selection_page(self)
         self.profile_manager= Profile_page(self.account_name, self)
-        self.stats_manager = Stats_page(self)
         self.category_change_handle = Change_category(self)
         self.query = query_processor()
 
@@ -166,6 +165,7 @@ class MainWindow(QMainWindow):
 
     def stats_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.stats_page)
+        self.stats_manager = Stats_page(self)
 
     def profile_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.profile_page)
