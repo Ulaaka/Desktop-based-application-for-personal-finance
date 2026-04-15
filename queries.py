@@ -537,6 +537,7 @@ class query_processor:
             # string to datetime conversion, could get useful
         parameter = [userID, accountID]
         toggle = "SUM"
+
         base_query = f"SELECT {toggle}(T.amount)" 
 
         body_query = """

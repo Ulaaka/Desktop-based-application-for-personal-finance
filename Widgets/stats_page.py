@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import QPushButton, QSizePolicy, QWidget, QVBoxLayout, QLabel, QComboBox, QDateEdit, QLineEdit
 from PyQt5.QtCore import QDate, Qt, QMargins
 from PyQt5.QtGui import QPainter
-from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis, QHorizontalBarSeries, QPieSeries
+from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis, QHorizontalBarSeries, QPieSeries, QLineSeries, QCategoryAxis
 from queries import query_processor
 from Widgets.account_control_page import Account_control_page
+from datetime import datetime, timedelta
+import calendar
 class Stats_page():
     def __init__(self, parent):
         self._parent = parent
@@ -338,7 +340,49 @@ class Stats_page():
         return x_axis
 
     def create_weekly_graph(self):
-        pass
+        parent_window = self._parent
+
+        transaction_type_txt = self.active_filters["Transaction Type"].currentText()
+        value_txt = self.active_filters["Mode"].currentText()
+
+        max_toggle = None
+        transfer_toggle = self.transfer_toggle_dic[transaction_type_txt]
+        if transfer_toggle is not None and value_txt != "Total":
+            max_toggle = self.max_toggle_dic[transfer_toggle][value_txt]
+
+        graph = QChart()
+        graph_series = QLineSeries()
+
+        current_date = datetime.today().date()
+        week_day = current_date.weekday()
+
+        result_list = []
+        for idx,  i in enumerate(range(week_day + 1)):
+            day = current_date - timedelta(days=week_day - i)
+            date_str = day.strftime("%Y-%m-%d")
+            result = self.query.total_transfer_or_extreme_value(parent_window.userID, parent_window.accountID, transfer_toggle=transfer_toggle,
+                                                       max_toggle=max_toggle, date_lower=date_str, date_upper=date_str)
+            if result is None:
+                result = 0
+            result_list.append((calendar.day_name[day.weekday()], int(result), idx))
+
+        for i in result_list:
+            graph_series.append(i[2], i[1])
+
+        category_axis = QCategoryAxis()
+        for idx, day in enumerate(range(len(result_list))):
+            category_axis.append(result_list[idx][0], idx)
+
+        axis_y = QValueAxis()
+        axis_y.setRange(0, max([result[1] for result in result_list]) * 1.2)
+        graph.addSeries(graph_series)
+        graph.addAxis(category_axis, Qt.AlignBottom)
+        graph.addAxis(axis_y, Qt.AlignLeft)
+        graph_series.attachAxis(category_axis)
+        graph_series.attachAxis(axis_y)
+
+        return graph
+
 
     def create_monthly_graph(self):
         pass
@@ -383,3 +427,4 @@ class Stats_page():
         graph.addSeries(graph_series)
         graph.setTitle("Transaction by Categories")
         return graph
+    
