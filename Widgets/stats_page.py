@@ -223,7 +223,7 @@ class Stats_page():
         x_axis.append(value)
         graph.addAxis(x_axis, Qt.AlignBottom)
         return x_axis
-        
+
     def create_weekly_graph(self):
         pass
 
