@@ -124,17 +124,7 @@ class Stats_page():
 
     def stats_signals_connect(self):
         parent_window = self._parent
-        parent_window.ui.dateEdit.setDate(QDate(parent_window.start_date.year, parent_window.start_date.month, parent_window.start_date.day))
-        parent_window.ui.dateEdit_2.setDate(QDate(parent_window.end_date.year, parent_window.end_date.month, parent_window.end_date.day))
         parent_window.ui.scrollAreaWidgetContents.setStyleSheet("background-color: #fff;")
-
-        parent_window.ui.dateEdit_2.setCalendarPopup(True)
-        parent_window.ui.dateEdit.setCalendarPopup(True)
-
-        parent_window.ui.transaction_type_box.currentTextChanged.connect(self.update_graph)
-        parent_window.ui.value_box.currentTextChanged.connect(self.update_graph)
-        parent_window.ui.dateEdit.dateChanged.connect(self.update_graph)
-        parent_window.ui.dateEdit_2.dateChanged.connect(self.update_graph)
         parent_window.ui.download_chart_button.clicked.connect(self.download_graph)
 
         self.wipe_out_layout(self.scroll_layout)
@@ -197,25 +187,16 @@ class Stats_page():
         if widget_desc["type"] == "comboBox":
             add = QComboBox()
             add.addItems(widget_desc["value"])
+            add.currentTextChanged.connect(self.update_graph)
         elif widget_desc["type"] == "dateEdit":
             add = QDateEdit()
-            add.setDate("value")
+            date = widget_desc["value"]
+            add.setDate(QDate(date.year, date.month, date.day))
             add.setCalendarPopup(True)
+            add.dateChanged.connect(self.update_graph)
         vertical.addWidget(add)
         self.active_filters[widget_desc["name"]] = add
         return widget
-
-    def get_date(self):
-        parent_window = self._parent
-        date_low_str = parent_window.ui.dateEdit.date().toPyDate().strftime("%Y-%m-%d")
-        date_up_str = parent_window.ui.dateEdit_2.date().toPyDate().strftime("%Y-%m-%d")
-        return date_low_str, date_up_str
-
-    def get_combo_text(self):
-        parent_window = self._parent
-        transaction_type_text = parent_window.ui.transaction_type_box.currentText()
-        mode_text = parent_window.ui.value_box.currentText()
-        return transaction_type_text, mode_text
 
     def download_graph(self):
         pass
@@ -245,13 +226,15 @@ class Stats_page():
         graph.addAxis(x_axis, Qt.AlignBottom)
         graph_series.attachAxis(x_axis)
         graph.setTitle("Possible subscriptions")
-
         return graph
 
     def create_summary_graph(self):
         parent_window = self._parent
-        transaction_type_txt, value_txt = self.get_combo_text()
-        result= self.get_date()
+        transaction_type_txt = self.active_filters["Transaction Type"].currentText()
+        value_txt = self.active_filters["Mode"].currentText()
+
+        date_low_str = self.active_buttons["From"].date().toPyDate().strftime("%Y-%m-%d")
+        date_up_str = self.active_filters["To"].date().toPyDate().strftime("%Y-%m-%d")
 
         graph = QChart()
         if transaction_type_txt == "All":
@@ -262,8 +245,8 @@ class Stats_page():
             except:
                 in_max_toggle = None
                 out_max_toggle = None
-            income = self.query.total_transfer_or_extreme_value(parent_window.userID, accountID=parent_window.accountID , transfer_toggle=True, max_toggle=in_max_toggle, date_lower=result[0], date_upper=result[1])
-            expense = self.query.total_transfer_or_extreme_value( parent_window.userID, accountID=parent_window.accountID , transfer_toggle=False, max_toggle=out_max_toggle, date_lower=result[0], date_upper=result[1])
+            income = self.query.total_transfer_or_extreme_value(parent_window.userID, accountID=parent_window.accountID , transfer_toggle=True, max_toggle=in_max_toggle, date_lower=date_low_str, date_upper=date_up_str)
+            expense = self.query.total_transfer_or_extreme_value( parent_window.userID, accountID=parent_window.accountID , transfer_toggle=False, max_toggle=out_max_toggle, date_lower=date_low_str, date_upper=date_up_str)
             graph_series = QBarSeries()
 
             int_bar = QBarSet(bar_names[0])
@@ -291,7 +274,7 @@ class Stats_page():
             if transfer_toggle is not None and value_txt != "Total":
                 max_toggle = self.max_toggle_dic[transfer_toggle][value_txt]
 
-            going = self.query.total_transfer_or_extreme_value(parent_window.userID, accountID=parent_window.accountID, transfer_toggle=transfer_toggle, max_toggle=max_toggle, date_lower=result[0], date_upper=result[1])
+            going = self.query.total_transfer_or_extreme_value(parent_window.userID, accountID=parent_window.accountID, transfer_toggle=transfer_toggle, max_toggle=max_toggle, date_lower=date_low_str, date_upper=date_up_str)
             name = "Income" if transfer_toggle is True else "Expense"
 
             graph_series = QBarSeries()
