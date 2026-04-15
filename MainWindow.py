@@ -40,7 +40,6 @@ class MainWindow(QMainWindow):
         self.category_change_handle = Change_category(self)
         self.query = query_processor()
 
-        self.profile_manager.show_profile_page()
         self.MainWindow_signals_connection()
         self.home_page_handler()
 
@@ -169,6 +168,7 @@ class MainWindow(QMainWindow):
 
     def profile_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.profile_page)
+        self.profile_manager.show_profile_page()
 
     def settings_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.settings_page)

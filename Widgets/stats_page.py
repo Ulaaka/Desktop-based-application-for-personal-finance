@@ -3,17 +3,16 @@ from PyQt5.QtCore import QDate, Qt, QMargins
 from PyQt5.QtGui import QPainter
 from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis, QHorizontalBarSeries
 from queries import query_processor
-
+from Widgets.account_control_page import Account_control_page
 class Stats_page():
     def __init__(self, parent):
         self._parent = parent
-
         self.active_buttons = []
         self.query = query_processor()
         self.set_graph_view = None
         self.graph_name = "Summary"
+        self.account_currency = None
         self.copy_list = []
-
         self.active_filters = {}
 
         self.widget_layout = parent.ui.filters_widget.layout()
@@ -121,13 +120,15 @@ class Stats_page():
         new_list.append("All")
         return new_list
 
-
     def stats_signals_connect(self):
         parent_window = self._parent
         parent_window.ui.scrollAreaWidgetContents.setStyleSheet("background-color: #fff;")
         parent_window.ui.download_chart_button.clicked.connect(self.download_graph)
+        if parent_window.accountID:
+            self.account_currency = self.query.get_type_account_currency(parent_window.account_name, parent_window.userID)[1].upper()
 
         self.wipe_out_layout(self.scroll_layout)
+    
 
         # populate buttons 
         for graph in list(self.func_mapping.keys()):
@@ -152,7 +153,7 @@ class Stats_page():
                 layout.itemAt(i).widget().setParent(None)
             else:
                 layout.removeItem(layout.itemAt(i))
-    
+
     def update_filters(self, graph_name):
         self.wipe_out_layout(self.widget_layout)
 
@@ -186,14 +187,14 @@ class Stats_page():
 
         if widget_desc["type"] == "comboBox":
             add = QComboBox()
-            # passed the name of combobox with the same style
             add.addItems(widget_desc["value"])
             add.setObjectName("stats_combo")
             add.currentTextChanged.connect(self.update_graph)
         elif widget_desc["type"] == "dateEdit":
             add = QDateEdit()
             date = widget_desc["value"]
-            add.setDate(QDate(date.year, date.month, date.day))
+            if date:
+                add.setDate(QDate(date.year, date.month, date.day))
             add.setCalendarPopup(True)
             add.setObjectName("stats_date")
 
@@ -224,7 +225,8 @@ class Stats_page():
         graph_series.attachAxis(y_axis)
 
         x_axis = QValueAxis()
-        x_axis.setRange(0, max([int(sub[1]) for sub in result]))
+        if result:
+            x_axis.setRange(0, max([int(sub[1]) for sub in result]))
         x_axis.setLabelFormat("%f")
         x_axis.setTickCount(6)
         graph.addAxis(x_axis, Qt.AlignBottom)
@@ -240,6 +242,7 @@ class Stats_page():
         date_low_str = self.active_filters["From"].date().toString("yyyy-MM-dd")
         date_up_str = self.active_filters["To"].date().toString("yyyy-MM-dd")
 
+        y_column_name = f"Amount in {self.account_currency}"
         graph = QChart()
         if transaction_type_txt == "All":
             bar_names = ["Income", "Expense"]
@@ -267,7 +270,8 @@ class Stats_page():
             x_axis = self.add_to_x_axis(bar_names, graph)
             graph_series.attachAxis(x_axis)
 
-            y_axis = self.add_to_y_axis(max(int(income), int(expense)), graph)
+
+            y_axis = self.add_to_y_axis(max(int(income), int(expense)), graph, y_column_name)
             graph_series.attachAxis(y_axis)
 
             graph.setTitle("Income vs Expense")
@@ -289,7 +293,8 @@ class Stats_page():
             graph.addSeries(graph_series)
 
             x_axis = self.add_to_x_axis(name, graph)
-            y_axis = self.add_to_y_axis(going, graph)
+            y_axis = self.add_to_y_axis(going, graph, y_column_name)
+
 
             graph_series.attachAxis(x_axis)
             graph_series.attachAxis(y_axis)
@@ -297,11 +302,13 @@ class Stats_page():
             graph.setTitle(name)
         return graph
 
-    def add_to_y_axis(self, value, graph, tick=5, horizontal=None):
-        y_axis = QValueAxis() 
+    def add_to_y_axis(self, value, graph , title_text=None, horizontal=None):
+        y_axis = QValueAxis()
+        if title_text:
+            y_axis.setTitleText(title_text)
         y_axis.setRange(0, value)
         y_axis.setLabelFormat("%d")
-        y_axis.setTickCount(tick)
+        y_axis.setTickCount(5)
         graph.addAxis(y_axis, Qt.AlignLeft)
         return y_axis
 

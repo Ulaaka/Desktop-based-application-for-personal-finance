@@ -174,7 +174,12 @@ class query_processor:
         self.cursor.execute(sql, (account_name, userID))
         output = self.cursor.fetchone()
         return output[0] if output else None
-
+    
+    def get_account_info(self, accountID):
+        sql = "SELECT account_currency FROM accounts WHERE accountID = %s"
+        self.cursor.execute(sql, (accountID,))
+        output = self.cursor.fetchone()
+        return output[0] if output else None
     # Returns the hashed name of the encrypted file
     def get_hashed_name(self, accountID, name_file=None, fileID=None):
         if name_file:
