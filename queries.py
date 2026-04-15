@@ -174,12 +174,7 @@ class query_processor:
         self.cursor.execute(sql, (account_name, userID))
         output = self.cursor.fetchone()
         return output[0] if output else None
-    
-    def get_account_info(self, accountID):
-        sql = "SELECT account_currency FROM accounts WHERE accountID = %s"
-        self.cursor.execute(sql, (accountID,))
-        output = self.cursor.fetchone()
-        return output[0] if output else None
+
     # Returns the hashed name of the encrypted file
     def get_hashed_name(self, accountID, name_file=None, fileID=None):
         if name_file:
@@ -662,7 +657,7 @@ class query_processor:
         return clean_ouput
 
     # Finds subscriptions from the transactions 
-    def find_subscriptions(self, userID, accountID=None):
+    def find_subscriptions(self, userID, account_name=None):
         head_query = f"""
             SELECT T.description, SUM(ABS(T.amount)) as total_sent , COUNT(*)
             FROM transactions T
@@ -672,8 +667,8 @@ class query_processor:
         """
 
         where_query = ""
-        if (accountID):
-            where_query+=f" and A.account_name = {accountID}"
+        if (account_name):
+            where_query+=f" and A.account_name = '{account_name}'"
 
         tail_query = " GROUP BY T.description, ABS(T.amount) HAVING COUNT(*) > 3 and COUNT(DISTINCT ABS(T.amount)) = 1 ORDER BY total_sent DESC LIMIT 5"
 
@@ -681,3 +676,74 @@ class query_processor:
         self.cursor.execute(query)
         output = self.cursor.fetchall()
         return output
+
+    def show_by_category(self, account_name):
+        head_query = f"""
+            SELECT T.category, COUNT(*), SUM(ABS(T.amount))
+            FROM transactions T
+            JOIN accounts A ON T.accountID = A.accountID
+            JOIN users U ON U.userID = A.userID
+        """
+
+        where_query = ""
+        if (account_name):
+            where_query+=f" and A.account_name = '{account_name}'"
+
+        tail_query = " GROUP BY T.category"
+
+        query = head_query + where_query + tail_query
+        self.cursor.execute(query)
+        output = self.cursor.fetchall()
+        return output
+
+    def show_by_type(self, userID, date_lower, date_upper, account_name=None):
+        head_query = f"""
+            SELECT T.transaction_type, COUNT(*), SUM(ABS(T.amount))
+            FROM transactions T
+            JOIN accounts A ON T.accountID = A.accountID
+            JOIN users U ON U.userID = A.userID
+            WHERE U.userID = {userID}
+        """
+        where_query = ""
+        if (account_name):
+            where_query += f" and A.account_name = '{account_name}'"
+
+        if (date_lower):
+            where_query += f" and T.transaction_date >= '{date_lower}'"
+
+        if (date_upper):
+            where_query += f" and T.transaction_date <= '{date_upper}'"
+
+        tail_query = " GROUP BY T.transaction_type"
+
+        query = head_query + where_query + tail_query
+        self.cursor.execute(query)
+        output = self.cursor.fetchall()
+        return output
+
+
+    def show_by_category(self, userID, date_lower, date_upper, account_name=None):
+        head_query = f"""
+            SELECT T.category, COUNT(*), SUM(ABS(T.amount))
+            FROM transactions T
+            JOIN accounts A ON T.accountID = A.accountID
+            JOIN users U ON U.userID = A.userID
+            WHERE U.userID = {userID}
+        """
+        where_query = ""
+        if (account_name):
+            where_query += f" and A.account_name = '{account_name}'"
+
+        if (date_lower):
+            where_query += f" and T.transaction_date >= '{date_lower}'"
+
+        if (date_upper):
+            where_query += f" and T.transaction_date <= '{date_upper}'"
+
+        tail_query = " GROUP BY T.category"
+
+        query = head_query + where_query + tail_query
+        self.cursor.execute(query)
+        output = self.cursor.fetchall()
+        return output
+

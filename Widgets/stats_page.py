@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QPushButton, QSizePolicy, QWidget, QVBoxLayout, QLabel, QComboBox, QDateEdit, QLineEdit
 from PyQt5.QtCore import QDate, Qt, QMargins
 from PyQt5.QtGui import QPainter
-from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis, QHorizontalBarSeries
+from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis, QHorizontalBarSeries, QPieSeries
 from queries import query_processor
 from Widgets.account_control_page import Account_control_page
 class Stats_page():
@@ -54,6 +54,11 @@ class Stats_page():
             ],
             "Type Distribution" : [
             {
+            "name" : "Accounts",
+            "type" : "comboBox",
+            "value": self.get_accounts_names()
+            },
+            {
             "name" : "From",
             "type" : "dateEdit",
             "value": self._parent.start_date
@@ -66,6 +71,11 @@ class Stats_page():
             ],
             "Category Distribution" : [
             {
+            "name" : "Accounts",
+            "type" : "comboBox",
+            "value": self.get_accounts_names()
+            },
+            {
             "name" : "From",
             "type" : "dateEdit",
             "value": self._parent.start_date
@@ -77,6 +87,11 @@ class Stats_page():
             }
             ],
             "Possible Subscriptions" : [
+            {
+            "name" : "Accounts",
+            "type" : "comboBox",
+            "value": self.get_accounts_names()
+            }
             ]
         }
 
@@ -112,6 +127,8 @@ class Stats_page():
     def get_accounts_names(self):
         parent_window = self._parent
         account_names = self.query.compute_account_options(parent_window.userID)
+        if not account_names:
+            return []
         new_list = []
         for account in account_names:
             if account != parent_window.account_name:
@@ -128,7 +145,6 @@ class Stats_page():
             self.account_currency = self.query.get_type_account_currency(parent_window.account_name, parent_window.userID)[1].upper()
 
         self.wipe_out_layout(self.scroll_layout)
-    
 
         # populate buttons 
         for graph in list(self.func_mapping.keys()):
@@ -187,7 +203,8 @@ class Stats_page():
 
         if widget_desc["type"] == "comboBox":
             add = QComboBox()
-            add.addItems(widget_desc["value"])
+            account_list = widget_desc["value"]
+            add.addItems(account_list)
             add.setObjectName("stats_combo")
             add.currentTextChanged.connect(self.update_graph)
         elif widget_desc["type"] == "dateEdit":
@@ -208,11 +225,13 @@ class Stats_page():
 
     def create_subscription_graph(self):
         parent_window = self._parent
-        result = self.query.find_subscriptions(parent_window.userID)
-
+        account_text = self.active_filters["Accounts"].currentText()
+        if account_text == "All":
+            result = self.query.find_subscriptions(parent_window.userID)
+        else:
+            result = self.query.find_subscriptions(parent_window.userID, account_text)
         graph = QChart()
         graph_series = QHorizontalBarSeries()
-        graph_series.setBarWidth(1)
         for sub in result:
             sub_bar = QBarSet(sub[0])
             sub_bar.append(int(sub[1]))
@@ -328,7 +347,39 @@ class Stats_page():
         pass
 
     def create_type_distribution_graph(self):
-        pass
+        account_name = self.active_filters["Accounts"].currentText()
+        date_low_str = self.active_filters["From"].date().toString("yyyy-MM-dd")
+        date_up_str = self.active_filters["To"].date().toString("yyyy-MM-dd")
+
+        if (account_name != "All"):
+            types = self.query.show_by_type(self._parent.userID, date_low_str, date_up_str, account_name)
+        else:
+             types = self.query.show_by_type(self._parent.userID, date_low_str, date_up_str)
+        graph = QChart()
+        graph_series = QPieSeries()
+        for type in types:
+            name = str(type[0])
+            value = float(type[1])
+            graph_series.append(name, value)
+        graph.addSeries(graph_series)
+        graph.setTitle("Transaction by Types")
+        return graph
 
     def create_category_distribution_graph(self):
-        pass
+        account_name = self.active_filters["Accounts"].currentText()
+        date_low_str = self.active_filters["From"].date().toString("yyyy-MM-dd")
+        date_up_str = self.active_filters["To"].date().toString("yyyy-MM-dd")
+
+        if (account_name != "All"):
+            types = self.query.show_by_category(self._parent.userID, date_low_str, date_up_str, account_name)
+        else:
+             types = self.query.show_by_category(self._parent.userID, date_low_str, date_up_str)
+        graph = QChart()
+        graph_series = QPieSeries()
+        for type in types:
+            name = str(type[0])
+            value = float(type[1])
+            graph_series.append(name, value)
+        graph.addSeries(graph_series)
+        graph.setTitle("Transaction by Categories")
+        return graph
