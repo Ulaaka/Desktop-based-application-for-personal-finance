@@ -241,6 +241,17 @@ class cryptography:
 
         file_ID = self.query.insert_into_files(accountID,  filename, new_filename, size_file, file_type)
         return file_ID
+    
+    def encrypt_data_key(self, wrapping_key, data_key):
+        fernet = Fernet(wrapping_key)
+        encrypted = fernet.encrypt(data_key)
+        return encrypted
+    
+    def decrypt_data_key(self, wrapping_key, enc_data_key):
+        fernet = Fernet(wrapping_key)
+        decrypted = fernet.decrypt(enc_data_key)
+        return decrypted
+
 
     # Decrypts the user file given filename or hashed_filename
     def decrypt(self, enc_storage_path, key, accountID, filename=None, hashed_filename=None, fileID=None):

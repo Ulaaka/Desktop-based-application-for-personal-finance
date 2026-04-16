@@ -13,7 +13,10 @@ from system_functions import system_functions, manage_seconds_qt
 from queries import query_processor
 from MainWindow import MainWindow
 from ui_support_functions import ui_support_functions
-import secrets
+import secrets,  base64
+from cryptography.fernet import Fernet
+
+
 
 class login_page(QWidget):
     def __init__(self, controller, db, cursor):
@@ -259,7 +262,9 @@ class sign_up_page(QWidget):
             crypto = cryptography()
             salt = os.urandom(32)
             wrapping_key = crypto.generate_key(password_local, salt)
-            data_key = secrets.token_bytes(32)
+            data_key = base64.urlsafe_b64encode(secrets.token_bytes(32))
+            fernet = Fernet(wrapping_key)
+            encrypted = fernet.encrypt(data_key)
 
             hashed_password = password_manager.hash_password(password_local)
             self.query.insert_user(username_local, hashed_password, email_local)
