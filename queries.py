@@ -8,7 +8,6 @@ import pandas as pd
 import pymysql
 from datetime import datetime
 
-
 class query_processor:
 
     """
@@ -392,7 +391,6 @@ class query_processor:
         self.cursor.execute(query, parameters)
         self.db.commit()
 
-
     # Returns the description of the transaction given the transaction ID
     def return_description_given_transactionID(self, transactionID):
         description_query =  """
@@ -601,7 +599,7 @@ class query_processor:
         self.cursor.execute(query)
 
         output = self.cursor.fetchall()
-        return output if output else None
+        return output
 
     # Finds subscriptions from the transactions 
     def find_subscriptions(self, userID, account_name=None):

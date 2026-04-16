@@ -179,7 +179,7 @@ class Stats_page():
             opt_button = QPushButton(graph)
             opt_button.setStyleSheet("background-color: #313a46;")
             opt_button.setObjectName("email_change_button")
-            opt_button.setFixedHeight(30)
+            opt_button.setFixedHeight(50)
             opt_button.clicked.connect(lambda clicked, graph_name=graph: self.show_graph(graph_name))
             self.scroll_layout.addWidget(opt_button)
         self.scroll_layout.addStretch()
@@ -729,11 +729,12 @@ class Stats_page():
         parent_window = self._parent
         date_low_str = self.active_filters["From"].date().toString("yyyy-MM-dd")
         date_up_str = self.active_filters["To"].date().toString("yyyy-MM-dd")
+        graph = QChart()
+        graph_series = QHorizontalBarSeries()
+        graph.setTitle("Top Income Sources")
         top_sources = self.query.common_transactions(parent_window.userID, 5, parent_window.accountID,
         transfer_toggle=True, date_lower=date_low_str, date_upper=date_up_str)
 
-        graph = QChart()
-        graph_series = QHorizontalBarSeries()
         for sub in top_sources:
             sub_bar = QBarSet(sub[0])
             sub_bar.append(int(sub[1]))
@@ -752,7 +753,6 @@ class Stats_page():
         x_axis.setTickCount(6)
         graph.addAxis(x_axis, Qt.AlignBottom)
         graph_series.attachAxis(x_axis)
-        graph.setTitle("Top Income Sources")
         return graph
 
 
@@ -760,11 +760,11 @@ class Stats_page():
         parent_window = self._parent
         date_low_str = self.active_filters["From"].date().toString("yyyy-MM-dd")
         date_up_str = self.active_filters["To"].date().toString("yyyy-MM-dd")
-        top_sources = self.query.common_transactions(parent_window.userID, 5, parent_window.accountID,
-        transfer_toggle=False, date_lower=date_low_str, date_upper=date_up_str)
-
         graph = QChart()
         graph_series = QHorizontalBarSeries()
+        graph.setTitle("Top Expense Sources")
+        top_sources = self.query.common_transactions(parent_window.userID, 5, parent_window.accountID,
+        transfer_toggle=False, date_lower=date_low_str, date_upper=date_up_str)
         for sub in top_sources:
             sub_bar = QBarSet(sub[0])
             sub_bar.append(int(sub[1]))
@@ -783,7 +783,6 @@ class Stats_page():
         x_axis.setTickCount(6)
         graph.addAxis(x_axis, Qt.AlignBottom)
         graph_series.attachAxis(x_axis)
-        graph.setTitle("Top Expense Sources")
         return graph
 
 
