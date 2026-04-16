@@ -1,14 +1,14 @@
-import random, os
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from db_connection import database
-from db_queries import QueryProcessor
-import matplotlib.pyplot as plt
+import random, os, matplotlib.pyplot as plt
+
 from matplotlib.backends.backend_pdf import PdfPages
-from matplotlib.image import imread
 from pathlib import Path
 from datetime import datetime
+
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
+from db_connection import Database
+from db_queries import QueryProcessor
 from base_classes import CryptoHelper
 class SystemHelpers:
 
@@ -17,7 +17,7 @@ class SystemHelpers:
     """
 
     def __init__(self):
-        connection = database()
+        connection = Database()
         self.db = connection.db
         self.query = QueryProcessor()
         self.cursor = connection.cursor

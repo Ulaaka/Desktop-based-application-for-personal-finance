@@ -1,9 +1,6 @@
-import camelot
-import pandas as pd
-import pdfplumber
+import camelot, re, pdfplumber, pandas as pd
+
 from base_classes import ParsingHelper
-import pandas as pd
-import re
 
 class ParsingPDF:
 

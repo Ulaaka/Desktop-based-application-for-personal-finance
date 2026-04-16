@@ -4,8 +4,8 @@ from Widgets.account_selection_generated import Ui_AccountSelection
 from Widgets.account_add_window import AccountAddPage
 from db_queries import QueryProcessor
 
-class Account_selection_page(QDialog):
-    chose_account = pyqtSignal(str, int) 
+class AccountSelectionPage(QDialog):
+    chose_account = pyqtSignal(str, int)
     def __init__(self, parent):
         super().__init__(parent)
 

@@ -1,21 +1,18 @@
-import os, sys, certifi, django
-from functools import partial
-
-from PyQt5.QtWidgets import  QWidget, QMainWindow, QApplication, QStackedWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QColor, QPalette
+import os, sys, certifi, django, secrets,  base64
+from decouple import config
 from qtwidgets import PasswordEdit
 
-from decouple import config
+from PyQt5.QtWidgets import  (QWidget, QMainWindow, QApplication, QStackedWidget,
+QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox)
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QFont, QColor, QPalette
+
 from db_connection import Database
 from base_classes import PasswordHelper, CryptoHelper
 from system_functions import SystemHelpers, TimerHelper
 from db_queries import QueryProcessor
-from MainWindow import MainWindow
-from ui_support_functions import UserInterfaceHelper
-import secrets,  base64
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives.ciphers.algorithms import AES
+from mainwindow import MainWindow
+from ui_helper import UserInterfaceHelper
 
 class login_page(QWidget):
     def __init__(self, controller, db, cursor):
@@ -330,8 +327,8 @@ class validation_page(QWidget):
             square.setAlignment(centering)
             square.setObjectName("digit_box")
 
-            square.textChanged.connect(partial(self.to_next_box, idx))
-            square.keyPressEvent = partial(self.to_prev_box, idx)
+            square.textChanged.connect(lambda: self.to_next_box(idx))
+            square.keyPressEvent = lambda event: self.to_prev_box(idx, event)
 
             square_layout.addWidget(square)
             self.squares.append(square)

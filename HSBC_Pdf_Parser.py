@@ -1,7 +1,5 @@
-import pandas as pd
-import pdfplumber
-import re 
-from datetime import datetime
+import pdfplumber, re, pandas as pd
+
 from base_classes import ParsingHelper
 # https://github.com/Anlanther/bank-statement-converter/blob/main/src/classes/BOCStatement.py#L28
 class ParsingPdfHSBC:

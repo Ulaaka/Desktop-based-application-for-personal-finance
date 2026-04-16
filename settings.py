@@ -1,7 +1,6 @@
+import ssl, certifi, os
 from decouple import config
-import ssl
-import certifi
-import os
+
 
 SECRET_KEY = "Db(wSSn!7uftyhN_[P$:R(N$6ArNMi"
 

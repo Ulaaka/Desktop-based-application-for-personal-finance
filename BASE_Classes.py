@@ -1,20 +1,13 @@
-import dateutil.parser
-from db_connection import database
+import dateutil.parser, os, base64, re, bcrypt, pandas as pd
 from datetime import datetime
-from db_queries import QueryProcessor
-import bcrypt
-import pandas as pd
 from fuzzywuzzy import fuzz
-import numpy as np
 from cryptography.fernet import Fernet
-import os
-from db_connection import database
-import base64
-from Crypto.Hash import SHA256
 from hashlib import pbkdf2_hmac
-import re
-from cryptography.hazmat.primitives.ciphers.algorithms import AES
-from Crypto.Cipher import ARC4 
+
+from db_connection import Database
+from db_queries import QueryProcessor
+
+#from Crypto.Hash import SHA256
 class ParsingHelper:
 
     """
@@ -157,7 +150,7 @@ class PasswordHelper:
     """
 
     def __init__(self):
-        connection = database()
+        connection = Database()
         self.db = connection.db
         self.cursor = connection.cursor
 
@@ -212,7 +205,7 @@ class CryptoHelper:
     """
 
     def __init__(self):
-        connection = database()
+        connection = Database()
         self.db = connection.db
         self.cursor = connection.cursor
         self.query = QueryProcessor()

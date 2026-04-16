@@ -7,8 +7,8 @@ from datetime import datetime
 from file_handle import FileHandling
 
 from Widgets.main_app_generated import Ui_MainWindow
-from Widgets.account_add_window import Account_selection_page
 from Widgets.account_control_page import AccountControlPage
+from Widgets.account_selection_window import AccountSelectionPage
 from Widgets.profile_page import ProfilePage
 from Widgets.upload_Page import UploadPage
 from Widgets.files_page import FilePage
@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.home_manager = HomePage(self)
         self.upload_manager = UploadPage(self)
         self.file_manager = FilePage(self)
-        self.account_manager = Account_selection_page(self)
+        self.account_manager = AccountSelectionPage(self)
         self.profile_manager= ProfilePage(self.account_name, self)
         self.category_change_manager = Change_category(self)
         self.account_control_manager = AccountControlPage(self.account_name, self)
@@ -64,7 +64,7 @@ class MainWindow(QMainWindow):
     def account_page_handler(self):
         if not self.status_panel:
             # https://forum.qt.io/topic/116360/qwidget-maptoglobal-not-giving-right-result/2
-            self.panel = Account_selection_page(self)
+            self.panel = AccountSelectionPage(self)
             self.panel.chose_account.connect(self.update_parent)
 
             global_pos = self.ui.account_button.mapToGlobal(QPoint(0,0))
