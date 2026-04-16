@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPainter
 from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis, QHorizontalBarSeries, QPieSeries, QLineSeries, QCategoryAxis
 from queries import query_processor
 from Widgets.account_control_page import Account_control_page
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import calendar
 class Stats_page():
     def __init__(self, parent):
@@ -405,6 +405,7 @@ class Stats_page():
 
                 out_series.attachAxis(category_axis)
                 out_series.attachAxis(axis_y)
+                graph.setTitle("Weekly Trend: Income vs Expense")
 
         else:
 
@@ -414,6 +415,8 @@ class Stats_page():
                 max_toggle = self.max_toggle_dic[transfer_toggle][value_txt]
 
             graph_series = QLineSeries()
+            name = "Income" if transfer_toggle is True else "Expense"
+            graph_series.setName(name)
 
             result_list = []
             for idx,  i in enumerate(range(week_day + 1)):
@@ -439,10 +442,12 @@ class Stats_page():
             graph.addAxis(axis_y, Qt.AlignLeft)
             graph_series.attachAxis(category_axis)
             graph_series.attachAxis(axis_y)
+            graph.setTitle("Weekly Trend")
 
         return graph
 
     def create_monthly_graph(self):
+
         parent_window = self._parent
 
         transaction_type_txt = self.active_filters["Transaction Type"].currentText()
@@ -453,43 +458,98 @@ class Stats_page():
         if transfer_toggle is not None and value_txt != "Total":
             max_toggle = self.max_toggle_dic[transfer_toggle][value_txt]
 
-        graph = QChart()
-        graph_series = QLineSeries()
-
         current_date = datetime.today().date()
         result = calendar.monthrange(current_date.year, current_date.month)[1]
-        first_day_str = current_date.strftime("%Y-%m-01")
-        first_day = datetime.strptime(first_day_str, "%Y-%m-%d")
+        first_day = date(current_date.year, current_date.month, 1)
+        graph = QChart()
+        if transaction_type_txt == "All":
+            try:
+                in_max_toggle = self.max_toggle_dic[True][value_txt]
+                out_max_toggle = self.max_toggle_dic[False][value_txt]
+            except:
+                in_max_toggle = None
+                out_max_toggle = None
 
-        result_list = []
-        for idx, i in enumerate(range(int(current_date.day))):
-            day = first_day + timedelta(days=i)
-            dat_str = day.strftime("%Y-%m-%d")
-            if (day == current_date):
-                break
-            result = self.query.total_transfer_or_extreme_value(parent_window.userID, parent_window.accountID, transfer_toggle=transfer_toggle,
-                                            max_toggle=max_toggle, date_lower=dat_str, date_upper=dat_str)
-            if result is None:
-                result = 0
-            result_list.append((idx+1, int(result)))
-        for i in result_list:
-            graph_series.append(QPointF(float(i[0]), float(i[1])))
+            in_result_list = []
+            out_result_list = []
+            for idx,  i in enumerate(range(int(current_date.day))):
+                day = first_day + timedelta(days=i)
+                date_str = day.strftime("%Y-%m-%d")
+                result_in = self.query.total_transfer_or_extreme_value(parent_window.userID, parent_window.accountID, transfer_toggle=True,
+                                                        max_toggle=in_max_toggle, date_lower=date_str, date_upper=date_str)
+                result_out = self.query.total_transfer_or_extreme_value(parent_window.userID, parent_window.accountID, transfer_toggle=False,
+                                                        max_toggle=out_max_toggle, date_lower=date_str, date_upper=date_str)
+                if result_in is None:
+                    result_in = 0
 
-        category_axis = QCategoryAxis()
-        axis_y = QValueAxis()
+                if result_out is None:
+                    result_out = 0
 
-        axis_y.setRange(0, max([result[1] for result in result_list]) * 1.2)
-        graph.addSeries(graph_series)
-        graph.addAxis(category_axis, Qt.AlignBottom)
-        graph.addAxis(axis_y, Qt.AlignLeft)
-        graph_series.attachAxis(category_axis)
-        graph_series.attachAxis(axis_y)
+                in_result_list.append((idx+1, int(result_in)))
+                out_result_list.append((idx+1, int(result_out)))
+                graph.removeAllSeries()
 
+                in_series = QLineSeries()
+                in_series.setName("Income")
 
+                out_series = QLineSeries()
+                out_series.setName("Expense")
 
+                for i in in_result_list:
+                    in_series.append(QPointF(float(i[0]), float(i[1])))
 
+                for i in out_result_list:
+                    out_series.append(QPointF(float(i[0]), float(i[1])))
 
-        
+                graph.addSeries(in_series)
+                graph.addSeries(out_series)
+
+                category_axis = QCategoryAxis()
+                axis_y = QValueAxis()
+                combined = in_result_list + out_result_list
+                axis_y.setRange(0, max([result[1] for result in combined]))
+
+                graph.addAxis(category_axis, Qt.AlignBottom)
+                graph.addAxis(axis_y, Qt.AlignLeft)
+
+                in_series.attachAxis(category_axis)
+                in_series.attachAxis(axis_y)
+
+                out_series.attachAxis(category_axis)
+                out_series.attachAxis(axis_y)
+                graph.setTitle("Monthly Trend: Income vs Expense")
+        else:
+            graph_series = QLineSeries()
+            name = "Income" if transfer_toggle is True else "Expense"
+            graph_series.setName(name)
+
+            result_list = []
+            for idx, i in enumerate(range(int(current_date.day))):
+                day = first_day + timedelta(days=i)
+                date_str = day.strftime("%Y-%m-%d")
+                if (day == current_date):
+                    break
+                result = self.query.total_transfer_or_extreme_value(parent_window.userID, parent_window.accountID, transfer_toggle=transfer_toggle,
+                                                max_toggle=max_toggle, date_lower=date_str, date_upper=date_str)
+                if result is None:
+                    result = 0
+                result_list.append((idx+1, int(result)))
+            for i in result_list:
+                graph_series.append(QPointF(float(i[0]), float(i[1])))
+
+            category_axis = QCategoryAxis()
+            axis_y = QValueAxis()
+
+            axis_y.setRange(0, max([result[1] for result in result_list]))
+            graph.addSeries(graph_series)
+            graph.addAxis(category_axis, Qt.AlignBottom)
+            graph.addAxis(axis_y, Qt.AlignLeft)
+            graph_series.attachAxis(category_axis)
+            graph_series.attachAxis(axis_y)
+            graph.setTitle("Monthly Trend")
+
+        return graph
+
     def create_yearly_graph(self):
         pass
 
@@ -531,3 +591,14 @@ class Stats_page():
         graph.setTitle("Transaction by Categories")
         return graph
     
+    def get_month_ranges(self, current_date):
+        months_list = []
+        for month in range(current_date.month):
+            first_day = date(current_date.year, month+1, 1)
+            last_day = date(current_date.year, month+2, 1) - timedelta(days=1)
+
+            if month == current_date.month:
+                last_day = current_date
+
+            months_list.append((first_day, last_day))
+        return months_list
