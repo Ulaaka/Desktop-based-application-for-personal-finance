@@ -94,6 +94,30 @@ class Stats_page():
             "type" : "comboBox",
             "value": self.get_accounts_names()
             }
+            ],
+            "Top Income Sources":[
+            {
+            "name" : "From",
+            "type" : "dateEdit",
+            "value": self._parent.start_date
+            },
+            {
+            "name" : "To",
+            "type" : "dateEdit",
+            "value": self._parent.end_date
+            }
+            ],
+            "Top Expense Sources":[
+            {
+            "name" : "From",
+            "type" : "dateEdit",
+            "value": self._parent.start_date
+            },
+            {
+            "name" : "To",
+            "type" : "dateEdit",
+            "value": self._parent.end_date
+            }
             ]
         }
 
@@ -104,7 +128,9 @@ class Stats_page():
             "Yearly Trend" : self.create_yearly_graph,
             "Type Distribution" : self.create_type_distribution_graph,
             "Category Distribution": self.create_category_distribution_graph,
-            "Possible Subscriptions": self.create_subscription_graph
+            "Possible Subscriptions": self.create_subscription_graph,
+            "Top Income Sources": self.create_top_income_sources,
+            "Top Expense Sources": self.create_top_expense_sources
         }
 
         self.transfer_toggle_dic = {
@@ -372,6 +398,9 @@ class Stats_page():
 
                 in_result_list.append((calendar.day_name[day.weekday()], int(result_in), idx))
                 out_result_list.append((calendar.day_name[day.weekday()], int(result_out), idx))
+
+                for axis in graph.axes():
+                    graph.removeAxis(axis)
                 graph.removeAllSeries()
 
                 in_series = QLineSeries()
@@ -582,6 +611,9 @@ class Stats_page():
 
                 in_result_list.append((calendar.month_name[idx+1], result_in, idx))
                 out_result_list.append((calendar.month_name[idx+1], result_out, idx))
+
+                for axis in graph.axes():
+                    graph.removeAxis(axis)
                 graph.removeAllSeries()
 
                 in_series = QLineSeries()
@@ -605,7 +637,7 @@ class Stats_page():
 
                 axis_y = QValueAxis()
                 combined = in_result_list + out_result_list
-                axis_y.setRange(0, max([result[1] for result in combined]) * 1.2)
+                axis_y.setRange(0, max([result[1] for result in combined]))
 
                 graph.addAxis(category_axis, Qt.AlignBottom)
                 graph.addAxis(axis_y, Qt.AlignLeft)
@@ -616,6 +648,44 @@ class Stats_page():
                 out_series.attachAxis(category_axis)
                 out_series.attachAxis(axis_y)
                 graph.setTitle("Yearly Trend: Income vs Expense")
+        else:
+            graph_series = QLineSeries()
+
+            max_toggle = None
+            transfer_toggle = self.transfer_toggle_dic[transaction_type_txt]
+            if transfer_toggle is not None and value_txt != "Total":
+                max_toggle = self.max_toggle_dic[transfer_toggle][value_txt]
+    
+            name = "Income" if transfer_toggle is True else "Expense"
+            graph_series.setName(name)
+
+            result_list = []
+            for idx, month_range in enumerate(months_list):
+                result = self.query.total_transfer_or_extreme_value(parent_window.userID, parent_window.accountID, transfer_toggle=transfer_toggle,
+                                            max_toggle=max_toggle, date_lower=month_range[0], date_upper=month_range[1])
+                if result is None:
+                    result = 0
+                result_list.append((calendar.month_name[idx+1], result, idx))
+
+            for i in result_list:
+                graph_series.append(i[2], i[1])
+
+            graph.addSeries(graph_series)
+            category_axis = QCategoryAxis()
+
+            category_axis = QCategoryAxis()
+            for idx, month in enumerate(range(len(result_list))):
+                category_axis.append(result_list[idx][0], idx)
+
+            axis_y = QValueAxis()
+            axis_y.setRange(0, max([result[1] for result in result_list]))
+            graph.addSeries(graph_series)
+            graph.addAxis(category_axis, Qt.AlignBottom)
+            graph.addAxis(axis_y, Qt.AlignLeft)
+            graph_series.attachAxis(category_axis)
+            graph_series.attachAxis(axis_y)
+            graph.setTitle("Yearly Trend")
+        return graph
 
     def create_type_distribution_graph(self):
         account_name = self.active_filters["Accounts"].currentText()
@@ -654,7 +724,69 @@ class Stats_page():
         graph.addSeries(graph_series)
         graph.setTitle("Transaction by Categories")
         return graph
-    
+
+    def create_top_income_sources(self):
+        parent_window = self._parent
+        date_low_str = self.active_filters["From"].date().toString("yyyy-MM-dd")
+        date_up_str = self.active_filters["To"].date().toString("yyyy-MM-dd")
+        top_sources = self.query.common_transactions(parent_window.userID, 5, parent_window.accountID,
+        transfer_toggle=True, date_lower=date_low_str, date_upper=date_up_str)
+
+        graph = QChart()
+        graph_series = QHorizontalBarSeries()
+        for sub in top_sources:
+            sub_bar = QBarSet(sub[0])
+            sub_bar.append(int(sub[1]))
+            graph_series.append(sub_bar)
+        graph.addSeries(graph_series)
+
+        y_axis = QBarCategoryAxis()
+        y_axis.append([sub[0] for sub in top_sources])
+        graph.addAxis(y_axis, Qt.AlignLeft)
+        graph_series.attachAxis(y_axis)
+
+        x_axis = QValueAxis()
+        if top_sources:
+            x_axis.setRange(0, max([int(sub[1]) for sub in top_sources]))
+        x_axis.setLabelFormat("%d")
+        x_axis.setTickCount(6)
+        graph.addAxis(x_axis, Qt.AlignBottom)
+        graph_series.attachAxis(x_axis)
+        graph.setTitle("Top Income Sources")
+        return graph
+
+
+    def create_top_expense_sources(self):
+        parent_window = self._parent
+        date_low_str = self.active_filters["From"].date().toString("yyyy-MM-dd")
+        date_up_str = self.active_filters["To"].date().toString("yyyy-MM-dd")
+        top_sources = self.query.common_transactions(parent_window.userID, 5, parent_window.accountID,
+        transfer_toggle=False, date_lower=date_low_str, date_upper=date_up_str)
+
+        graph = QChart()
+        graph_series = QHorizontalBarSeries()
+        for sub in top_sources:
+            sub_bar = QBarSet(sub[0])
+            sub_bar.append(int(sub[1]))
+            graph_series.append(sub_bar)
+        graph.addSeries(graph_series)
+
+        y_axis = QBarCategoryAxis()
+        y_axis.append([sub[0] for sub in top_sources])
+        graph.addAxis(y_axis, Qt.AlignLeft)
+        graph_series.attachAxis(y_axis)
+
+        x_axis = QValueAxis()
+        if top_sources:
+            x_axis.setRange(0, max([int(sub[1]) for sub in top_sources]))
+        x_axis.setLabelFormat("%d")
+        x_axis.setTickCount(6)
+        graph.addAxis(x_axis, Qt.AlignBottom)
+        graph_series.attachAxis(x_axis)
+        graph.setTitle("Top Expense Sources")
+        return graph
+
+
     def get_month_ranges(self, current_date):
         months_list = []
         for month in range(current_date.month):

@@ -572,18 +572,18 @@ class query_processor:
         return output[0] if output[0] is not None else 0
 
     # Finds the total amount of the repeating transactions of data range of the account
-    def common_transactions(self, username, limit, account_name=None, transfer_toggle=None, date_lower=None, date_upper=None, filter_amount=None):
+    def common_transactions(self, userID, limit, accountID=None, transfer_toggle=None, date_lower=None, date_upper=None):
         head_query = """
-            SELECT T.description as statement, SUM(ABS(T.amount)) as total_sent
+            SELECT REPLACE(TRIM(T.description), '[^A-Za-z0-9 ]', '') AS new_desc, SUM(ABS(T.amount)) as sumof
             FROM users U
             JOIN accounts A ON A.userID = U.userID
             JOIN transactions T ON T.accountID = A.accountID
         """
 
-        where_query = f" WHERE U.username = '{username}'"
+        where_query = f" WHERE U.userID = {userID}"
 
-        if (account_name):
-            where_query+=f" and A.account_name = '{account_name}'"
+        if (accountID):
+            where_query+=f" and A.accountID = {accountID}"
 
         if (transfer_toggle is not None):
             toggle = ">" if transfer_toggle else "<"
@@ -595,24 +595,13 @@ class query_processor:
         if (date_upper):
             where_query += f" and T.transaction_date <= '{date_upper}'"
 
-        tail_query = f" GROUP BY statement ORDER BY total_sent DESC LIMIT {limit}"
-
-        if (filter_amount):
-            tail_query = f" GROUP BY statement HAVING total_sent >= {filter_amount} ORDER BY total_sent DESC LIMIT {limit}"
+        tail_query = f" GROUP BY new_desc ORDER BY sumof DESC LIMIT {limit}"
 
         query = head_query + where_query + tail_query
         self.cursor.execute(query)
 
         output = self.cursor.fetchall()
-
-
-        regex = re.compile(r'\b[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*\b')
-
-        clean_ouput = []
-        for key, value in output:
-            clean_ouput.append(( ' '.join(regex.findall(key)), value))
-
-        return clean_ouput
+        return output if output else None
 
     # Finds subscriptions from the transactions 
     def find_subscriptions(self, userID, account_name=None):
