@@ -1,21 +1,21 @@
 import dateutil.parser
-from database_connection import database
+from db_connection import database
 from datetime import datetime
-from queries import query_processor
+from db_queries import QueryProcessor
 import bcrypt
 import pandas as pd
 from fuzzywuzzy import fuzz
 import numpy as np
 from cryptography.fernet import Fernet
 import os
-from database_connection import database
+from db_connection import database
 import base64
 from Crypto.Hash import SHA256
 from hashlib import pbkdf2_hmac
 import re
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from Crypto.Cipher import ARC4 
-class ParsingBase:
+class ParsingHelper:
 
     """
     Contains shared functions used for parsing different types of user transaction files(pdf, csv)
@@ -150,7 +150,7 @@ class ParsingBase:
                 mat2.append(i)
         return mat2, chosen_columns
 
-class password_class:
+class PasswordHelper:
 
     """
     Contains functions for managing the password
@@ -205,7 +205,7 @@ class password_class:
 
 #https://stackoverflow.com/questions/66218337/encrypt-and-protect-file-with-python
 #https://stackoverflow.com/questions/42568262/how-to-encrypt-text-with-a-password-in-python
-class cryptography:
+class CryptoHelper:
 
     """
     Contains functions for securing user files and accessing later
@@ -215,7 +215,7 @@ class cryptography:
         connection = database()
         self.db = connection.db
         self.cursor = connection.cursor
-        self.query = query_processor()
+        self.query = QueryProcessor()
 
     # Produces the key used in encryption and decryption of the user files given  password
     def generate_key(self, password, salt):

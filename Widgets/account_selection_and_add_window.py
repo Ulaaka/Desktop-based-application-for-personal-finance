@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QDialog, QCompleter, QMessageBox
 from PyQt5.QtCore import Qt,pyqtSignal, QPoint
 from Widgets.account_selection_panel import account_selection_form
 from Widgets.account_add_page import account_add_page_form
-from queries import query_processor
+from queries import QueryProcessor
 
 
 class Account_selection_page(QDialog):
@@ -30,7 +30,7 @@ class Account_selection_page(QDialog):
         self.ui.add_accounts_list.clicked.connect(self.add_accounts)
 
     def show_accounts(self):
-        query = query_processor()
+        query = QueryProcessor()
         self.ui.accounts_list.clear()
         self.account_options = query.compute_account_options(self.userID)
         if self.account_options:
@@ -39,7 +39,7 @@ class Account_selection_page(QDialog):
         self.update_list()
 
     def set_account(self, option):
-        query = query_processor()
+        query = QueryProcessor()
         accountID = query.get_accountID(option, self.userID)
         self.chose_account.emit(option, accountID)
 
@@ -87,7 +87,7 @@ class Account_add_page(QDialog):
         completer.setCaseSensitivity(Qt.CaseInsensitive)
 
     def add_account_database(self):
-        query = query_processor()
+        query = QueryProcessor()
         account_name = self.ui.account_name_type.text()
         account_type = self.ui.account_type_combo.currentText()
         account_currency = self.ui.account_currency_combo.currentText()[:3]

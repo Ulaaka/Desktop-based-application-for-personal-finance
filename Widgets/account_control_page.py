@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QCompleter, QWidget, QMessageBox
 from PyQt5.QtCore import Qt
-from queries import query_processor
+from queries import QueryProcessor
 from Widgets.deletion_disclaimer_window import Deletion_disclaimer_window
 
 class Account_control_page(QWidget):
@@ -12,7 +12,7 @@ class Account_control_page(QWidget):
         self._parent = parent
         self.currencies = parent.currency_list
         self.objective = 0
-        self.query = query_processor()
+        self.query = QueryProcessor()
         self.account_control_signals_connect()
 
     def account_control_signals_connect(self):
@@ -32,7 +32,7 @@ class Account_control_page(QWidget):
     def show_account_control_page(self):
         parent_window = self._parent
         parent_window.ui.account_name_change_line.setText(self.current_account)
-        query = query_processor()
+        query = QueryProcessor()
         result = query.get_type_account_currency(self.current_account, self.userID)
         parent_window.ui.account_type_combo.setEditable(True)
         parent_window.ui.account_type_combo.setCurrentText(result[0])

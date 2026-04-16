@@ -1,7 +1,7 @@
 import camelot
 import pandas as pd
 import pdfplumber
-from BASE_Classes import ParsingBase
+from base_classes import ParsingHelper
 import pandas as pd
 import re
 
@@ -15,7 +15,7 @@ class ParsingPDF:
 
         flavor_choice = self.flavor_decision(pdf_name, 0)
         tables = self.run_camelot(pdf_name, flavor_choice)
-        self.parser = ParsingBase()
+        self.parser = ParsingHelper()
         self.df = []
         for idx, table in enumerate(tables):
             df = table.df

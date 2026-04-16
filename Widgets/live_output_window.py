@@ -1,10 +1,10 @@
 import sys, os
 from decouple import config
 from PyQt5.QtWidgets import QDialog, QMessageBox
-from FILE_handling import file_handling
+from file_handle import FileHandling
 from Widgets.live_output_widget import Ui_live_output_window
-from BASE_Classes import cryptography
-from queries import query_processor
+from base_classes import CryptoHelper
+from db_queries import QueryProcessor
 class Live_output_window(QDialog):
     def __init__(self, parent, saved_print):
         super().__init__(parent)
@@ -15,9 +15,9 @@ class Live_output_window(QDialog):
         self.saved_print = saved_print
 
         self.ui = Ui_live_output_window()
-        self.crypto = cryptography()
-        self.file_handle = file_handling(self.userID, self.accountID, self.key)
-        self.query = query_processor()
+        self.crypto = CryptoHelper()
+        self.file_handle = FileHandling(self.userID, self.accountID, self.key)
+        self.query = QueryProcessor()
 
         self.ui.setupUi(self)
         self.live_output_signals_connection()
@@ -39,9 +39,7 @@ class Live_output_window(QDialog):
         pressed_file_name = event.toString()
         original_filename = pressed_file_name.split(":")[1]
 
-        result = self.file_handle.view_file(original_filename)
-        if not result:
-            QMessageBox.warning(self._parent, "Error", "File can not be restored")
+        self.file_handle.view_file(original_filename)
 
     # when the file window close
     def closeEvent(self, event):

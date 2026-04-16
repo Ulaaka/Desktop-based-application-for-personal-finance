@@ -1,14 +1,14 @@
 
 from decouple import config
 import os, tempfile, shutil
-from BASE_Classes import cryptography
-from CSV_Parser import ParsingCSV
-from DF_Processor import ProcessingDF
-from HSBC_Pdf_Parser import HSBC_PDF_CONVERSION
-from PDF_Parser import ParsingPDF
-from queries import query_processor
+from base_classes import CryptoHelper
+from csv_parser import ParsingCSV
+from df_processor import ProcessingDF
+from HSBC_Pdf_Parser import ParsingPdfHSBC
+from pdf_parser import ParsingPDF
+from db_queries import QueryProcessor
 
-class file_handling():
+class FileHandling():
     """
     Contains functions for handling files
     """
@@ -17,7 +17,7 @@ class file_handling():
         self.accountID = accountID
         self.key = key
         self.userID = userID
-        self.query = query_processor()
+        self.query = QueryProcessor()
         self.temp_files = []
 
     # Returns temporary decrypted text file of the file in a pdf format
@@ -32,10 +32,10 @@ class file_handling():
         return tmp.name
 
     def view_file(self, original_filename=None, fileID=None):
-        crypto = cryptography()
+        crypto = CryptoHelper()
 
         flag = False
-        query = query_processor()
+        query = QueryProcessor()
         sub_save_folder = os.path.join(config('SAVE_FOLDER'),f"account_{self.accountID}")
 
         if fileID:
@@ -68,7 +68,7 @@ class file_handling():
 
     # Checks if the file with the same content exists by checking the save folder for encrypted files
     def check_file_exists(self, sub_save_folder, file_path, filename):
-        crypto = cryptography()
+        crypto = CryptoHelper()
         found = False
         output = ""
 
@@ -87,7 +87,7 @@ class file_handling():
 
     # The functions for handling the parsing of the user input files
     def process_files_in_folder(self):
-        crypto = cryptography()
+        crypto = CryptoHelper()
         dir = os.listdir(config('FOLDER_PATH'))
         parsed_count = 0
         existing_file_output = []
@@ -114,7 +114,7 @@ class file_handling():
                         try:
                             parsing = ParsingPDF(file_path)
                         except:
-                            parsing = HSBC_PDF_CONVERSION(file_path)
+                            parsing = ParsingPdfHSBC(file_path)
                     parsed_count+=1
                     size_file = os.path.getsize(file_path)
                     file_ID = crypto.encrypt(sub_save_folder, config('FOLDER_PATH'), filename, self.key, self.accountID, size_file, file_type)

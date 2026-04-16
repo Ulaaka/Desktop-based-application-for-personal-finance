@@ -1,7 +1,7 @@
 from Widgets.change_confirmation import Ui_change_confirmation
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from system_functions import manage_seconds_qt, system_functions
+from system_functions import TimerHelper, SystemHelpers
 class Change_confirmation_page(QDialog):
     finished = pyqtSignal() 
 
@@ -11,7 +11,7 @@ class Change_confirmation_page(QDialog):
         self._parent = parent
         self.duration = 90
         self.timer = QTimer(self)
-        self.system = system_functions()
+        self.system = SystemHelpers()
         self.code = self.system.send_reset_digits(6, userID=self.userID)
 
         self.ui = Ui_change_confirmation()
@@ -27,7 +27,7 @@ class Change_confirmation_page(QDialog):
         self.ui.timer_label.setText("01:30")
 
     def change_information_show(self):
-        self.timer_manager = manage_seconds_qt(self.ui.timer_label, self.timer, self.duration, expire_func=self.expire_func)
+        self.timer_manager = TimerHelper(self.ui.timer_label, self.timer, self.duration, expire_func=self.expire_func)
 
     def start_time(self):
         self.timer_manager.begin_timer()

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import  QWidget, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt, QPoint
-from queries import query_processor
+from queries import QueryProcessor
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from Widgets.account_control_page import Account_control_page
 from Widgets.change_confirmation_window import Change_confirmation_page
@@ -24,7 +24,7 @@ class Profile_page(QWidget):
         parent_window.ui.email_change_button.clicked.connect(self.change_user_mail)
 
     def show_profile_page(self):
-        query = query_processor()
+        query = QueryProcessor()
         tree_model = QStandardItemModel()
         tree_model.setHorizontalHeaderLabels(["Account Name", ""])
         parent_window = self._parent
@@ -76,7 +76,7 @@ class Profile_page(QWidget):
                 value.setStyleSheet("border: 2px solid black;")
 
     def change_username(self):
-        query = query_processor()
+        query = QueryProcessor()
         parent_window = self._parent
         state = self.username_button_state
         self.username_button_state = not state
@@ -89,7 +89,7 @@ class Profile_page(QWidget):
 
 
     def change_user_mail(self):
-        query = query_processor()
+        query = QueryProcessor()
         parent_window = self._parent
         state = self.mail_button_state
         self.mail_button_state = not state
@@ -112,7 +112,7 @@ class Profile_page(QWidget):
             self.show_profile_page()
 
     def navigate_to_account_control(self, name):
-        query = query_processor()
+        query = QueryProcessor()
         parent_window = self._parent
         accountID = query.get_accountID(name, self.userID)
         parent_window.update_parent(name, accountID)

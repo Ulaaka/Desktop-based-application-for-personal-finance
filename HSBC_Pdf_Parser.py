@@ -2,9 +2,9 @@ import pandas as pd
 import pdfplumber
 import re 
 from datetime import datetime
-from BASE_Classes import ParsingBase
+from base_classes import ParsingHelper
 # https://github.com/Anlanther/bank-statement-converter/blob/main/src/classes/BOCStatement.py#L28
-class HSBC_PDF_CONVERSION:
+class ParsingPdfHSBC:
 
     """
     Manages the parsing of the HSBC bank pdf
@@ -15,7 +15,7 @@ class HSBC_PDF_CONVERSION:
         detected_transactions = self.detect_transactions(text)
         self.corrected_transaction = self.correct_transactions(detected_transactions)
         self.classified_transactions = self.classify_transactions(self.corrected_transaction)
-        parser = ParsingBase()
+        parser = ParsingHelper()
 
         df = pd.DataFrame(self.classified_transactions)
         date_column = df[df.columns[0]]

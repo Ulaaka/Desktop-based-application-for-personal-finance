@@ -2,9 +2,9 @@ import sys, pycountry
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtCore import QPoint, QDate
 
-from queries import query_processor
+from queries import QueryProcessor
 from datetime import datetime
-from FILE_handling import file_handling
+from file_handle import file_handling
 
 from Widgets.financial_app import Ui_MainWindow
 from Widgets.account_selection_and_add_window import Account_selection_page
@@ -41,13 +41,13 @@ class MainWindow(QMainWindow):
         self.account_control_manager = Account_control_page(self.account_name, self)
         self.stats_manager = Stats_page(self)
 
-        self.query = query_processor()
+        self.query = QueryProcessor()
 
         self.MainWindow_signals_connection()
         self.home_page_handler()
 
     def home_page_handler(self):
-        query = query_processor()
+        query = QueryProcessor()
         options = query.compute_account_options(self.userID)
 
         if options is None:

@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QPushButton, QHeaderView, QFileDialog
 from PyQt5.QtCore import Qt, QDate, QSortFilterProxyModel
-from queries import query_processor
+from queries import QueryProcessor
 from Widgets.Table_View import ListModel
-from system_functions import system_functions
+from system_functions import SystemHelpers
 from Widgets.thread_worker import Thread_worker
 from pathlib import Path
 from datetime import datetime
@@ -15,7 +15,7 @@ class Home_page():
         self.filter_transaction = None
         self.current_time = datetime.now().strftime("%Y-%m-%d")
         self.download_folder_path = Path.home() / "Downloads"
-        self.system = system_functions()
+        self.system = SystemHelpers()
         self.home_signals_connect()
 
     def home_signals_connect(self):
@@ -32,7 +32,7 @@ class Home_page():
 
     def show_table(self):
             parent_window = self._parent
-            query = query_processor()
+            query = QueryProcessor()
             if not parent_window.accountID:
                 return
 
@@ -97,7 +97,7 @@ class Home_page():
                 lambda checked, id=transaction_id: self.handle_remove_button(id))
 
     def handle_remove_button(self, id):
-        query = query_processor()
+        query = QueryProcessor()
         query.delete_transaction(int(id))
         self.show_table()
 

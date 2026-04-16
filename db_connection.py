@@ -1,7 +1,7 @@
 import mysql.connector
 from decouple import config
 
-class database:
+class Database:
 
     def __init__(self):
 
@@ -18,4 +18,4 @@ class database:
 
         self.cursor = self.db.cursor(buffered=True)
 
-db  = database()
+db  = Database()

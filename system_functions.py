@@ -2,15 +2,15 @@ import random, os
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from database_connection import database
-from queries import query_processor
+from db_connection import database
+from db_queries import QueryProcessor
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.image import imread
 from pathlib import Path
 from datetime import datetime
-from BASE_Classes import cryptography
-class system_functions:
+from base_classes import CryptoHelper
+class SystemHelpers:
 
     """
     Manages the functions for authentication the user
@@ -19,9 +19,9 @@ class system_functions:
     def __init__(self):
         connection = database()
         self.db = connection.db
-        self.query = query_processor()
+        self.query = QueryProcessor()
         self.cursor = connection.cursor
-        self.crypto = cryptography()
+        self.crypto = CryptoHelper()
 
     # Generates random digits for user authentication for 2FA
     def generate_random_digits(self, digits_size):
@@ -119,8 +119,7 @@ class system_functions:
         next_enc_data_key = self.crypto.encrypt_data_key(next_wrapping_key, data_key)
         return next_enc_data_key, next_salt
 
-
-class manage_seconds_qt():
+class TimerHelper():
     def __init__(self, label, timer, duration, expire_func=None):
         self.duration = duration
         self.timer = timer

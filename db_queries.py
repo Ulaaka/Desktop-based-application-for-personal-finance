@@ -1,21 +1,18 @@
-from database_connection import database
+import re, pandas as pd, json
+from db_connection import Database
 from datetime import datetime
-import re
 from nltk.corpus import stopwords
 from geotext import GeoText
-import json
-import pandas as pd
-import pymysql
 from datetime import datetime
 
-class query_processor:
+class QueryProcessor:
 
     """
     Contains the functions for querying the database
     """
 
     def __init__(self):
-        self.connection = database()
+        self.connection = Database()
         connection = self.connection
         self.db = connection.db
         self.cursor = connection.cursor

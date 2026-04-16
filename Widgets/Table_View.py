@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QAbstractTableModel, Qt
-from queries import query_processor
+from queries import QueryProcessor
 # https://www.pythonguis.com/faq/editing-pyqt6-tableview/
 class ListModel(QAbstractTableModel):
     def __init__(self, data, parent, home_page):
@@ -28,7 +28,7 @@ class ListModel(QAbstractTableModel):
                 return str(value)
 
     def setData(self, index, value, role):
-        query = query_processor()
+        query = QueryProcessor()
         main_window = self._parent
         if role == Qt.ItemDataRole.EditRole:
             column =int(index.column())
@@ -98,7 +98,7 @@ class ListModelCategory(QAbstractTableModel):
                 return str(value)
 
     def setData(self, index, value, role):
-        query = query_processor()
+        query = QueryProcessor()
         main_window = self._parent
         if role == Qt.ItemDataRole.EditRole:
 

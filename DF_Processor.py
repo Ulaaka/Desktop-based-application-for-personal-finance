@@ -1,8 +1,8 @@
-from database_connection import database
-from BASE_Classes import password_class, ParsingBase
+from db_connection import Database
+from base_classes import PasswordHelper, ParsingHelper
 from datetime import datetime
 from decimal import Decimal
-from queries import query_processor
+from db_queries import QueryProcessor
 
 
 class ProcessingDF:
@@ -13,11 +13,11 @@ class ProcessingDF:
 
     def __init__(self, df, file_ID, userID, accountID):
 
-        connection = database()
+        connection = Database()
         self.db = connection.db
         self.cursor = connection.cursor
         self.accountID = accountID
-        self.query = query_processor()
+        self.query = QueryProcessor()
         self.file_ID = file_ID
         self.userID = userID
 
@@ -29,8 +29,8 @@ class ProcessingDF:
 
     # Inserts type classified transaction into the database
     def insert_transaction(self, accountID, dtb):
-        parser = ParsingBase()
-        query = query_processor()
+        parser = ParsingHelper()
+        query = QueryProcessor()
 
         # https://stackoverflow.com/questions/16476924/how-can-i-iterate-over-rows-in-a-pandas-dataframe
 

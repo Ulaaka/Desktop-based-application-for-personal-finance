@@ -7,12 +7,12 @@ from PyQt5.QtGui import QFont, QColor, QPalette
 from qtwidgets import PasswordEdit
 
 from decouple import config
-from database_connection import database
-from BASE_Classes import password_class, cryptography
-from system_functions import system_functions, manage_seconds_qt
-from queries import query_processor
+from db_connection import Database
+from base_classes import PasswordHelper, CryptoHelper
+from system_functions import SystemHelpers, TimerHelper
+from db_queries import QueryProcessor
 from MainWindow import MainWindow
-from ui_support_functions import ui_support_functions
+from ui_support_functions import UserInterfaceHelper
 import secrets,  base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
@@ -23,8 +23,8 @@ class login_page(QWidget):
         self.controller = controller
         self.db = db
         self.cursor = cursor
-        self.system = system_functions()
-        self.query = query_processor()
+        self.system = SystemHelpers()
+        self.query = QueryProcessor()
 
         self.user_interface()
 
@@ -36,7 +36,7 @@ class login_page(QWidget):
         # set the color of the background
         self.setAutoFillBackground(True)
         palette = self.palette()
-        palette.setColor(QPalette.Window, QColor(ui_support_functions.color_dic["login_page"]["background_color"]))
+        palette.setColor(QPalette.Window, QColor(UserInterfaceHelper.color_dic["login_page"]["background_color"]))
         self.setPalette(palette)
 
         # layout
@@ -49,7 +49,7 @@ class login_page(QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setFont(QFont('Arial', 20, QFont.Bold))
         title_color = title.palette()
-        title_color.setColor(QPalette.WindowText, QColor(ui_support_functions.color_dic["login_page"]["title_color"]))
+        title_color.setColor(QPalette.WindowText, QColor(UserInterfaceHelper.color_dic["login_page"]["title_color"]))
         title.setPalette(title_color)
 
         # Username input
@@ -70,7 +70,7 @@ class login_page(QWidget):
 
         # Login button
         login_btn = QPushButton('Log In')
-        login_btn.setStyleSheet(ui_support_functions.handle_button_style(True, ui_support_functions.color_dic["login_page"]['login_button_color']["normal"], ui_support_functions.color_dic["login_page"]['login_button_color']["focus"], underline_flag=False))
+        login_btn.setStyleSheet(UserInterfaceHelper.handle_button_style(True, UserInterfaceHelper.color_dic["login_page"]['login_button_color']["normal"], UserInterfaceHelper.color_dic["login_page"]['login_button_color']["focus"], underline_flag=False))
         login_btn.setFont(QFont('Arial', 15, QFont.Bold))
         login_btn.setFixedHeight(50)
         login_btn.setCursor(Qt.PointingHandCursor)
@@ -78,7 +78,7 @@ class login_page(QWidget):
 
         # sign up button
         signup_btn = QPushButton('Create new account')
-        signup_btn.setStyleSheet(ui_support_functions.handle_button_style(True, ui_support_functions.color_dic["login_page"]["sign_up_button_color"]["normal"], ui_support_functions.color_dic["login_page"]["sign_up_button_color"]["focus"], underline_flag=False))
+        signup_btn.setStyleSheet(UserInterfaceHelper.handle_button_style(True, UserInterfaceHelper.color_dic["login_page"]["sign_up_button_color"]["normal"], UserInterfaceHelper.color_dic["login_page"]["sign_up_button_color"]["focus"], underline_flag=False))
         signup_btn.setFont(QFont('Arial', 15, QFont.Bold))
         signup_btn.setFixedHeight(50)
         signup_btn.setCursor(Qt.PointingHandCursor)
@@ -86,7 +86,7 @@ class login_page(QWidget):
 
         # Forgot password link
         forgot_password = QPushButton('Forgotten password?')
-        forgot_password.setStyleSheet(ui_support_functions.handle_button_style(False, "transparent", "green",  underline_flag=True))
+        forgot_password.setStyleSheet(UserInterfaceHelper.handle_button_style(False, "transparent", "green",  underline_flag=True))
         forgot_password.setCursor(Qt.PointingHandCursor)
         forgot_password.clicked.connect(self.handle_forgot_password)
 
@@ -106,9 +106,9 @@ class login_page(QWidget):
     def handle_login(self):
         username_local = self.username.text()
         password_local = self.password.text()
-        query = query_processor()
-        password_manager = password_class()
-        crypto = cryptography()
+        query = QueryProcessor()
+        password_manager = PasswordHelper()
+        crypto = CryptoHelper()
 
         if not username_local or not password_local:
             QMessageBox.warning(self, 'Error', 'Please enter both of the credentials, thank you')
@@ -155,7 +155,7 @@ class sign_up_page(QWidget):
         self.db = db
         self.cursor = cursor
         self.user_interface()
-        self.query = query_processor()
+        self.query = QueryProcessor()
 
     def user_interface(self):
         # set the size and name
@@ -164,7 +164,7 @@ class sign_up_page(QWidget):
         # set the color of the background
         self.setAutoFillBackground(True)
         palette = self.palette()
-        palette.setColor(QPalette.Window, QColor(ui_support_functions.color_dic["sign_up_page"]["background_color"]))
+        palette.setColor(QPalette.Window, QColor(UserInterfaceHelper.color_dic["sign_up_page"]["background_color"]))
         self.setPalette(palette)
 
         # layout
@@ -177,7 +177,7 @@ class sign_up_page(QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setFont(QFont('Arial', 20, QFont.Bold))
         title_color = title.palette()
-        title_color.setColor(QPalette.WindowText, QColor(ui_support_functions.color_dic["sign_up_page"]['title_color']))
+        title_color.setColor(QPalette.WindowText, QColor(UserInterfaceHelper.color_dic["sign_up_page"]['title_color']))
         title.setPalette(title_color)
 
         # Username input
@@ -207,7 +207,7 @@ class sign_up_page(QWidget):
 
         # Login button
         submit_btn = QPushButton('Submit')
-        submit_btn.setStyleSheet(ui_support_functions.handle_button_style(True, ui_support_functions.color_dic["sign_up_page"]["submit_button_color"]["normal"], ui_support_functions.color_dic["sign_up_page"]["submit_button_color"]["focus"], underline_flag=False))
+        submit_btn.setStyleSheet(UserInterfaceHelper.handle_button_style(True, UserInterfaceHelper.color_dic["sign_up_page"]["submit_button_color"]["normal"], UserInterfaceHelper.color_dic["sign_up_page"]["submit_button_color"]["focus"], underline_flag=False))
         submit_btn.setFont(QFont('Arial', 15, QFont.Bold))
         submit_btn.setFixedHeight(50)
         submit_btn.setCursor(Qt.PointingHandCursor)
@@ -215,7 +215,7 @@ class sign_up_page(QWidget):
 
         # already have an account?
         got_account = QPushButton('Already have an account?')
-        got_account.setStyleSheet(ui_support_functions.handle_button_style(False, "transparent", 'green',  underline_flag=True))
+        got_account.setStyleSheet(UserInterfaceHelper.handle_button_style(False, "transparent", 'green',  underline_flag=True))
         got_account.setCursor(Qt.PointingHandCursor)
         got_account.clicked.connect(self.handle_got_account)
 
@@ -238,7 +238,7 @@ class sign_up_page(QWidget):
         password_local = self.password.text()
         email_local = self.email.text()
 
-        password_manager = password_class()
+        password_manager = PasswordHelper()
 
         result = self.query.get_userID(username_local)
 
@@ -259,7 +259,7 @@ class sign_up_page(QWidget):
             return
 
         # random salt
-        crypto = cryptography()
+        crypto = CryptoHelper()
 
         salt = os.urandom(32)
         wrapping_key = crypto.generate_key(password_local, salt)
@@ -276,7 +276,7 @@ class validation_page(QWidget):
         self.duration = 90
         self.time_left_int = self.duration
         self.timer = QTimer(self)
-        self.system = system_functions()
+        self.system = SystemHelpers()
         self.controller = controller
         self.db = db
         self.cursor = cursor
@@ -291,7 +291,7 @@ class validation_page(QWidget):
         # set the color of the background 
         self.setAutoFillBackground(True)
         palette = self.palette()
-        palette.setColor(QPalette.Window, QColor(ui_support_functions.color_dic["validation_page"]['background_color']))
+        palette.setColor(QPalette.Window, QColor(UserInterfaceHelper.color_dic["validation_page"]['background_color']))
         self.setPalette(palette)
 
         # layout
@@ -304,12 +304,12 @@ class validation_page(QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setFont(QFont('Arial', 20, QFont.Bold))
         title_color = title.palette()
-        title_color.setColor(QPalette.WindowText, QColor(ui_support_functions.color_dic["validation_page"]['title_color']))
+        title_color.setColor(QPalette.WindowText, QColor(UserInterfaceHelper.color_dic["validation_page"]['title_color']))
         title.setPalette(title_color)
 
         # Login button
         submit_btn = QPushButton('Submit')
-        submit_btn.setStyleSheet(ui_support_functions.handle_button_style(True, ui_support_functions.color_dic["validation_page"]['submit_button_color']['normal'],ui_support_functions.color_dic["validation_page"]['submit_button_color']['focus'], underline_flag=False))
+        submit_btn.setStyleSheet(UserInterfaceHelper.handle_button_style(True, UserInterfaceHelper.color_dic["validation_page"]['submit_button_color']['normal'],UserInterfaceHelper.color_dic["validation_page"]['submit_button_color']['focus'], underline_flag=False))
         submit_btn.setFont(QFont('Arial', 15, QFont.Bold))
         submit_btn.setFixedHeight(50)
         submit_btn.setCursor(Qt.PointingHandCursor)
@@ -343,7 +343,7 @@ class validation_page(QWidget):
         layout.addWidget(self.timerLabel)
         layout.addStretch()
 
-        self.timer_manager = manage_seconds_qt(label=self.timerLabel, timer=self.timer, duration=self.duration, expire_func=self.expire_func)
+        self.timer_manager = TimerHelper(label=self.timerLabel, timer=self.timer, duration=self.duration, expire_func=self.expire_func)
 
     def expire_func(self):
         self.login_page.random_digits = self.system.send_reset_digits(
@@ -396,7 +396,7 @@ class reset_password(QWidget):
         # set the color of the background 
         self.setAutoFillBackground(True)
         palette = self.palette()
-        palette.setColor(QPalette.Window, QColor(ui_support_functions.color_dic["reset_password"]["background_color"]))
+        palette.setColor(QPalette.Window, QColor(UserInterfaceHelper.color_dic["reset_password"]["background_color"]))
         self.setPalette(palette)
 
         # layout
@@ -409,7 +409,7 @@ class reset_password(QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setFont(QFont('Arial', 20, QFont.Bold))
         title_color = title.palette()
-        title_color.setColor(QPalette.WindowText, QColor(ui_support_functions.color_dic["reset_password"]["title_color"]))
+        title_color.setColor(QPalette.WindowText, QColor(UserInterfaceHelper.color_dic["reset_password"]["title_color"]))
         title.setPalette(title_color)
 
         # New Password input
@@ -427,7 +427,7 @@ class reset_password(QWidget):
 
         # Login button
         submit_btn = QPushButton('Submit')
-        submit_btn.setStyleSheet(ui_support_functions.handle_button_style(True, ui_support_functions.color_dic["reset_password"]["submit_button_color"]['normal'], ui_support_functions.color_dic["reset_password"]["submit_button_color"]['focus'], underline_flag=False))
+        submit_btn.setStyleSheet(UserInterfaceHelper.handle_button_style(True, UserInterfaceHelper.color_dic["reset_password"]["submit_button_color"]['normal'], UserInterfaceHelper.color_dic["reset_password"]["submit_button_color"]['focus'], underline_flag=False))
         submit_btn.setFont(QFont('Arial', 15, QFont.Bold))
         submit_btn.setFixedHeight(50)
         submit_btn.setCursor(Qt.PointingHandCursor)
@@ -453,8 +453,8 @@ class reset_password(QWidget):
         self.setLayout(layout)
 
     def compare_password(self):
-        password_manager  = password_class()
-        query = query_processor()
+        password_manager  = PasswordHelper()
+        query = QueryProcessor()
         safety = password_manager.check_password_safety(self.password_1.text())
         same = self.password_1.text() == self.password_2.text()
         if not safety:
@@ -482,20 +482,21 @@ class reset_password(QWidget):
             # create new key and everything
 
             # random salt
-            crypto = cryptography()
+            crypto = CryptoHelper()
 
             new_salt = os.urandom(32)
             new_wrapping_key = crypto.generate_key(new_password, new_salt)
             new_data_key = base64.urlsafe_b64encode(secrets.token_bytes(32))
             new_encrypted_data_key = crypto.encrypt_data_key(new_wrapping_key, new_data_key)
             query.change_data_key_salt(new_encrypted_data_key, new_salt, userID)
+            query.delete_user_files(userID)
             self.controller.show_login()
 
 class User_authentication(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        connection = database()
+        connection = Database()
         self.db = connection.db
         self.cursor = connection.cursor
 

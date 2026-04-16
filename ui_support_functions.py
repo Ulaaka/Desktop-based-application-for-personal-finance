@@ -1,5 +1,5 @@
 
-class ui_support_functions:
+class UserInterfaceHelper:
     color_dic = {
         "login_page": {
             "title_color" :"#32CD32",

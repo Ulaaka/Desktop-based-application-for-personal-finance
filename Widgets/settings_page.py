@@ -1,18 +1,18 @@
 from PyQt5.QtWidgets import QMessageBox, QLineEdit, QPushButton, QHeaderView
 from PyQt5.QtCore import QPoint, QSortFilterProxyModel, Qt
 
-from queries import query_processor
-from BASE_Classes import password_class, cryptography
+from db_queries import QueryProcessor
+from base_classes import password_class, CryptoHelper
 from Widgets.change_confirmation_window import Change_confirmation_page
 from Widgets.Table_View import ListModelCategory
 from Widgets.home_page import Home_page
-from system_functions import system_functions
+from system_functions import SystemHelpers
 import os, base64, secrets
 class Change_password_page():
     def __init__(self, parent):
         self._parent = parent
         self.password_manager = password_class()
-        self.query = query_processor()
+        self.query = QueryProcessor()
         self.objective = 0
         self.change_password_signals_connect()
 
@@ -31,9 +31,9 @@ class Change_password_page():
         )
 
     def change_password(self):
-        crypto = cryptography()
-        system = system_functions()
-        query = query_processor()
+        crypto = CryptoHelper()
+        system = SystemHelpers()
+        query = QueryProcessor()
         parent_window = self._parent
         current_password = parent_window.ui.current_password_line.text()
         new_password = parent_window.ui.new_password_line.text()
@@ -119,7 +119,7 @@ class Change_password_page():
 class Delete_user_account():
     def __init__(self, parent):
         self._parent = parent
-        self.query = query_processor()
+        self.query = QueryProcessor()
         self.password_manager = password_class()
         self.delete_user_signals_connect()
 
@@ -151,7 +151,7 @@ class Change_category():
         parent_window.ui.category_table.verticalHeader().setVisible(False)
 
     def show_category_table(self):
-        query = query_processor()
+        query = QueryProcessor()
         parent_window = self._parent
         if not parent_window.accountID:
             QMessageBox.warning(parent_window, "error", "Please create an account first")
@@ -192,7 +192,7 @@ class Change_category():
 
 
     def handle_add_button(self):
-        query = query_processor()
+        query = QueryProcessor()
         parent_window = self._parent
         description = self.model.description
         name = self.model.name
@@ -203,7 +203,7 @@ class Change_category():
 
     def handle_remove_button(self, categoryID, category_name):
         parent_window = self._parent
-        query = query_processor()
+        query = QueryProcessor()
         query.delete_category(int(categoryID))
         query.update_transaction_after_deletion_description(parent_window.userID, parent_window.accountID, str(category_name))
         self.show_category_table()

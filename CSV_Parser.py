@@ -1,7 +1,7 @@
 
 import pandas as pd
 from datetime import datetime
-from BASE_Classes import ParsingBase
+from base_classes import ParsingHelper
 import numpy as np
 
 class ParsingCSV:
@@ -14,7 +14,7 @@ class ParsingCSV:
 
         # https://www.geeksforgeeks.org/python/how-to-do-fuzzy-matching-on-pandas-dataframe-column-using-python/
 
-        parser = ParsingBase()
+        parser = ParsingHelper()
         columns_list = list(pd.read_csv(pdf_name, nrows=0).columns.tolist())
 
         mat2, selected_columns = parser.choose_ratio(columns_list)

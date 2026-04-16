@@ -2,11 +2,11 @@ import sys, shutil
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from PyQt5.QtCore import QDate
 from Widgets.live_output_window import Live_output_window
-from FILE_handling import file_handling
+from file_handle import file_handling
 from Widgets.stream import Stream
 from Widgets.thread_worker import Thread_worker
 from decouple import config
-from queries import query_processor
+from queries import QueryProcessor
 from Widgets.home_page import Home_page
 from datetime import date
 class Upload_page():
@@ -24,7 +24,7 @@ class Upload_page():
 
     def add_transaction(self):
         parent_window = self._parent
-        query = query_processor()
+        query = QueryProcessor()
         if parent_window.accountID is None:
             QMessageBox.warning(
             parent_window, "Error", "Please create an account first")

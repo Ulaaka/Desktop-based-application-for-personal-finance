@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import  QPushButton, QHeaderView, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from Widgets.disclaimer_window import Disclaimer_window
-from queries import query_processor
-from FILE_handling import file_handling
+from queries import QueryProcessor
+from file_handle import FileHandling
 
 class Files_page():
     def __init__(self, parent):
@@ -16,7 +16,7 @@ class Files_page():
 
     def show_files(self):
         parent_window = self._parent
-        query = query_processor()
+        query = QueryProcessor()
         if not parent_window.accountID:
             self.set_files(False)
             parent_window.ui.no_file_label.setText("No files to show, please create an account first")
@@ -40,7 +40,7 @@ class Files_page():
                 view_button.clicked.connect(lambda clicked, id=fileID: self.view_file_with_ID(id))
 
     def view_file_with_ID(self, id):
-        file_handle = file_handling( self._parent.userID,  self._parent.accountID,  self._parent.key)
+        file_handle = FileHandling( self._parent.userID,  self._parent.accountID,  self._parent.key)
         file_handle.view_file(fileID=id)
 
     def delete_file_wht_ID(self, fileID):
@@ -49,7 +49,7 @@ class Files_page():
 
     def files_exist(self):
         parent_window = self._parent
-        file_handle = file_handling( self._parent.userID,  self._parent.accountID,  self._parent.key)
+        file_handle = FileHandling( self._parent.userID,  self._parent.accountID,  self._parent.key)
         self.tree_model = QStandardItemModel()
         self.tree_model.setHorizontalHeaderLabels(["Name", "Size", "Kind", "Date Added", "", ""])
 

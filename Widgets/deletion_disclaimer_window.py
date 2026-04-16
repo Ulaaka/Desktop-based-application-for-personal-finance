@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QDialog
 from Widgets.disclaimer_widget import Ui_Disclaimer
-from queries import query_processor
+from queries import QueryProcessor
 
 class Deletion_disclaimer_window(QDialog):
     def __init__(self, parent):
@@ -10,7 +10,7 @@ class Deletion_disclaimer_window(QDialog):
         self.accountID = parent.accountID
         self.userID = parent.userID
         self._parent = parent
-        self.query = query_processor()
+        self.query = QueryProcessor()
         self.ui.setupUi(self)
         self.signal_connect()
 
