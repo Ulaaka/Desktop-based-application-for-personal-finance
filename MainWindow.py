@@ -184,14 +184,13 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentWidget(self.ui.stats_page)
         self.stats_manager = Stats_page(self)
 
-
     def profile_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.profile_page)
         self.profile_manager.show_profile_page()
 
     def settings_page_show(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.settings_page)
-        self.ui.stackedWidget_2.setCurrentWidget(self.ui.category_table_page)
+        self.ui.settings_stack.setCurrentWidget(self.ui.category_table_page)
         self.category_change_handle.show_category_table()
 
         # when the file window close
