@@ -159,7 +159,6 @@ class query_processor:
         output = self.cursor.fetchone()
         return output[0] if output else None
 
-
     # Returns userID
     def get_userID(self, username):
         sql = "SELECT userID FROM users WHERE username = %s"

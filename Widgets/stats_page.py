@@ -185,7 +185,6 @@ class Stats_page():
         self.scroll_layout.addStretch()
 
     def show_graph(self, graph):
-        parent_window = self._parent
         self.graph_name = graph
         self.update_filters(graph)
         self.update_graph()
@@ -512,6 +511,8 @@ class Stats_page():
 
                 in_result_list.append((idx+1, int(result_in)))
                 out_result_list.append((idx+1, int(result_out)))
+                for axis in graph.axes():
+                    graph.removeAxis(axis)
                 graph.removeAllSeries()
 
                 in_series = QLineSeries()

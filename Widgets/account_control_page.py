@@ -14,7 +14,6 @@ class Account_control_page(QWidget):
         self.objective = 0
         self.query = query_processor()
         self.account_control_signals_connect()
-        self.show_account_control_page()
 
     def account_control_signals_connect(self):
         parent_window = self._parent
