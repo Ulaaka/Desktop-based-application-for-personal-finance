@@ -22,7 +22,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="account_name_type">
+    <widget class="QLineEdit" name="name_select_combo">
      <property name="text">
       <string/>
      </property>
@@ -39,7 +39,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="account_type_combo">
+    <widget class="QComboBox" name="type_select_combo">
      <property name="editable">
       <bool>false</bool>
      </property>
@@ -78,7 +78,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="account_currency_combo">
+    <widget class="QComboBox" name="currency_select_combo">
      <property name="editable">
       <bool>true</bool>
      </property>

@@ -224,6 +224,7 @@ class MainWindow(QMainWindow):
         Opens home page, its corresponding widgets
         """
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page)
+        self.home_manager = HomePage(self)
         self.home_manager.show_table()
 
     def upload_page_show(self):

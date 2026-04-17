@@ -53,7 +53,6 @@ class UploadPage():
                 parent_window, "Error", "Entered date is not valid")
                 return
 
-            #transaction_list.append((accountID, self.file_ID, self.change_to_date(row[0]), row[1], row[2], category, Decimal(row[3]),  Decimal(row[4])))
             category = query.return_updated_category(parent_window.userID, parent_window.accountID, description)
             transaction_list = [(parent_window.accountID, 1, date_input, type, description, category, amount, balance)]
             query.insert_into_transactions(transaction_list)
@@ -86,6 +85,7 @@ class UploadPage():
         # process the files
         files_process = FileHandling(parent_window.userID, parent_window.accountID, parent_window.key)
         self.worker = ThreadWorker(files_process.process_files_in_folder)
+        self.worker.done.connect(self.finished_upload)
         self.worker.start()
         self.print_output.input_text.connect(self.get_output)
         self.live_output.ui.textBrowser.adjustSize()
@@ -96,6 +96,10 @@ class UploadPage():
         stripped_list = [line for line in text.splitlines() if line.strip() != ""]
         lines = "\n".join(stripped_list)
         self.live_output.ui.textBrowser.append(lines)
+
+    def finished_upload(self):
+        self.home_page = HomePage(self._parent)
+        self.home_page.show_table() 
 
 # custom class for capturing print outputs
 class Stream(QObject):

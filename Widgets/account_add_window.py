@@ -16,20 +16,20 @@ class AccountAddPage(QDialog):
         self.account_add_signals_connection()
 
     def account_add_signals_connection(self):
-        self.ui.account_currency_combo.addItems(self.currencies)
+        self.ui.currency_select_combo.addItems(self.currencies)
         self.ui.submit_button.clicked.connect(self.add_account_database)
-        currency_search = self.ui.account_currency_combo.lineEdit()
+        currency_search = self.ui.currency_select_combo.lineEdit()
         currency_search.setPlaceholderText("Search currency...")
-        completer = QCompleter(self.ui.account_currency_combo.model(), self)
+        completer = QCompleter(self.ui.currency_select_combo.model(), self)
 
         completer.setFilterMode(Qt.MatchContains)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
 
     def add_account_database(self):
         query = QueryProcessor()
-        account_name = self.ui.account_name_type.text()
-        account_type = self.ui.account_type_combo.currentText()
-        account_currency = self.ui.account_currency_combo.currentText()[:3]
+        account_name = self.ui.name_select_combo.text()
+        account_type = self.ui.type_select_combo.currentText()
+        account_currency = self.ui.currency_select_combo.currentText()[:3]
         if account_name and account_type and account_currency:
             accountID = query.insert_account(self.userID, account_name, account_type, account_currency)
 
