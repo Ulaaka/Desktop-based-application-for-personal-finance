@@ -2,6 +2,7 @@
 from PyQt5.QtWidgets import  QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QColor, QPalette
+from functools import partial
 
 from system_functions import SystemHelpers, TimerHelper
 from ui_helper import UserInterfaceHelper
@@ -67,8 +68,8 @@ class ValidationWindow(QWidget):
             square.setAlignment(centering)
             square.setObjectName("digit_box")
 
-            square.textChanged.connect(lambda: self.to_next_box(idx))
-            square.keyPressEvent = lambda event: self.to_prev_box(idx, event)
+            square.textChanged.connect(partial(self.to_next_box, idx))
+            square.keyPressEvent = partial(self.to_prev_box, idx)
 
             square_layout.addWidget(square)
             self.squares.append(square)
