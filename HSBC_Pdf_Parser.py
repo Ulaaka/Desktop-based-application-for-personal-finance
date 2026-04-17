@@ -18,10 +18,10 @@ class ParsingPdfHSBC:
         """
 
         text = self.return_text(pdf_name)
-        detected_transactions = self.detect_transactions(text)
+        detected_transactions, first = self.detect_transactions(text)
+        balance = self.get_first_balance_line(text, first)
         self.corrected_transaction = self.correct_transactions(detected_transactions)
-        print(self.corrected_transaction)
-        self.classified_transactions = self.classify_transactions(self.corrected_transaction)
+        self.classified_transactions = self.classify_transactions(self.corrected_transaction, float(balance))
         parser = ParsingHelper()
 
         df = pd.DataFrame(self.classified_transactions)
@@ -42,6 +42,14 @@ class ParsingPdfHSBC:
                 text_list.append(page.extract_text(x_tolerance=1))
             return " ".join(text_list)
 
+    def get_first_balance_line(self, text, idx):
+        """
+        Find the lines containing the first starting balance, and get the initial balance
+        """
+        line = text.split("\n")[idx]
+        match = re.search(r'BALANCE BROUGHT FORWARD.*?([\d.]+)$', line)
+        if match:
+            return match.group(1)
 
     def detect_transactions(self, text):
         """
@@ -69,7 +77,7 @@ class ParsingPdfHSBC:
                 continue
             transaction_lines.append(i.replace(",", ""))
 
-        return transaction_lines
+        return transaction_lines, first
 
     def new_transaction_func(self, i):
         """
@@ -163,7 +171,7 @@ class ParsingPdfHSBC:
             'balance': None if parts[2] == "None" else float(parts[2])
         }
 
-    def classify_transactions(self, transactions, initial_balance=89.78):
+    def classify_transactions(self, transactions, initial_balance):
         """
         Classify transactions and create DataFrame with Credit/Debit columns
         """
