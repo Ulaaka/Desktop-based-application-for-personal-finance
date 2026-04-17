@@ -1,0 +1,135 @@
+import os, secrets,  base64
+
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QColor, QPalette
+
+from base_classes import PasswordHelper, CryptoHelper
+from db_queries import QueryProcessor
+from ui_helper import UserInterfaceHelper
+
+
+class SignUpWindow(QWidget):
+
+    # https://doc.qt.io/qt-6/stylesheet-reference.html
+    def __init__(self, controller, db, cursor):
+        super().__init__()
+        self.controller = controller
+        self.db = db
+        self.cursor = cursor
+        self.user_interface()
+        self.query = QueryProcessor()
+
+    def user_interface(self):
+        # set the size and name
+        self.setWindowTitle('Sign Up')
+        self.setFixedSize(400, 500)
+        # set the color of the background
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        palette.setColor(QPalette.Window, QColor(UserInterfaceHelper.color_dic["sign_up_page"]["background_color"]))
+        self.setPalette(palette)
+
+        # layout
+        layout = QVBoxLayout()
+        layout.setContentsMargins(50, 70, 50, 70)
+        layout.setSpacing(25)
+
+        # Title
+        title = QLabel('Create a new account')
+        title.setAlignment(Qt.AlignCenter)
+        title.setFont(QFont('Arial', 20, QFont.Bold))
+        title_color = title.palette()
+        title_color.setColor(QPalette.WindowText, QColor(UserInterfaceHelper.color_dic["sign_up_page"]['title_color']))
+        title.setPalette(title_color)
+
+        # Username input
+        self.username = QLineEdit()
+        self.username.setPlaceholderText('Username')
+        self.username.setObjectName("input_field")
+        self.username.setFont(QFont('Arial', 15))
+
+        # Password input
+        self.password = QLineEdit()
+        self.password.setEchoMode(QLineEdit.Password)
+        self.password.setPlaceholderText('Password')
+        self.password.setObjectName("input_field")
+        self.password.setFont(QFont('Arial', 15))
+        self.password.setToolTip(
+            "Your password must be at least 8 characters \n"
+            "should include: \n"
+            "- a combination of numbers\n"
+            "- letters\n"
+            "- special characters (!$@%)"
+        )
+
+        # email input
+        self.email = QLineEdit()
+        self.email.setPlaceholderText('Email')
+        self.email.setObjectName("input_field")
+        self.email.setFont(QFont('Arial', 15))
+
+        # Login button
+        submit_btn = QPushButton('Submit')
+        submit_btn.setStyleSheet(UserInterfaceHelper.handle_button_style(True, UserInterfaceHelper.color_dic["sign_up_page"]["submit_button_color"]["normal"], UserInterfaceHelper.color_dic["sign_up_page"]["submit_button_color"]["focus"], underline_flag=False))
+        submit_btn.setFont(QFont('Arial', 15, QFont.Bold))
+        submit_btn.setFixedHeight(50)
+        submit_btn.setCursor(Qt.PointingHandCursor)
+        submit_btn.clicked.connect(self.handle_submit)
+
+        # already have an account?
+        got_account = QPushButton('Already have an account?')
+        got_account.setStyleSheet(UserInterfaceHelper.handle_button_style(False, "transparent", 'green',  underline_flag=True))
+        got_account.setCursor(Qt.PointingHandCursor)
+        got_account.clicked.connect(self.handle_got_account)
+
+        # Add widgets to layout
+        layout.addWidget(title)
+        layout.addWidget(self.username)
+        layout.addWidget(self.password)
+        layout.addWidget(self.email)
+        layout.addWidget(submit_btn)
+        layout.addWidget(got_account, alignment=Qt.AlignCenter)
+        layout.addStretch()
+        self.setLayout(layout)
+
+    def handle_got_account(self):
+        self.controller.show_login()
+        pass
+
+    def handle_submit(self):
+        username_local = self.username.text()
+        password_local = self.password.text()
+        email_local = self.email.text()
+
+        password_manager = PasswordHelper()
+
+        result = self.query.get_userID(username_local)
+
+        if not username_local or not password_local or not email_local:
+            QMessageBox.warning(self, 'Error', 'Please enter all  the credentials, thank you')
+            return
+
+        if result:
+            QMessageBox.warning(self, 'Error', 'Username already exists, please try another username')
+            return
+
+        if not password_manager.check_password_safety(password_local):
+            QMessageBox.warning(self, 'Not Satisfied', 'Password Requirement not satisfied')
+            return
+
+        if not password_manager.check_email_validity(email_local):
+            QMessageBox.warning(self, 'Invalid', 'Invalid email')
+            return
+
+        # random salt
+        crypto = CryptoHelper()
+
+        salt = os.urandom(32)
+        wrapping_key = crypto.generate_key(password_local, salt)
+        data_key = base64.urlsafe_b64encode(secrets.token_bytes(32))
+        encrypted_data_key = crypto.encrypt_data_key(wrapping_key, data_key)
+
+        hashed_password = password_manager.hash_password(password_local)
+        self.query.insert_user(username_local, hashed_password, email_local, encrypted_data_key, salt)
+        self.controller.show_login()

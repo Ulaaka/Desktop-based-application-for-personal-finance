@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
     def __init__(self, controller , key, userID):
         """
         Constructor for the main window class
-        Initialises the home page 
+        Initialises the home page
         """
         super(MainWindow, self).__init__()
 
