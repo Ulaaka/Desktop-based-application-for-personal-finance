@@ -28,6 +28,7 @@ class ParsingPdfHSBC:
         date_column = df[df.columns[0]]
         parser.change_date_type(df.loc[0, df.columns[0]] , date_column, df)
 
+        # Remove extra amount column if detected
         df = parser.unify_amount_columns(df)
         self.df = df
 
@@ -73,6 +74,7 @@ class ParsingPdfHSBC:
     def new_transaction_func(self, i):
         """
         Returns the beginning new transaction by detecting the date
+        :return: the beginning of transaction
         """
         regex_date = r"\b\d{1,2}\s+[A-Za-z]{3,9}\s+\d{2}\b"
         return re.search(regex_date, i)

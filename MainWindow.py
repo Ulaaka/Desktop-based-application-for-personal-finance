@@ -18,11 +18,13 @@ from Widgets.graphs_page import GraphPage
 
 class MainWindow(QMainWindow):
     """
-    Manages main application widgets interaction
+    Main Window controller for the application
+    Coordinates pages' navigation, account selection and interaction between different UI widgets.
     """
     def __init__(self, controller , key, userID):
         """
-        Constructor for MainWindow
+        Constructor for the main window class
+        Initialises the home page 
         """
         super(MainWindow, self).__init__()
 
@@ -95,7 +97,8 @@ class MainWindow(QMainWindow):
 
     def update_parent(self, option, accountID):
         """
-        Updates the main variables the app where the window/pages depend on
+        Updates the main variables of the app where the window/pages depend on
+        After account is changed, widget are refreshed to get accurate information/state
         """
         self.account_name = option
         self.accountID = accountID
@@ -122,7 +125,7 @@ class MainWindow(QMainWindow):
 
     def update_account(self, new_account_name, new_accountID):
         """
-        Order of updates following the change of the account
+        Order of update actions when account is updated
         """
         self.account_name = new_account_name
         self.accountID = new_accountID
@@ -276,6 +279,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
+    # loads style file where widget styles are defined
     with open('style.qss', 'r') as styling:
         style = styling.read()
 
