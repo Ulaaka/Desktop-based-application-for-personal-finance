@@ -9,12 +9,12 @@ from Widgets.app_table_helper import TransactionTable
 from system_functions import SystemHelpers
 from Widgets.thread_worker import ThreadWorker
 
-
 class HomePage():
     def __init__(self, parent):
         self._parent = parent
         self.transactions = None
         self.filter_transaction = None
+        self.current_day = datetime.today().date()
         self.current_time = datetime.now().strftime("%Y-%m-%d")
         self.download_folder_path = Path.home() / "Downloads"
         self.system = SystemHelpers()
@@ -33,8 +33,8 @@ class HomePage():
         parent_window.ui.end_date_edit.setCalendarPopup(True)
 
     def show_table(self):
-            parent_window = self._parent
             query = QueryProcessor()
+            parent_window = self._parent
             if not parent_window.accountID:
                 return
 
@@ -45,40 +45,47 @@ class HomePage():
             else:
                 self.set_table(True)
 
-                min_date, max_date, transactions = self.system.set_select_dates(self.transactions)
+                min_date, _, transactions = self.system.set_select_dates(self.transactions)
                 self.transactions = transactions
 
-                if parent_window.start_date is None and parent_window.end_date is  None:
-                    parent_window.start_date = min_date
-                    parent_window.end_date = datetime.today().date()
+                parent_window.start_date = min_date
+                parent_window.end_date = self.current_day
 
-                parent_window.ui.start_date_edit.setDate(QDate(parent_window.start_date.year, parent_window.start_date.month, parent_window.start_date.day))
-                parent_window.ui.end_date_edit.setDate(QDate(parent_window.end_date.year, parent_window.end_date.month, parent_window.end_date.day))
+                parent_window.ui.start_date_edit.setDate(QDate(min_date.year, min_date.month, min_date.day))
+                parent_window.ui.end_date_edit.setDate(QDate(self.current_day.year, self.current_day.month, self.current_day.day))
 
-                if (parent_window.start_date < min_date and parent_window.end_date > max_date):
-                    return
-                else:
-                    self.filter_transaction = self.transactions[self.transactions.iloc[:, 3].dt.date.between(parent_window.start_date, parent_window.end_date)]
+                self.initalise(min_date, self.current_day)
 
-                # -- TABLE LOADING -- 
-                self.model = TransactionTable(self.filter_transaction, parent_window, self)
-                self.data = self.filter_transaction
+    def initalise(self, start_date, end_date):
+        parent_window = self._parent
+        if self.transactions is None:
+            return
+        if start_date < parent_window.start_date:
+            return
+        if end_date > parent_window.end_date:
+            return
+        self.filter_transaction = self.transactions[self.transactions.iloc[:, 3].dt.date.between(start_date, end_date)]
 
-                # Set the search filter for the table
-                # inspired from:  https://www.youtube.com/watch?v=53bZSTSLUqI
+        # -- TABLE LOADING -- 
+        self.model = TransactionTable(self.filter_transaction, parent_window, self)
+        self.data = self.filter_transaction
 
-                self.proxy_model.setSourceModel(self.model)
-                self.proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
-                self.proxy_model.setFilterKeyColumn(5)
-                parent_window.ui.search_transaction_line.textChanged.connect(lambda text: self.filtered_search(text, self.proxy_model))
-                parent_window.ui.tableView.setModel(self.proxy_model)
+        # Set the search filter for the table
+        # inspired from:  https://www.youtube.com/watch?v=53bZSTSLUqI
 
-                self.load_buttons(self.proxy_model)
+        self.proxy_model.setSourceModel(self.model)
+        self.proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.proxy_model.setFilterKeyColumn(5)
+        parent_window.ui.search_transaction_line.textChanged.connect(lambda text: self.filtered_search(text, self.proxy_model))
+        parent_window.ui.tableView.setModel(self.proxy_model)
 
-                # Hides the ID columns of dataframe
-                hidden_columns = [0, 1, 2]
-                for i in hidden_columns:
-                    parent_window.ui.tableView.setColumnHidden(i, True)
+        self.load_buttons(self.proxy_model)
+
+        # Hides the ID columns of dataframe
+        hidden_columns = [0, 1, 2]
+        for i in hidden_columns:
+            parent_window.ui.tableView.setColumnHidden(i, True)
+
 
     def filtered_search(self, text, proxy):
         proxy.setFilterRegExp(text)
@@ -118,12 +125,12 @@ class HomePage():
     def get_filter_date(self, start=None):
         parent_window =self._parent
         if start is True:
-            value = parent_window.ui.start_date_edit.date()
-            parent_window.start_date  = value.toPyDate()
+            value = parent_window.ui.start_date_edit.date().toPyDate()
+            parent_window.start_date  = value
         elif start is False:
-            value = parent_window.ui.end_date_edit.date()
-            parent_window.end_date  = value.toPyDate()
-        self.show_table()
+            value = parent_window.ui.end_date_edit.date().toPyDate()
+            parent_window.end_date  = value
+        self.initalise(parent_window.start_date, parent_window.end_date)
 
     def set_table(self, flag):
         parent_window = self._parent

@@ -7,7 +7,6 @@ from PyQt5.QtCore import QDate, pyqtSignal, QObject
 
 from Widgets.live_output_window import LiveOutputWindow
 from Widgets.thread_worker import ThreadWorker
-from Widgets.home_page import HomePage
 
 from db_queries import QueryProcessor
 from file_handle import FileHandling
@@ -22,7 +21,6 @@ class UploadPage():
         parent_window = self._parent
         parent_window.ui.upload_file_button.clicked.connect(self.upload_file)
         parent_window.ui.add_transaction_button.clicked.connect(self.add_transaction)
-
 
     def add_transaction(self):
         parent_window = self._parent
