@@ -92,10 +92,9 @@ class SystemHelpers:
 
                 info = ax.table(cellText= section.values, colLabels=section.columns, loc='center')
                 ax.axis('off')
-                info.set_fontsize(20)
+                info.set_fontsize(25)
                 info.scale(1.2,2.5)
                 pdf.savefig(fig)
-                plt.close(fig) 
 
     def create_csv(self, account_name, df):
         """

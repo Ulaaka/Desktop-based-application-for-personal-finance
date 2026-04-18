@@ -89,7 +89,6 @@ class UploadPage():
         self.live_output.ui.textBrowser.adjustSize()
         self.live_output.adjustSize()
         self.live_output.show()
-        self._parent.home_manager.show_table()
 
     def get_output(self, text):
         stripped_list = [line for line in text.splitlines() if line.strip() != ""]
