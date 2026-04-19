@@ -36,7 +36,7 @@ class FileHandling():
         suffix_str = ".csv"
         if (pdf_flag):
             suffix_str = ".pdf"
-    
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix_str) as tmp:
             tmp.write(decrypted_text)
             tmp.flush()
