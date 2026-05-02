@@ -105,6 +105,7 @@ class ValidationWindow(QWidget):
     def handle_reset_password(self):
         entered = "".join(i.text() for i in self.squares)
         if (self.login_page.random_digits == entered):
+            self.timer.stop()
             self.controller.show_reset_password()
         else:
             QMessageBox.warning(

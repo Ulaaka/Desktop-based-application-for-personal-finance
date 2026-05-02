@@ -199,3 +199,6 @@ class TimerHelper():
         :return: formatted seconds
         """
         return f'{seconds // 60:02}:{seconds % 60:02}'
+
+    def stop_timer(self):
+        self.timer.stop()
