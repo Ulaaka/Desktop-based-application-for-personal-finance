@@ -128,6 +128,7 @@ class SignUpWindow(QWidget):
         salt = os.urandom(32)
         wrapping_key = crypto.generate_key(password_local, salt)
         data_key = base64.urlsafe_b64encode(secrets.token_bytes(32))
+
         encrypted_data_key = crypto.encrypt_data_key(wrapping_key, data_key)
 
         # RSA

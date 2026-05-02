@@ -109,7 +109,7 @@ class LoginWindow(QWidget):
 
         if result and password_manager.check_password(password_local, result[0]):
                 userID = query.get_userID(username_local)
-                enc_data_key, salt = query.get_data_key_salt(userID)
+                enc_data_key, salt, _ = query.get_data_key_salt(userID)
                 wrapping_key = crypto.generate_key(password_local, salt)
                 data_key = crypto.decrypt_data_key(wrapping_key, enc_data_key)
                 self.controller.show_dashboard(data_key, userID)
