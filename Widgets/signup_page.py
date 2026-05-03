@@ -1,4 +1,5 @@
 import os, secrets,  base64
+from decouple import config
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt
@@ -10,8 +11,10 @@ from ui_helper import UserInterfaceHelper
 
 
 class SignUpWindow(QWidget):
+    """
+    Class for handling signup page
+    """
 
-    # https://doc.qt.io/qt-6/stylesheet-reference.html
     def __init__(self, controller, db, cursor):
         super().__init__()
         self.controller = controller
@@ -21,6 +24,9 @@ class SignUpWindow(QWidget):
         self.query = QueryProcessor()
 
     def user_interface(self):
+        """
+        Setup the user interface widgets
+        """
         # set the size and name
         self.setWindowTitle('Sign Up')
         self.setFixedSize(400, 500)
@@ -94,10 +100,20 @@ class SignUpWindow(QWidget):
         self.setLayout(layout)
 
     def handle_got_account(self):
+        """
+        Navigates to login page when the user already have an account
+        """
         self.controller.show_login()
         pass
 
     def handle_submit(self):
+        """
+        Handles the scenario when the new user information is submitted
+        - Validates the information fields
+        - Creates unique keys for the user to allow for cryptography
+        - Inserts the user infos after securing safety
+        - Navigates to the login page
+        """
         username_local = self.username.text()
         password_local = self.password.text()
         email_local = self.email.text()
@@ -106,6 +122,7 @@ class SignUpWindow(QWidget):
 
         result = self.query.get_userID(username_local)
 
+        # Validates the information fields
         if not username_local or not password_local or not email_local:
             QMessageBox.warning(self, 'Error', 'Please enter all  the credentials, thank you')
             return
@@ -122,20 +139,31 @@ class SignUpWindow(QWidget):
             QMessageBox.warning(self, 'Invalid', 'Invalid email')
             return
 
-        # random salt
+        # Generate the random salt for wrapping key creation
         crypto = CryptoHelper()
-
         salt = os.urandom(32)
+
+        # Create the wrapping key using password and salt combination
         wrapping_key = crypto.generate_key(password_local, salt)
+
+        # Generate unique data key for the user upon creation
         data_key = base64.urlsafe_b64encode(secrets.token_bytes(32))
 
+        # Encrypt the data key with the wrapping key
         encrypted_data_key = crypto.encrypt_data_key(wrapping_key, data_key)
 
-        # RSA
-        public_key, private_key = crypto.generate_pub_priv_keys()
-        crypto.generate_save_to_pems(public_key, private_key)
+        # If it is the first user, generate RSA public and private key
+        # It allows for recovery when the user forgets the password instead of deleting all the user data
+        if not os.path.exists(config("PEM_FOLDER")):
+            public_key, private_key = crypto.generate_pub_priv_keys()
+            crypto.generate_save_to_pems(public_key, private_key)
+        else:
+            # Retrieve the existing public key for recovery encrypted data key
+            public_key, _ = crypto.retrieve_keys_pem()
+
         enc_data_key_public = crypto.encrypt_rsa(data_key, public_key)
 
+        # Hash the password
         hashed_password = password_manager.hash_password(password_local)
         self.query.insert_user(username_local, hashed_password, email_local, encrypted_data_key, enc_data_key_public, salt)
         self.controller.show_login()

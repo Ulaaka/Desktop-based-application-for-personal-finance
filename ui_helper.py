@@ -1,6 +1,8 @@
 
 class UserInterfaceHelper:
-
+    """
+    The color dictionary for user authentication phase of the app
+    """
     color_dic = {
         "login_page": {
             "title_color" :"#32CD32",
@@ -41,7 +43,7 @@ class UserInterfaceHelper:
 
     def handle_button_style(if_handle, button_color, hover_color, underline_flag=None):
         """
-        Handles different styles of buttons
+        Handles different styles of buttons in the user authentication phase of the app
         """
 
         handle_button_additional = """

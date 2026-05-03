@@ -12,6 +12,9 @@ from base_classes import PasswordHelper, CryptoHelper
 from system_functions import SystemHelpers
 
 class Change_password_page():
+    """
+    Class for handling the password change from the main app
+    """
     def __init__(self, parent):
         self._parent = parent
         self.password_manager = PasswordHelper()

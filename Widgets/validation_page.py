@@ -9,7 +9,15 @@ from ui_helper import UserInterfaceHelper
 
 
 class ValidationWindow(QWidget):
+    """
+    The class for handling user authentication through sending digits to the registered email
+    and checking the digits to allow for resetting the password
+    """
+
     def __init__(self, controller, login_page,  db, cursor):
+        """
+        Constructor for validation page
+        """
         super().__init__()
         self.duration = 90
         self.time_left_int = self.duration
@@ -58,6 +66,7 @@ class ValidationWindow(QWidget):
         self.timerLabel.setAlignment(Qt.AlignCenter)
         self.timerLabel.setStyleSheet("font: 17pt Helvetica;")
 
+        # The blocks for random digits
         self.squares = []
         centering = Qt.AlignCenter
         square_layout = QHBoxLayout()
@@ -84,6 +93,11 @@ class ValidationWindow(QWidget):
         self.timer_manager = TimerHelper(label=self.timerLabel, timer=self.timer, duration=self.duration, expire_func=self.expire_func)
 
     def expire_func(self):
+        """
+        Activates when the random digit validity expires.
+        Resend 6 digit random numbers to the registered email and
+        clear the digits blocks
+        """
         self.login_page.random_digits = self.system.send_reset_digits(
             6, username=self.login_page.username.text()
         )
@@ -91,10 +105,16 @@ class ValidationWindow(QWidget):
             square.clear()
 
     def to_next_box(self, idx, _):
+        """
+        Moves to the next digit block when current is filled
+        """
         if idx < 5:
             self.squares[idx + 1].setFocus()
 
     def to_prev_box(self, idx, input):
+        """
+        Moves back to the previous digit block when backspace is clicked
+        """
         if input.key() == Qt.Key_Backspace:
             if not self.squares[idx].text() and idx > 0:
                 self.squares[idx - 1].clear()
@@ -103,6 +123,12 @@ class ValidationWindow(QWidget):
         QLineEdit.keyPressEvent(self.squares[idx], input)
 
     def handle_reset_password(self):
+        """
+        Activates when submit button is clicked.
+        Checks the entered digits against the sent digits.
+        If matched, stop the timer to prevent expiry function activating and shows password reset page.
+        Else, shoe a warning message.
+        """
         entered = "".join(i.text() for i in self.squares)
         if (self.login_page.random_digits == entered):
             self.timer.stop()
@@ -116,4 +142,7 @@ class ValidationWindow(QWidget):
             return
 
     def start_time(self):
+        """
+        Starts the timer
+        """
         self.timer_manager.begin_timer()

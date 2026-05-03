@@ -77,15 +77,24 @@ class SystemHelpers:
     def create_pdf(self, account_name, df):
         """
         Downloads pdf file to the user's download folder
+        :param account_name: the name of the account to be used for saving the file
+        :param df: dataframe to be converted to PDF
         """
         current_time = datetime.now().strftime("%Y-%m-%d")
         file_name = f"{account_name}_financial_report_{current_time}.pdf"
+
+        # Save to the downloads folder of the user
         file_path = str(Path.home() / "Downloads"/file_name)
 
+        # Skip the first few ID columns
         df = df.iloc[:, 3:]
+
+        # Number of row per page
         rows_count = 9
+
         with PdfPages(file_path) as pdf:
             for mark in range(0, len(df), rows_count):
+                # section of dataframe to be read
                 section = df.iloc[mark:mark + rows_count]
                 fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -99,10 +108,15 @@ class SystemHelpers:
     def create_csv(self, account_name, df):
         """
         Downloads csv file to the user's download folder
+        :param account_name: the name of the account to be used for saving the file
+        :param df: dataframe to be converted to CSV
         """
+        # Skip the ID columns
         df = df.iloc[:, 3:]
         current_time = datetime.now().strftime("%Y-%m-%d")
         file_name = f"{account_name}_financial_report_{current_time}.csv"
+
+        # Save to the downloads folder of the user
         file_path = str(Path.home() / "Downloads"/file_name)
         df.to_csv(file_path, sep=',', encoding='utf-8', index=False, header=True)
 
@@ -165,26 +179,29 @@ class TimerHelper():
 
         # Function to active when time runs out
         self.expire_func = expire_func
+
         # Update the timer
         self.timer.timeout.connect(self.time_out)
+        self.tick = 1000
 
     def begin_timer(self):
         """
         Starts the timer, let it tick by a sec
         """
         self.remaining = self.duration
-        self.timer.start(1000)
+        self.timer.start(self.tick)
 
     def time_out(self):
         """
-        Counts the remaining time down
+        Counts the remaining time down, and update the time label
         """
-        self.remaining -= 1
-        if self.remaining == 0:
+        self.remaining -=1
+        if self.remaining != 0:
+            self.update_label()
+        else:
             self.remaining = self.duration
             if self.expire_func:
                 self.expire_func()
-        self.update_label()
 
     def update_label(self):
         """
@@ -199,6 +216,3 @@ class TimerHelper():
         :return: formatted seconds
         """
         return f'{seconds // 60:02}:{seconds % 60:02}'
-
-    def stop_timer(self):
-        self.timer.stop()

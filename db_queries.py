@@ -479,7 +479,7 @@ class QueryProcessor:
         query = "DELETE FROM accounts WHERE accountID = %s"
         self.cursor.execute(query, (accountID, ))
         self.db.commit()
-    
+
     def delete_transaction(self, transactionID):
         """
         Delete transaction from database given transaction ID
@@ -488,7 +488,7 @@ class QueryProcessor:
         self.cursor.execute(query, (transactionID, ))
         self.db.commit()
 
-    # Deleted the user, resulting in cascading effect
+
     def delete_user(self, userID):
         """
         All data relating to the user is deleted
@@ -510,9 +510,9 @@ class QueryProcessor:
 
     def return_word_list(self, description):
         """
-            Returns the list of words from the description of the selected transaction
-            plus_list = words to be used to identify close transactions
-            word_list = the list of the words passed
+        Returns the list of words from the description of the selected transaction
+        plus_list = words to be used to identify close transactions
+        word_list = the list of the words passed
         """
         # removing words with length of 2-3 and extra white space between words in the description
         clean_description = re.sub(r'\b\w{2,3}\b', '', " ".join(description.lower().split()))

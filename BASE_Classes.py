@@ -275,17 +275,26 @@ class CryptoHelper:
         self.db = connection.db
         self.cursor = connection.cursor
         self.query = QueryProcessor()
-        self.padding_enc  = padding.OAEP(
+
+        # Padding for RSA encryption and decryption
+        self.padding  = padding.OAEP(
                 mgf=padding.MGF1(algorithm=hashes.SHA256()),
                 algorithm=hashes.SHA256(),
                 label=None)
 
-    # RSA
+
+    """ RCA cryptography functions """
 
     def generate_pub_priv_keys(self):
         """
-        Generate RSA public and private keys
+        Generate RSA public and private keys for encrypted recovery key
+        in case the user forgets
+
+        Should only be called once when the first user is created.
+        :return public_key: generated RSA public key
+        :return private_key: generated RSA private key
         """
+
         private_key = rsa.generate_private_key(
             public_exponent=int(config("PUBLIC_EXP")),
             key_size=int(config("KEY_SIZE")),
@@ -297,7 +306,12 @@ class CryptoHelper:
 
     def generate_save_to_pems(self, public, private):
         """
-        Writes the serialised keys to the the respective pem files
+        Creates a folder for PEM files if does not exist and
+        saves the serialised keys to the their respective pem files
+
+        Should only be called once when the first user is created.
+        :param public: RSA public key
+        :param private: RSA private key
         """
         if not os.path.exists(config("PEM_FOLDER")):
             os.makedirs(config("PEM_FOLDER"))
@@ -320,6 +334,11 @@ class CryptoHelper:
             file.write(public_serial)
 
     def retrieve_keys_pem(self):
+        """
+        Retrieved RSA public and private keys from the PEM folder
+        :return pub_k: public key
+        :return priv_k: private key
+        """
         with open(os.path.join(config("PEM_FOLDER"),  "key_private.pem"), "rb") as key_file:
             priv_k = serialization.load_pem_private_key(
                 key_file.read(),
@@ -334,11 +353,21 @@ class CryptoHelper:
             )
         return pub_k, priv_k
 
-    def encrypt_rsa(self, data, public_key):
-        return public_key.encrypt(data, self.padding_enc)
+    def encrypt_rsa(self, data_key, public_key):
+        """
+        Encrypts the data key with public key
+        :return: encrypted data key
+        """
+        encrypted_data_key = public_key.encrypt(data_key, self.padding)
+        return encrypted_data_key
 
-    def decrypt_rsa(self, enc_data, private_key):
-        return private_key.decrypt(enc_data,self.padding_enc)
+    def decrypt_rsa(self, enc_data_key, private_key):
+        """
+        Decrypts  encrypted data key with private key
+        :return: decrypted original data key
+        """
+        decrypted_data_key = private_key.decrypt(enc_data_key,self.padding)
+        return decrypted_data_key
 
 
     def generate_key(self, password, salt):

@@ -23,6 +23,7 @@ class FileHandling():
         self.key = key
         self.userID = userID
         self.query = QueryProcessor()
+        # holds temporarily created files to delete when the app closes
         self.temp_files = []
 
     def show_decrypted_pdf(self, decrypted_text, pdf_flag=None):
@@ -96,6 +97,8 @@ class FileHandling():
     def check_file_exists(self, sub_save_folder, file_path, filename):
         """
         Checks if the file with the same content exists by checking the save folder for encrypted files
+        :return found: is true when duplicate file exists
+        :return output: if exist, return the existing file's name
         """
         crypto = CryptoHelper()
         found = False
@@ -116,8 +119,9 @@ class FileHandling():
 
     def process_files_in_folder(self):
         """
-        Parses the files in the submission ("FOLDER_PATH") folder
+        Parses the files in the submission ("FOLDER_PATH") folder using the corresponding parsing techniques
         print statements are captured in a window for the user to see the loading of the files
+        Deletes and recreates the submission folder once the files processed
         """
         crypto = CryptoHelper()
         dir = os.listdir(config('FOLDER_PATH'))
@@ -173,6 +177,7 @@ class FileHandling():
     def convert_file_size(self, size):
         """
         Converts the size of the file into a string format
+        :return converted_size: converted file size
         """
         converted_size = ""
         if (size < 1024):

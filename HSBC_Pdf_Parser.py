@@ -153,6 +153,7 @@ class ParsingPdfHSBC:
     def parse_transaction(self, line):
         """
         Analyses the transaction line, returning dictionary with target columns values, if not found, set to default
+        :return: dictionary containing the column values of the transaction
         """
 
         parts = line.rsplit(maxsplit=2)
@@ -174,6 +175,7 @@ class ParsingPdfHSBC:
     def classify_transactions(self, transactions, initial_balance):
         """
         Classify transactions and create DataFrame with Credit/Debit columns
+        :return values: transaction'c column values with updates classified column
         """
         parsed = []
         for i in transactions:

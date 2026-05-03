@@ -10,6 +10,7 @@ if __name__ == "__main__":
     with open(style_path, 'r') as styling:
         style = styling.read()
 
+    # Apply the style sheet to the whole app
     app.setStyleSheet(style)
     window = UserAuthentication()
     window.show()
