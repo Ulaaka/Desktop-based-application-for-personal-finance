@@ -369,7 +369,7 @@ class CryptoHelper:
         decrypted_data_key = private_key.decrypt(enc_data_key,self.padding)
         return decrypted_data_key
 
-
+    
     def generate_key(self, password, salt):
         """
         Generates key used for wrapping main data key for encryption and decryption of the files

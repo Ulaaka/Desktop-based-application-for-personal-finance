@@ -23,6 +23,9 @@ class Change_password_page():
         self.change_password_signals_connect()
 
     def change_password_signals_connect(self):
+        """
+        Connect the widget signals
+        """
         parent_window = self._parent
         parent_window.ui.change_password_button_settings.clicked.connect(self.change_password)
         parent_window.ui.forgot_password_button_settings.clicked.connect(self.forgot_password_handle)
