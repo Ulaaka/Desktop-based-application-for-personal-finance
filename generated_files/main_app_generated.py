@@ -1607,4 +1607,4 @@ class Ui_MainWindow(object):
         self.new_password_line.setPlaceholderText(_translate("MainWindow", "New Password"))
         self.change_password_button_settings.setText(_translate("MainWindow", "submit"))
         self.forgot_password_button_settings.setText(_translate("MainWindow", "Forgot the password?"))
-import Widgets.resource_rc
+import Widgets.resources_rc

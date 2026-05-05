@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 from PyQt5.QtWidgets import QPushButton, QSizePolicy, QWidget, QVBoxLayout, QLabel, QComboBox, QDateEdit, QApplication
-from PyQt5.QtCore import QDate
+from PyQt5.QtCore import QDate, Qt
 from PyQt5.QtGui import QPainter
 from PyQt5.QtChart import QChartView
 from Widgets.create_graphs import CreateGraph
@@ -186,16 +186,17 @@ class GraphPage():
             opt_button.clicked.connect(lambda clicked, graph_name=graph: self.show_graph(graph_name))
             self.scroll_layout.addWidget(opt_button)
         self.scroll_layout.addStretch()
-
         parent_window.ui.expand_button.setVisible(False)
+        parent_window.ui.frame.setVisible(True)
         parent_window.ui.graphs_label.mousePressEvent = self.graph_label_clicked
+        parent_window.ui.expand_button.clicked.connect(self.expand_button_clicked)
 
     def graph_label_clicked(self, event):
-        self._parent.ui.frame.setVisible(not self._parent.ui.frame.isVisible())
+        self._parent.ui.frame.setVisible(False)
         self._parent.ui.expand_button.setVisible(True)
 
     def expand_button_clicked(self):
-        self._parent.ui.frame.setVisible(not self._parent.ui.frame.isVisible())
+        self._parent.ui.frame.setVisible(True)
         self._parent.ui.expand_button.setVisible(False)
 
     def show_graph(self, graph):
@@ -248,6 +249,8 @@ class GraphPage():
             account_list = widget_desc["value"]
             add.addItems(account_list)
             add.setObjectName("stats_combo")
+            add.setFixedHeight(25)
+
             add.currentTextChanged.connect(self.update_graph)
         elif widget_desc["type"] == "dateEdit":
             add = QDateEdit()
@@ -255,11 +258,15 @@ class GraphPage():
             if date:
                 add.setDate(QDate(date.year, date.month, date.day))
             add.setCalendarPopup(True)
+            add.setFixedHeight(25)
             add.setObjectName("stats_date")
 
             add.dateChanged.connect(self.update_graph)
+
         vertical.addWidget(add)
         self.active_filters[widget_desc["name"]] = add
+        #filter_layout = self._parent.ui.filters_widget.layout()
+        #filter_layout.setAlignment(add, Qt.AlignVCenter)
         return widget
 
     def download_graph(self):
