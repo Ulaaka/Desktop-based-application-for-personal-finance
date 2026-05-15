@@ -5,6 +5,9 @@ from generated_files.account_add_generated import Ui_AccountAdd
 from db_queries import QueryProcessor
 
 class AccountAddPage(QDialog):
+    """
+    Dialog for adding a new account with a name, type, and currency
+    """
     def __init__(self, currencies, parent):
         super().__init__(parent)
         self.userID = parent.userID
@@ -16,6 +19,9 @@ class AccountAddPage(QDialog):
         self.account_add_signals_connection()
 
     def account_add_signals_connection(self):
+        """
+        Populates the currency dropdown, attaches a search completer, and connects the submit button
+        """
         self.ui.currency_select_combo.addItems(self.currencies)
         self.ui.submit_button.clicked.connect(self.add_account_database)
         currency_search = self.ui.currency_select_combo.lineEdit()
@@ -26,6 +32,11 @@ class AccountAddPage(QDialog):
         completer.setCaseSensitivity(Qt.CaseInsensitive)
 
     def add_account_database(self):
+        """
+        Reads the entered account details and inserts the new account into the database
+        Updates the main window to reflect the newly added account
+        Shows a warning if any field is missing
+        """
         query = QueryProcessor()
         account_name = self.ui.name_select_combo.text()
         account_type = self.ui.type_select_combo.currentText()

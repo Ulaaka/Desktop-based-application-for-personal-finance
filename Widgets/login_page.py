@@ -9,6 +9,9 @@ from db_queries import QueryProcessor
 from ui_helper import UserInterfaceHelper
 
 class LoginWindow(QWidget):
+    """
+    Handles the login window - allows the user to log in, sign up, or reset their password
+    """
     def __init__(self, controller, db, cursor):
         super().__init__()
         self.controller = controller
@@ -20,6 +23,9 @@ class LoginWindow(QWidget):
         self.user_interface()
 
     def user_interface(self):
+        """
+        Builds the login window layout with username, password fields and action buttons
+        """
         # set the size and name
         self.setWindowTitle('Finance Login')
         self.setFixedSize(400, 500)
@@ -92,9 +98,15 @@ class LoginWindow(QWidget):
         self.setLayout(layout)
 
     def handle_sign_up(self):
+        """
+        Navigates to the sign up window
+        """
         self.controller.show_sign_up()
 
     def handle_login(self):
+        """
+        Validates credentials, decrypts the data key on success, and opens the dashboard
+        """
         username_local = self.username.text()
         password_local = self.password.text()
         query = QueryProcessor()
@@ -117,8 +129,11 @@ class LoginWindow(QWidget):
             QMessageBox.warning(self, 'Error', 'Password or Username is wrong')
             return
 
-    # finished to be later
     def handle_forgot_password(self):
+        """
+        Sends a reset code to the user's email and navigates to the validation page
+        Username must be entered before clicking this
+        """
         username_local = self.username.text()
 
         if not username_local:
@@ -133,6 +148,5 @@ class LoginWindow(QWidget):
         if self.random_digits:
             self.controller.show_validation_page()
         else:
-            # needs to make it more sophisticated
             QMessageBox.warning(self, 'Error', 'The user Does Not Exist')
             return

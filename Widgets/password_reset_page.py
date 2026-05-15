@@ -10,6 +10,9 @@ from ui_helper import UserInterfaceHelper
 
 
 class PasswordResetWindow(QWidget):
+    """
+    Window for resetting the user's password after verification
+    """
     def __init__(self, controller, login_page, db, cursor):
         super().__init__()
         self.controller = controller
@@ -19,6 +22,9 @@ class PasswordResetWindow(QWidget):
         self.user_interface()
 
     def user_interface(self):
+        """
+        Builds the password reset window layout with input fields and submit button
+        """
         # set the size and name
         self.setWindowTitle('Enter New Password')
         self.setFixedSize(400, 500)
@@ -85,6 +91,10 @@ class PasswordResetWindow(QWidget):
         self.setLayout(layout)
 
     def compare_password(self):
+        """
+        Validates that the new password meets safety requirements and both fields match
+        On success, updates the password and re-encrypts the data key with the new password
+        """
         password_manager  = PasswordHelper()
         query = QueryProcessor()
         safety = password_manager.check_password_safety(self.password_1.text())
@@ -118,6 +128,7 @@ class PasswordResetWindow(QWidget):
             new_salt = os.urandom(32)
             new_wrapping_key = crypto.generate_key(new_password, new_salt)
 
+            # recover data key via RSA private key and re-encrypt with new wrapping key
             _, _, encrypted_data_key_server = query.get_data_key_salt(userID)
             _, private_key = crypto.retrieve_keys_pem()
             data_key = crypto.decrypt_rsa(encrypted_data_key_server, private_key)

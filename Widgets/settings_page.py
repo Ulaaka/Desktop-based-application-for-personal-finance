@@ -40,6 +40,12 @@ class Change_password_page():
         )
 
     def change_password(self):
+        """
+        Handles password change for both standard and forgot password flows.
+        For standard change, validates the current password before updating.
+        For forgot password, decrypts the data key via RSA and re-encrypts with the new password.
+        """
+
         crypto = CryptoHelper()
         system = SystemHelpers()
         query = QueryProcessor()
@@ -47,6 +53,7 @@ class Change_password_page():
         current_password = parent_window.ui.current_password_line.text()
         new_password = parent_window.ui.new_password_line.text()
         if (self.objective == 0):
+            # standard password change 
             safety = self.password_manager.check_password_safety(new_password)
 
             if current_password and new_password:
@@ -82,6 +89,7 @@ class Change_password_page():
                 if result:
                     parent_window.ui.current_password_line.clear()
                     parent_window.ui.new_password_line.clear()
+                    # re-encrypt data key with new password
                     enc_data_key, salt = system.update_data_key(current_password, new_password, self._parent.userID)
                     query.update_key_salt(enc_data_key, salt, self._parent.userID)
                     QMessageBox.information(
@@ -114,6 +122,10 @@ class Change_password_page():
                 return
 
     def forgot_password_handle(self):
+        """
+        Opens the email verification window the forgot password button is clicked.
+        """
+
         parent_window = self._parent
         confirmation_window = ChangeConfirmationPage(parent_window)
         confirmation_window.finished.connect(self.capture_result)
@@ -123,12 +135,20 @@ class Change_password_page():
         confirmation_window.show()
 
     def capture_result(self):
+        """
+        Called after email verification succeeds, hides the current password
+        field and switches to the forgot password mode.
+        """
         parent_window = self._parent
         parent_window.ui.current_password_line.hide()
         parent_window.ui.new_password_line.clear()
         self.objective = 1
 
 class Delete_user_account():
+    """
+    Handles  deletion of the user account after password verification.
+    """
+
     def __init__(self, parent):
         self._parent = parent
         self.query = QueryProcessor()
@@ -136,11 +156,20 @@ class Delete_user_account():
         self.delete_user_signals_connect()
 
     def delete_user_signals_connect(self):
+        """
+        Connects delete account widget signals to their handler methods.
+        """
+
         parent_window = self._parent
         parent_window.ui.delete_user_button_2.clicked.connect(self.delete_user)
         parent_window.ui.delete_user_line.setEchoMode(QLineEdit.Password)
 
     def delete_user(self):
+        """
+        Verifies the entered password and deletes the user account if it matches.
+        Logs the user out before deletion.
+        """
+
         parent_window = self._parent
         current_password = self._parent.ui.delete_user_line.text()
 
@@ -152,17 +181,30 @@ class Delete_user_account():
             self.query.delete_user(parent_window.userID)
 
 class Change_category():
+    """
+    Handles the category management page, including displaying, adding,
+    removing, and searching categories.
+    """
     def __init__(self, parent):
         self._parent = parent
         self.home_page = HomePage(parent)
         self.category_signals_connect()
 
     def category_signals_connect(self):
+        """
+        Signals are connected
+        """
         parent_window = self._parent
         parent_window.ui.category_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         parent_window.ui.category_table.verticalHeader().setVisible(False)
 
     def show_category_table(self):
+        """
+        Retrieves categories for the selected account and loads them into
+        the category table with search and sort proxy support.
+        An empty row is appended at the bottom to allow new category creation.
+        """
+
         query = QueryProcessor()
         parent_window = self._parent
         if not parent_window.accountID:
@@ -196,6 +238,11 @@ class Change_category():
 
 
     def set_category_table(self, flag):
+        """
+        Switches between the category table page and the empty state page.
+        :param flag: True to show the table, False to show the empty state
+        """
+
         parent_window = self._parent
         if flag:
             parent_window.ui.settings_stack.setCurrentWidget(parent_window.ui.category_table_page)
@@ -204,6 +251,12 @@ class Change_category():
 
 
     def handle_add_button(self):
+
+        """
+        Adds a new category using the name and description entered in the table,
+        then refreshes both the category and transaction tables.
+        """
+
         query = QueryProcessor()
         parent_window = self._parent
         description = self.model.description
@@ -214,18 +267,38 @@ class Change_category():
         self.home_page.show_table()
 
     def handle_remove_button(self, categoryID, category_name):
+
+        """
+        Deletes the selected category and reassigns affected transactions,
+        then refreshes both the category and transaction tables.
+        :param categoryID: ID of the category to delete
+        :param category_name: name of the category to delete
+        """
+
         parent_window = self._parent
         query = QueryProcessor()
         query.delete_category(int(categoryID))
-        query.update_transaction_after_deletion_description(parent_window.userID, parent_window.accountID, str(category_name))
+        query.update_transaction_after_deletion(parent_window.userID, parent_window.accountID, str(category_name))
         self.show_category_table()
         self.home_page.show_table()
 
     def filtered_search(self, text, proxy, categories):
+        """
+        Applies a search filter to the category table and reloads row buttons.
+        :param text: search string entered by the user
+        :param proxy: proxy model managing the filtered view
+        :param categories: full categories dataframe for button mapping
+        """
         proxy.setFilterRegExp(text)
         self.load_buttons(proxy, categories)
 
     def load_buttons(self, proxy, categories):
+        """
+        Inserts an add button on the last row and remove buttons on all other rows.
+        :param proxy: proxy model used to map rows to source indices
+        :param categories: full categories dataframe for button mapping
+        """
+
         parent_window = self._parent
         for row_index in range(proxy.rowCount()):
             index_button = proxy.index(row_index, proxy.columnCount() - 1)

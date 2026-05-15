@@ -10,6 +10,11 @@ from system_functions import SystemHelpers
 from Widgets.thread_worker import ThreadWorker
 
 class HomePage():
+    """
+    Manages the home page of the main window, responsible for displaying
+    the transaction table, handling date filters, search, and table downloads
+    """
+
     def __init__(self, parent):
         self._parent = parent
         self.transactions = None
@@ -22,6 +27,11 @@ class HomePage():
         self.home_signals_connect()
 
     def home_signals_connect(self):
+
+        """
+        Connects all home page widget signals to their respective handler methods.
+        """
+
         parent_window = self._parent
         parent_window.ui.start_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=True))
         parent_window.ui.end_date_edit.editingFinished.connect(lambda: self.get_filter_date(start=False))
@@ -33,6 +43,12 @@ class HomePage():
         parent_window.ui.end_date_edit.setCalendarPopup(True)
 
     def show_table(self):
+
+            """
+            Retrieves transactions for the selected account and displays
+            the table or an empty state message if no transaction found
+            """
+
             query = QueryProcessor()
             parent_window = self._parent
             if not parent_window.accountID:
@@ -57,6 +73,13 @@ class HomePage():
                 self.initalise(min_date, self.current_day)
 
     def initalise(self, start_date, end_date):
+    
+        """
+        Filters transactions by date range and loads the table model.
+        :param start_date: start of the filter range
+        :param end_date: end of the filter range
+        """
+
         parent_window = self._parent
         if self.transactions is None:
             return
@@ -84,10 +107,23 @@ class HomePage():
 
 
     def filtered_search(self, text, proxy):
+
+        """
+        Applies a search filter to the table and loads the row buttons again.
+        :param text: text entered by the user
+        :param proxy: proxy model for managing the filtered view
+        """
+
         proxy.setFilterRegExp(text)
         self.load_buttons(proxy)
 
     def load_buttons(self, proxy):
+
+        """
+        Inserts a remove button into each row of the table.
+        :param proxy: proxy model used to map rows to source indices
+        """
+
         parent_window = self._parent
         for row_index in range(proxy.rowCount()):
             index_button = proxy.index(row_index, proxy.columnCount() - 1)
@@ -101,11 +137,21 @@ class HomePage():
                 lambda checked, id=transaction_id: self.handle_remove_button(id))
 
     def handle_remove_button(self, id):
+        """
+        Deletes the selected transaction and refreshes the table.
+        :param id: transaction ID to be deleted
+        """
+
         query = QueryProcessor()
         query.delete_transaction(int(id))
         self.show_table()
 
     def download_table(self):
+
+        """
+        Exports the filtered transaction table as CSV or PDF to the downloads folder.
+        """
+
         if self.filter_transaction is None:
             return
         parent_window = self._parent
@@ -119,6 +165,11 @@ class HomePage():
             self.worker.start()
 
     def get_filter_date(self, start=None):
+        """
+        Updates the start or end date from the date picker and refreshes the table.
+        :param start: True to update start date, False to update end date
+        """
+
         parent_window =self._parent
         if start is True:
             value = parent_window.ui.start_date_edit.date().toPyDate()
@@ -129,6 +180,12 @@ class HomePage():
         self.initalise(parent_window.start_date, parent_window.end_date)
 
     def set_table(self, flag):
+
+        """
+        Switches between the transaction table page and the empty state page.
+        :param flag: True to show the table, False to show the empty state
+        """
+
         parent_window = self._parent
         if flag:
             parent_window.ui.home_stacked.setCurrentWidget(parent_window.ui.table_page)

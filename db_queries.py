@@ -71,7 +71,6 @@ class QueryProcessor:
         :param transaction_list: list of transactions to be inserted
         """
 
-        "print"
         sql = """INSERT IGNORE INTO transactions (accountID, file_ID, transaction_date, transaction_type, description, category, amount, balance) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
         self.cursor.executemany(sql, transaction_list)
         self.db.commit()
@@ -170,7 +169,8 @@ class QueryProcessor:
 
             priority_list = [(len([item for item in category_list if item in i]), len(i)) for i in category_dictionary]
 
-            # the best next match
+            # The best next match
+            # If there is a tie, select the one with lower count of keywords
             max_category = max(priority_list, key=lambda x: (x[0], -x[1]))
             if max_category[0] == 0:
                 return None
@@ -532,9 +532,9 @@ class QueryProcessor:
 
         return plus_list, word_list
 
-    def find_close_transactions(self, description, accountID):
+    def find_close_transactions_and_keywords(self, description, accountID):
         """
-        Returns transaction IDs of close transactions given the user selected description
+        Returns transaction IDs of close transactions and keywords given the user selected description
         :param description: description of the transaction
         :param accountID: account ID
         :return: transaction IDs of close transactions in the account
@@ -594,18 +594,19 @@ class QueryProcessor:
         self.cursor.execute(query, parameters)
         self.db.commit()
 
-
     def change_category_transaction(self, userID, accountID, category, transactionID):
         """
         Updates category name of the given transaction by its transaction ID and its close transactions
         """
+
         self.update_category(category, transactionID)
         description = self.return_description_given_transactionID(transactionID)
-        close_transaction_ids, world_list = self.find_close_transactions(description, accountID)
+        close_transaction_ids, world_list = self.find_close_transactions_and_keywords(description, accountID)
         categoryID, exist = self.insert_category(userID, accountID, description, world_list, category)
         if exist:
             self.update_category_name(category, categoryID)
         self.update_category(category, close_transaction_ids)
+
 
     def return_updated_category(self, userID, accountID,  description):
         """
@@ -641,7 +642,7 @@ class QueryProcessor:
         """
         Adds new category and update matching transactions' category name
         """
-        close_transaction_ids, word_list = self.find_close_transactions(description, accountID)
+        close_transaction_ids, word_list = self.find_close_transactions_and_keywords(description, accountID)
         categoryID, exist = self.insert_category(userID, accountID, description, word_list, category_name)
         if exist:
             self.update_category_name(category_name, categoryID)
@@ -660,9 +661,10 @@ class QueryProcessor:
         self.cursor.execute(query_delete, (categoryID, ))
         self.db.commit()
 
-    def update_transaction_after_deletion_description(self, userID, accountID, category_name):
+    def update_transaction_after_deletion(self, userID, accountID, category_name):
         """
         Finds next matching category of the transactions after category is deleted
+        and updates the affected transactions
         :param category_name: name of the category to be deleted
         :param accountID: account ID
         """

@@ -1,7 +1,16 @@
 from PyQt5.QtCore import QAbstractTableModel, Qt
 from db_queries import QueryProcessor
-# https://www.pythonguis.com/faq/editing-pyqt6-tableview/
+
+"""
+The following tables were inspired from:
+https://www.pythonguis.com/faq/editing-pyqt6-tableview/
+
+"""
+
 class TransactionTable(QAbstractTableModel):
+    """
+    Table model for displaying and editing transaction records on the home page
+    """
     def __init__(self, data, parent, home_page):
         super().__init__(parent)
         self._data = data
@@ -18,6 +27,9 @@ class TransactionTable(QAbstractTableModel):
         return self._data.shape[1] + 1
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        """
+        Returns the value for each cell, empty string for the extra button column
+        """
         if index.isValid():
             if role == Qt.ItemDataRole.DisplayRole or role == Qt.ItemDataRole.EditRole:
                 column =int(index.column())
@@ -28,6 +40,11 @@ class TransactionTable(QAbstractTableModel):
                 return str(value)
 
     def setData(self, index, value, role):
+        """
+        Handles direct cell edits in the transaction table
+        Column 5 triggers a description update and recalculates the category
+        Column 6 triggers a direct category update for the transaction and related ones
+        """
         query = QueryProcessor()
         main_window = self._parent
         if role == Qt.ItemDataRole.EditRole:
@@ -46,13 +63,15 @@ class TransactionTable(QAbstractTableModel):
         return False
 
     def headerData(self, col, orientation, role):
+        """
+        Returns the column header name, empty string for the button column
+        """
         if (
             orientation == Qt.Orientation.Horizontal
             and role == Qt.ItemDataRole.DisplayRole
         ):
             if (col < 9):
                 return self.header_names[col]
-                
                 #return self._data.columns[col]
 
             else:
@@ -66,6 +85,10 @@ class TransactionTable(QAbstractTableModel):
         )
 
 class CategoryTable(QAbstractTableModel):
+    """
+    Table model for displaying and editing categories on the settings page
+    The last row is reserved for creating a new category
+    """
     def __init__(self, data, parent, category_page):
         super().__init__(parent)
         self._data = data
@@ -84,6 +107,9 @@ class CategoryTable(QAbstractTableModel):
         return self._data.shape[1] + 1  # keep your logic
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        """
+        Returns the value for each cell, empty string for the extra button column
+        """
         if index.isValid():
             if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
 
@@ -97,6 +123,11 @@ class CategoryTable(QAbstractTableModel):
                 return str(value)
 
     def setData(self, index, value, role):
+        """
+        Handles direct cell edits in the category table
+        Last row stores description and name temporarily until the add button is clicked
+        For existing rows, editing description or name updates the category and re-matches transactions
+        """
         query = QueryProcessor()
         main_window = self._parent
         if role == Qt.ItemDataRole.EditRole:
@@ -116,7 +147,7 @@ class CategoryTable(QAbstractTableModel):
                 if column == 2:
                     description = value
                     name = self._data.iloc[row, column+1]
-                    close_transaction_ids, word_list = query.find_close_transactions(description, main_window.accountID)
+                    close_transaction_ids, word_list = query.find_close_transactions_and_keywords(description, main_window.accountID)
                     query.update_category_description(description, word_list, name, categoryID)
                     query.update_category(name, close_transaction_ids)
                     self.category_page.show_category_table()
@@ -124,7 +155,7 @@ class CategoryTable(QAbstractTableModel):
                 elif column == 3:
                     name = value
                     description = self._data.iloc[row, column-1]
-                    close_transaction_ids, word_list = query.find_close_transactions(description, main_window.accountID)
+                    close_transaction_ids, word_list = query.find_close_transactions_and_keywords(description, main_window.accountID)
                     query.update_category_name(name, categoryID)
                     query.update_category(name, close_transaction_ids)
                     self.category_page.show_category_table()
@@ -133,6 +164,9 @@ class CategoryTable(QAbstractTableModel):
         return False
 
     def headerData(self, col, orientation, role):
+        """
+        Returns the column header name, empty string for the button column
+        """
         if (
             orientation == Qt.Orientation.Horizontal
             and role == Qt.ItemDataRole.DisplayRole

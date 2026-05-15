@@ -8,7 +8,7 @@ from file_handle import FileHandling
 
 from generated_files.main_app_generated import Ui_MainWindow
 from Widgets.account_control_page import AccountControlPage
-from Widgets.account_selection_window import AccountSelectionPage
+from Widgets.account_selection_window import AccountSelectionWindow
 from Widgets.profile_page import ProfilePage
 from Widgets.upload_page import UploadPage
 from Widgets.files_page import FilePage
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
         self.home_manager = HomePage(self)
         self.upload_manager = UploadPage(self)
         self.file_manager = FilePage(self)
-        self.account_manager = AccountSelectionPage(self)
+        self.account_manager = AccountSelectionWindow(self)
         self.profile_manager= ProfilePage(self.account_name, self)
         self.category_change_manager = Change_category(self)
         self.account_control_manager = AccountControlPage(self.account_name, self)
@@ -83,7 +83,7 @@ class MainWindow(QMainWindow):
         and connecting corresponding signals.
         """
         if not self.status_panel:
-            self.panel = AccountSelectionPage(self)
+            self.panel = AccountSelectionWindow(self)
             self.panel.chose_account.connect(self.update_parent)
 
             # Show the window directly down the button

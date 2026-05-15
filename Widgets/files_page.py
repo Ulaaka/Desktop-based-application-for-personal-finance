@@ -13,9 +13,16 @@ class FilePage():
         self.show_files()
 
     def files_signals_connect(self):
+        """
+        Sets the file tree view header to stretch across all columns
+        """
         self._parent.ui.files_treeView.header().setSectionResizeMode(QHeaderView.Stretch)
 
     def show_files(self):
+        """
+        Fetches files for the selected account and loads them into the tree view
+        Shows an empty state message if no account or files are found
+        """
         parent_window = self._parent
         query = QueryProcessor()
         if not parent_window.accountID:
@@ -41,14 +48,26 @@ class FilePage():
                 view_button.clicked.connect(lambda clicked, id=fileID: self.view_file_with_ID(id))
 
     def view_file_with_ID(self, id):
+        """
+        Opens a temporary preview of the selected file using its file ID
+        :param id: the file ID to preview
+        """
         file_handle = FileHandling( self._parent.userID,  self._parent.accountID,  self._parent.key)
         file_handle.view_file(fileID=id)
 
     def delete_file_wht_ID(self, fileID):
+        """
+        Opens the disclaimer confirmation window before deleting the selected file
+        :param fileID: the file ID to delete
+        """
         disclaimer = DisclaimerWindow(fileID, self._parent)
         disclaimer.show()
 
     def files_exist(self):
+        """
+        Builds the tree model and populates it with file records
+        File size is converted to a readable format before display
+        """
         parent_window = self._parent
         file_handle = FileHandling( self._parent.userID,  self._parent.accountID,  self._parent.key)
         self.tree_model = QStandardItemModel()
@@ -80,6 +99,10 @@ class FilePage():
             parent_window.ui.files_treeView.setModel(self.tree_model)
 
     def set_files(self, flag):
+        """
+        Switches between the file tree page and the empty state page
+        :param flag: True to show the file tree, False to show the empty state
+        """
         parent_window = self._parent
         if flag:
             parent_window.ui.files_stack.setCurrentWidget(parent_window.ui.files_tree_page)

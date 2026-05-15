@@ -6,6 +6,9 @@ from db_queries import QueryProcessor
 from file_handle import FileHandling
 
 class DisclaimerWindow(QDialog):
+    """
+    Confirmation dialog shown before deleting a file
+    """
     def __init__(self, fileID, parent):
         super().__init__(parent)
         self.ui = Ui_Disclaimer()
@@ -20,10 +23,16 @@ class DisclaimerWindow(QDialog):
         self.signal_connect()
 
     def signal_connect(self):
+        """
+        Connects proceed and cancel buttons to their handler methods
+        """
         self.ui.proceed_button.clicked.connect(self.proceed_button_clicked)
         self.ui.cancel_button.clicked.connect(self.cancel_button_clicked)
 
     def proceed_button_clicked(self):
+        """
+        Deletes the file record and its encrypted copy, then refreshes the file and transaction tables
+        """
         hashed_name = self.query.get_hashed_name(self.accountID, fileID=self.fileID)
         self.query.delete_file(self.fileID)
         self.file_handle.delete_encrypted_file(self.accountID, hashed_name)
@@ -32,4 +41,7 @@ class DisclaimerWindow(QDialog):
         self.close()
 
     def cancel_button_clicked(self):
+        """
+        Closes the dialog without making any changes
+        """
         self.close()

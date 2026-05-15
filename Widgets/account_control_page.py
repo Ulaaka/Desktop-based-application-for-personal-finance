@@ -5,6 +5,9 @@ from Widgets.deletion_disclaimer_window import DeleteDisclaimerWindow
 from db_queries import QueryProcessor
 
 class AccountControlPage(QWidget):
+    """
+    Handles the account control page - allows the user to view, edit, and delete an account
+    """
     def __init__(self, current_account, parent):
         super().__init__(parent)
         self.current_account = current_account
@@ -17,6 +20,9 @@ class AccountControlPage(QWidget):
         self.account_control_signals_connect()
 
     def account_control_signals_connect(self):
+        """
+        Sets up the account page widgets, currency search completer, and button signals
+        """
         parent_window = self._parent
 
         parent_window.ui.stackedWidget.setCurrentWidget(parent_window.ui.account_page)
@@ -31,6 +37,9 @@ class AccountControlPage(QWidget):
         parent_window.ui.delete_account.clicked.connect(self.delete_acc)
 
     def show_account_control_page(self):
+        """
+        Loads and displays the current account details including type, currency, and dates
+        """
         parent_window = self._parent
         parent_window.ui.account_name_change_line.setText(self.current_account)
         query = QueryProcessor()
@@ -49,6 +58,11 @@ class AccountControlPage(QWidget):
         self.activate(False)
 
     def activate(self, flag):
+        """
+        Toggles the account fields between editable and read-only
+        Button text switches between 'Edit' and 'Save' accordingly
+        :param flag: True to enable editing, False to disable
+        """
         parent_window = self._parent
         parent_window.ui.account_name_change_line.setEnabled(flag)
         parent_window.ui.account_type_combo.setEnabled(flag)
@@ -61,6 +75,10 @@ class AccountControlPage(QWidget):
             self.set_fields_border()
 
     def set_fields_border(self, activate=False):
+        """
+        Updates the border colour of the editable fields
+        Blue when in edit mode, black when in view mode
+        """
         parent_window = self._parent
         color = "black"
         if activate:
@@ -70,16 +88,26 @@ class AccountControlPage(QWidget):
         parent_window.ui.account_currency_change_combo.setStyleSheet(f"border: 2px solid {color}")
 
     def delete_acc(self):
+        """
+        Opens the delete confirmation dialog for the current account
+        """
         disclaimer_window = DeleteDisclaimerWindow(self)
         disclaimer_window.show()
 
     def objective_toggler(self):
+        """
+        Toggles between edit and view mode
+        Saves changes when switching back to view mode
+        """
         self.objective = 1 - self.objective
         if (self.objective == 0):
             self.get_answer()
         self.manage_change_account()
 
     def manage_change_account(self):
+        """
+        Activates or deactivates the fields based on the current objective state
+        """
         if (self.objective == 1):
             flag = True
         else:
@@ -87,6 +115,10 @@ class AccountControlPage(QWidget):
         self.activate(flag)
 
     def get_answer(self):
+        """
+        Reads the edited field values and updates the account in the database
+        Refreshes the account control page after saving
+        """
         parent_window = self._parent
         account_name = parent_window.ui.account_name_change_line.text()
         account_type = parent_window.ui.account_type_combo.currentText()

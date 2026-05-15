@@ -124,6 +124,7 @@ class FileHandling():
         print statements are captured in a window for the user to see the loading of the files
         Deletes and recreates the submission folder once the files processed
         """
+
         crypto = CryptoHelper()
         dir = os.listdir(config('FOLDER_PATH'))
         parsed_count = 0

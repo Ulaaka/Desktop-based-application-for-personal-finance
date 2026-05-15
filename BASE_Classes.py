@@ -15,7 +15,6 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from db_connection import Database
 from db_queries import QueryProcessor
 
-#from Crypto.Hash import SHA256
 class ParsingHelper:
 
     """
@@ -31,9 +30,14 @@ class ParsingHelper:
         Each nested list of the instance variable holds possible variation of the column name to be extracted
         The ordering of the nested lists dictates the final ordering of the dataframe columns
         """
-        self.expecting = [["Date"], ["Type" , "Category"], [ "Details", "Description", "Reference", "Narrative"], 
+        self.expecting = [
+            ["Date"], 
+            ["Type" , "Category"], 
+            [ "Details", "Description", "Reference", "Narrative"], 
             ["Money Out", "Paid Out", "Debit" "Debit Amount", "Withdrawal"], 
-            ["Money In", "Paid In", "Credit", "Credit Amount", "Received", "Deposit"], ["Balance"]]
+            ["Money In", "Paid In", "Credit", "Credit Amount", "Received", "Deposit"], 
+            ["Balance"]
+        ]
 
 
         self.card = {'DEB', ')))', 'VIS', 'Card payment', 'Debit Card Transaction', 'DD'}
@@ -140,7 +144,7 @@ class ParsingHelper:
         Inspired from:
         https://www.geeksforgeeks.org/python/how-to-do-fuzzy-matching-on-pandas-dataframe-column-using-python/
 
-        :returns: ratio_score, target column names of the file
+        :returns: matched column names of the file, and their indices
         """
         mat1 = [None]*len(self.expecting)
         used = set()
@@ -377,8 +381,8 @@ class CryptoHelper:
         :return: wrapping key
         """
         password = password.encode()
-        hashed = pbkdf2_hmac("sha256", password, salt, 10000, dklen=32)
-        return base64.urlsafe_b64encode(hashed)
+        key = pbkdf2_hmac("sha256", password, salt, 10000, dklen=32)
+        return base64.urlsafe_b64encode(key)
 
 
     def encrypt(self, save_folder, folder_path, filename, key, accountID, size_file, file_type):

@@ -9,6 +9,9 @@ from db_queries import QueryProcessor
 
 
 class ProfilePage(QWidget):
+    """
+    Handles the profile page - shows user info and account list
+    """
     def __init__(self, current_account, parent):
         super().__init__(parent)
         self.current_account = current_account
@@ -21,11 +24,18 @@ class ProfilePage(QWidget):
         self.show_profile_page()
 
     def profile_signals_connect(self):
+        """
+        Connect the edit buttons to their functions
+        """
         parent_window = self._parent
         parent_window.ui.username_change_button.clicked.connect(self.change_username)
         parent_window.ui.email_change_button.clicked.connect(self.change_user_mail)
 
     def show_profile_page(self):
+        """
+        Loads and displays user info and their accounts list
+        Each account gets an Edit/View button next to it
+        """
         query = QueryProcessor()
         tree_model = QStandardItemModel()
         tree_model.setHorizontalHeaderLabels(["Account Name", ""])
@@ -58,6 +68,14 @@ class ProfilePage(QWidget):
         self.activate(False, "both")
 
     def activate(self, flag, type):
+        """
+        Toggles the edit state of the username or email fields
+        When active, the field is editable and the button says 'save'
+        When inactive, the field is locked and the button says 'edit'
+        :param flag: True to enable editing, False to disable
+        :param type: 'mail', 'name', or 'both'
+        """
+
         parent_window = self._parent
         dictionary = {
             "mail": [parent_window.ui.email_change_value, parent_window.ui.email_change_button],
@@ -91,6 +109,11 @@ class ProfilePage(QWidget):
 
 
     def change_user_mail(self):
+        """
+        Toggles username edit mode
+        On save, updates the username in the db and refreshes the profile page
+        """
+
         query = QueryProcessor()
         parent_window = self._parent
         state = self.mail_button_state
@@ -114,6 +137,11 @@ class ProfilePage(QWidget):
             self.show_profile_page()
 
     def navigate_to_account_control(self, name):
+        """
+        Opens the account control page for the selected account
+        :param name: the account name selected by the user
+        """
+
         query = QueryProcessor()
         parent_window = self._parent
         accountID = query.get_accountID(name, self.userID)
@@ -122,6 +150,9 @@ class ProfilePage(QWidget):
         parent_window.account_control_manager.show_account_control_page()
 
     def capture_result(self):
+        """
+        Called after email verification succeeds, enables the email field for editing
+        """
         self.activate(self.mail_button_state, "mail")
 
 

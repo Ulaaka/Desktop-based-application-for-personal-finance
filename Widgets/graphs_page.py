@@ -9,6 +9,9 @@ from Widgets.create_graphs import CreateGraph
 from db_queries import QueryProcessor
 from datetime import datetime
 class GraphPage():
+    """
+    Handles the graph page - manages graph selection, filter widgets, and chart display
+    """
     def __init__(self, parent):
         self._parent = parent
         self.active_buttons = []
@@ -23,6 +26,7 @@ class GraphPage():
         self.scroll_layout = parent.ui.scrollAreaWidgetContents.layout()
         self.CreateGraph = CreateGraph(parent, self.active_filters, self.account_currency)
 
+        # maps each graph type to its required filter widgets
         self.button_to_filers_dic = {
             "Summary" : [{
                 "name" : "Transaction Type",
@@ -124,6 +128,7 @@ class GraphPage():
             ]
         }
 
+        # maps each graph name to its creation method
         self.func_mapping = {
             "Summary" : self.create_summary_graph,
             "Weekly Trend" : self.create_weekly_graph,
@@ -136,12 +141,14 @@ class GraphPage():
             "Top Expense Sources": self.create_top_expense_sources
         }
 
+        # maps transaction type label to boolean for filtering
         self.transfer_toggle_dic = {
             "Income" : True,
             "Expense": False,
             "All": None
         }
 
+        # maps mode selection to min/max flags
         self.max_toggle_dic = {
             False: {
                 "Highest" : False,
@@ -156,6 +163,10 @@ class GraphPage():
         self.show_graph(self.graph_name)
 
     def get_accounts_names(self):
+        """
+        Returns account name list for the current user
+        Current account is placed first, 'All' option appended at the end
+        """
         parent_window = self._parent
         account_names = self.query.compute_account_options(parent_window.userID)
         if not account_names:
@@ -169,6 +180,9 @@ class GraphPage():
         return new_list
 
     def stats_signals_connect(self):
+        """
+        Sets up the graph page signals and populates the graph selection buttons
+        """
         parent_window = self._parent
         parent_window.ui.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         parent_window.ui.download_chart_button.clicked.connect(self.download_graph)
@@ -192,20 +206,33 @@ class GraphPage():
         parent_window.ui.expand_button.clicked.connect(self.expand_button_clicked)
 
     def graph_label_clicked(self, event):
+        """
+        Hides the graph sidebar and shows the expand button when the label is clicked
+        """
         self._parent.ui.frame.setVisible(False)
         self._parent.ui.expand_button.setVisible(True)
 
     def expand_button_clicked(self):
+        """
+        sShows the graph sidebar when the expand button is clicked
+        """
         self._parent.ui.frame.setVisible(True)
         self._parent.ui.expand_button.setVisible(False)
 
     def show_graph(self, graph):
+        """
+        Updates the active graph name, refreshes filters and redraws the chart
+        :param graph: name of the graph to display
+        """
         self.graph_name = graph
         self.update_filters(graph)
         self.update_graph()
 
-    #Source - https://stackoverflow.com/a/70248114
     def wipe_out_layout(self, layout):
+        """
+        Removes all widgets and items from the given layout
+        :param layout: the layout to clear
+        """
         for i in reversed(range(layout.count())):
             if layout.itemAt(i).widget():
                 layout.itemAt(i).widget().setParent(None)
@@ -213,6 +240,10 @@ class GraphPage():
                 layout.removeItem(layout.itemAt(i))
 
     def update_filters(self, graph_name):
+        """
+        Clears existing filter widgets and loads the right ones for the selected graph
+        :param graph_name: name of the selected graph
+        """
         self.wipe_out_layout(self.widget_layout)
 
         if graph_name in ["Weekly Trend", "Monthly Trend", "Yearly Trend"]:
@@ -222,6 +253,9 @@ class GraphPage():
             self.widget_layout.addWidget(self.create_filter(widget_desc))
 
     def update_graph(self):
+        """
+        Clears the chart area and shows the currently selected graph
+        """
         parent_window = self._parent
         chart_layout = parent_window.ui.charts_widget.layout()
         self.wipe_out_layout(chart_layout)
@@ -240,6 +274,11 @@ class GraphPage():
 
 
     def create_filter(self, widget_desc):
+        """
+        Creates a single filter widget (comboBox or dateEdit) based on the description
+        Connects it to update_graph so any change triggers a redraw
+        :param widget_desc: dictionary describing the filter name, type, and values
+        """
         widget = QWidget()
         vertical = QVBoxLayout(widget)
         vertical.addWidget(QLabel(widget_desc["name"]))
@@ -270,6 +309,9 @@ class GraphPage():
         return widget
 
     def download_graph(self):
+        """
+        Saves the currently displayed chart as a PNG to the downloads folder
+        """
         filename = f"{self._parent.account_name}_{self.graph_name}_{self.current_date}.png"
 
         self.set_graph_view.repaint()
