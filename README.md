@@ -14,7 +14,7 @@ cp .env.example .env
 - Set up the database
 mysql -u root -p < database_creation_query.sql
 
-5. Run the app
+- Run the application
 python src/main.py
 
 Features:
