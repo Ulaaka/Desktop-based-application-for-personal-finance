@@ -4,17 +4,17 @@ A personal finance app that reads the bank statements and turns them into clear,
 
 Setting up:
 
-- Install the dependencies
+- Install the dependencies:
 pip install -r requirements.txt
 
-- Set up the environment variables
-- Open .env and fill in the values.
+- Set up the environment variables:
+- Open .env and fill in the values:
 cp .env.example .env
 
-- Set up the database
+- Set up the database:
 mysql -u root -p < database_creation_query.sql
 
-- Run the application
+- Run the application:
 python src/main.py
 
 Features:
