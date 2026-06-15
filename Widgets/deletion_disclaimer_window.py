@@ -4,6 +4,10 @@ from generated_files.disclaimer_generated import Ui_Disclaimer
 from db_queries import QueryProcessor
 
 class DeleteDisclaimerWindow(QDialog):
+    """
+    Confirmation dialog shown before deleting an account
+    Warns the user that related transactions and files will also be removed
+    """
     def __init__(self, parent):
         super().__init__(parent)
         self.ui = Ui_Disclaimer()
@@ -16,11 +20,18 @@ class DeleteDisclaimerWindow(QDialog):
         self.signal_connect()
 
     def signal_connect(self):
+        """
+        Sets the warning message and connects proceed and cancel buttons
+        """
         self.ui.disclaimer_label.setText("Deleting the account will result in the permanent removal of related transactions and files")
         self.ui.proceed_button.clicked.connect(self.proceed_button_clicked)
         self.ui.cancel_button.clicked.connect(self.cancel_button_clicked)
 
     def proceed_button_clicked(self):
+        """
+        Deletes the account and switches to the next available account
+        If no accounts remain, resets the selection to default
+        """
         main_window = self._parent.parent()
         main_window.ui.stackedWidget.setCurrentWidget(main_window.ui.home_page)
         options = self.query.compute_account_options(self.userID)
@@ -37,4 +48,7 @@ class DeleteDisclaimerWindow(QDialog):
         self.close()
 
     def cancel_button_clicked(self):
+        """
+        Closes the dialog without making any changes
+        """
         self.close()
