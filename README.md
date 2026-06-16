@@ -159,6 +159,15 @@ The transaction table, including filtered views, can be exported in CSV or PDF f
 
 You can see the downloaded files in your downloads folder.
 
+- Exported Transaction Table in CSV format.
+[View CSV](./Export_exmaples/lloyds_financial_report_2026-06-16.csv)
+
+- Exported Transaction Table in PDF format.
+[View report](./Export_exmaples/lloyds_financial_report_2026-06-16.pdf)
+
+- Exported Graph in PDF format (example).
+![Top Expense Sources](./Export_exmaples/lloyds_Top%20Expense%20Sources_2026-06-16.png)
+
 #### Categorisation
 
 You can define and customise transaction categories either through the Category subpage in Settings, or directly from the transaction table. 
