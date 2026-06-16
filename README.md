@@ -54,7 +54,7 @@ python src/main.py
 
 ### Some explanations of the development:
 
-The UI was designed using Qt Designer. Each window and its widgets were created separately and saved as .ui files, which were then converted into .py files using pyuic5.
+The UI was designed using Qt Designer. Each window and its widgets were created separately and saved as  `.ui` files, which were then converted into  `.py` files using pyuic5.
 
 These Python files were imported into separate classes where the behaviour of the widgets was defined and signals were connected to their corresponding handler functions. For example, the account selection window logic is handled in the AccountSelectionWindow class inside account_selection_window.py.
 
