@@ -33,7 +33,7 @@ python src/main.py
 
 ### Features
 
-- Supports PDF and CSV bank statements from multiple UK banks (Lloyds, HSBC, Monzo, Santander, etc.)
+- Supports PDF and CSV bank statements from multiple UK banks (Lloyds, HSBC, Monzo, Santander, and it should theoretically for other banks too)
 - Automatically standardises transaction data across different bank formats
 - Searchable and filterable transaction table
 - Smart auto-categorisation that updates as changes are made
