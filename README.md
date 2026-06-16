@@ -2,7 +2,7 @@
 
 ### Overview
 
-A personal finance app that reads bank statements that are in different formats and structures from multiple banks using and turns them into clear, interactive charts and reports, helping you better understand your financial patterns.
+A personal finance app that reads bank statements that are in different formats and structures from multiple banks and turns them into clear, interactive charts and reports, helping you better understand your financial patterns.
 
 ### Setup
 
