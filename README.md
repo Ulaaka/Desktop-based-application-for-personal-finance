@@ -147,6 +147,10 @@ You can remove transactions either by deleting the associated file, which remove
 
 <img width="1064" height="630" alt="Screenshot 2026-06-16 at 15 11 24" src="https://github.com/user-attachments/assets/a8aea369-631f-4b98-a52a-81743193084b" />
 
+Transactions in the  table (also category table) can be searched and filtered by search on top.
+<img width="1067" height="627" alt="Screenshot 2026-06-16 at 18 07 51" src="https://github.com/user-attachments/assets/b37d2629-6ad0-4bf9-b7e8-ceb7e2a454db" />
+
+
 #### Graphs
 
 There are various options of graphs available for you to understand your spending pattern, each  having their unique filters.
@@ -166,13 +170,13 @@ The transaction table, including filtered views, can be exported in CSV or PDF f
 You can see the downloaded files in your downloads folder.
 
 - Exported Transaction Table in CSV format.
-[View CSV](./Export_exmaples/lloyds_financial_report_2026-06-16.csv)
+[View CSV](./export_examples/lloyds_financial_report_2026-06-16.csv)
 
 - Exported Transaction Table in PDF format.
-[View PDF](./Export_exmaples/lloyds_financial_report_2026-06-16.pdf)
+[View PDF](./export_examples/lloyds_financial_report_2026-06-16.pdf)
 
 - Exported Graph in PNG format (example).
-![Top Expense Sources](./Export_exmaples/lloyds_Top%20Expense%20Sources_2026-06-16.png)
+![Top Expense Sources](./export_examples/lloyds_Top%20Expense%20Sources_2026-06-16.png)
 
 #### Categorisation
 
